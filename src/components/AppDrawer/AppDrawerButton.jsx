@@ -1,12 +1,4 @@
-import {
-  alpha,
-  Box,
-  Button,
-  Icon,
-  Tooltip,
-  Typography,
-  useTheme,
-} from '@mui/material'
+import { alpha, Box, Button, Icon, Tooltip, Typography } from '@mui/material'
 import classNames from 'classnames'
 
 export default function AppDrawerButton({
@@ -20,7 +12,6 @@ export default function AppDrawerButton({
   active,
   component,
 }) {
-  const theme = useTheme()
   return (
     <Tooltip
       placement='right'
@@ -37,10 +28,11 @@ export default function AppDrawerButton({
         sx={
           active
             ? {
-                background: alpha(
-                  theme.palette.primary.main,
-                  theme.palette.action.selectedOpacity
-                ),
+                background: (theme) =>
+                  alpha(
+                    theme.palette.primary.main,
+                    theme.palette.action.selectedOpacity
+                  ),
               }
             : {}
         }

@@ -23,7 +23,7 @@ export default async function Layout({ children, params }) {
         selectedAcademicYear={selectedAcademicYear}
         userName={user?.name}
       />
-      <main className='w-full p-4'>{children}</main>
+      <main className='min-w-0 w-full p-4'>{children}</main>
     </Box>
   )
 }

@@ -89,7 +89,7 @@ export default function AppDrawer({
       slotProps={{
         paper: {
           elevation: 1,
-          className: classNames('h-screen max-h-screen relative', {
+          className: classNames('h-screen max-h-screen sticky', {
             'w-3xs': isDrawerExpanded,
             'w-16': !isDrawerExpanded,
           }),
