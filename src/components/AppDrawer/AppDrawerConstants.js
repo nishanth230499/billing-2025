@@ -1,0 +1,130 @@
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+import BusinessIcon from '@mui/icons-material/Business'
+import MenuBookIcon from '@mui/icons-material/MenuBook'
+import { FaFileInvoice } from 'react-icons/fa'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import { SiBookstack } from 'react-icons/si'
+import { LuPackagePlus } from 'react-icons/lu'
+import { FaRegListAlt } from 'react-icons/fa'
+import BackspaceIcon from '@mui/icons-material/Backspace'
+import { IoDocumentsOutline } from 'react-icons/io5'
+import ReceiptIcon from '@mui/icons-material/Receipt'
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
+import { FaSchoolFlag } from 'react-icons/fa6'
+import GroupIcon from '@mui/icons-material/Group'
+
+export const appDrawerItems = [
+  {
+    key: 'school',
+    icon: FaSchoolFlag,
+    name: 'School Pages',
+    menuItems: [
+      {
+        key: 'schools',
+        href: (academicYear) => `/${academicYear}`,
+        icon: FaSchoolFlag,
+        name: 'Schools',
+      },
+      {
+        key: 'create-sales-order',
+        href: '/',
+        icon: PlaylistAddIcon,
+        name: 'Create Sales Order',
+      },
+      {
+        key: 'packing-note',
+        href: '/',
+        icon: ContentPasteIcon,
+        name: 'Packing Note',
+      },
+      {
+        key: 'create-packed-list',
+        href: '/',
+        icon: LuPackagePlus,
+        name: 'Create Packed List',
+      },
+      {
+        key: 'create-invoice',
+        href: '/',
+        icon: FaFileInvoice,
+        name: 'Create Invoice',
+      },
+      {
+        key: 'set-pack',
+        href: '/',
+        icon: SiBookstack,
+        name: 'Set Pack',
+      },
+      {
+        key: 'sales-consolidate',
+        href: '/',
+        icon: FaRegListAlt,
+        name: 'Sales Consolidate',
+      },
+      {
+        key: 'returns-entry',
+        href: '/',
+        icon: BackspaceIcon,
+        name: 'Returns Entry',
+      },
+      {
+        key: 'receipt-entry',
+        href: '/',
+        icon: ReceiptIcon,
+        name: 'Receipt Entry',
+      },
+      {
+        key: 'statement',
+        href: '/',
+        icon: RequestQuoteIcon,
+        name: 'Statement',
+      },
+      {
+        key: 'list-of-docs',
+        href: '/',
+        icon: IoDocumentsOutline,
+        name: 'List of Documents',
+      },
+    ],
+  },
+  {
+    key: 'company',
+    icon: BusinessIcon,
+    name: 'Company Pages',
+    menuItems: [
+      {
+        key: 'companys',
+        href: '/',
+        icon: BusinessIcon,
+        name: 'Companys',
+      },
+      {
+        key: 'create-purchase-order',
+        href: '/',
+        icon: PlaylistAddIcon,
+        name: 'Create Purchase Order',
+      },
+      {
+        key: 'create-purchase-returns',
+        href: '/',
+        icon: BackspaceIcon,
+        name: 'Create Purchase Returns',
+      },
+    ],
+  },
+  {
+    key: 'books',
+    icon: MenuBookIcon,
+    name: 'Books',
+    href: '/',
+  },
+]
+
+export const adminDrawerItems = [
+  {
+    key: 'users',
+    icon: GroupIcon,
+    name: 'Users',
+    href: (academicYear) => `/${academicYear}/users`,
+  },
+]
