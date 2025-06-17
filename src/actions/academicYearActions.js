@@ -6,8 +6,7 @@ import AcademicYear from '@/models/AcademicYear'
 
 async function getAcademicYears() {
   await connectDB()
-  console.log('academic years requested')
-
+  console.log(' * Page Reloaded')
   const academicYears = await AcademicYear.find({}, { _id: 0 })
     .sort({ year: 1 })
     .lean()

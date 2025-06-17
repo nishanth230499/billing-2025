@@ -1,26 +1,31 @@
 'use client'
 
-import { MOBILE_MAX_WIDTH, TABLET_MAX_WIDTH } from '@/constants'
+import { TABLET_MAX_WIDTH } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-  Slide,
+  IconButton,
   SwipeableDrawer,
   useMediaQuery,
 } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import { redirect } from 'next/navigation'
-import { forwardRef, useMemo } from 'react'
+import { useMemo } from 'react'
 
-const Transition = forwardRef(function Transition(props, ref) {
-  return <Slide direction='up' ref={ref} {...props} />
-})
-
-export default function Modal({ children, openSearchParamKey, title }) {
+export default function Modal({
+  children,
+  openSearchParamKey,
+  title,
+  maxWidth = 'md',
+}) {
   const [searchParams, getURL] = useHandleSearchParams()
 
-  const open = useMemo(() => searchParams.get(openSearchParamKey) === 'true')
+  const openSearchParamValue = searchParams.get(openSearchParamKey)
+  const open = useMemo(
+    () => Boolean(openSearchParamValue) && openSearchParamValue !== 'false'
+  )
 
   const isMobileOrTabletWidth = useMediaQuery(`(max-width:${TABLET_MAX_WIDTH})`)
 
@@ -48,12 +53,17 @@ export default function Modal({ children, openSearchParamKey, title }) {
   }
   return (
     <Dialog
+      fullWidth
+      maxWidth={maxWidth}
       open={open}
-      onClose={() => redirect(getURL({ [openSearchParamKey]: null }))}
-      slots={{
-        transition: Transition,
-      }}>
+      onClose={() => redirect(getURL({ [openSearchParamKey]: null }))}>
       <DialogTitle>{title}</DialogTitle>
+      <IconButton
+        aria-label='close'
+        onClick={() => redirect(getURL({ [openSearchParamKey]: null }))}
+        className='absolute top-2 right-2'>
+        <CloseIcon />
+      </IconButton>
       <DialogContent>{children}</DialogContent>
     </Dialog>
   )

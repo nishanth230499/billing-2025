@@ -11,11 +11,10 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   useMediaQuery,
 } from '@mui/material'
-import { DEFAULT_PAGE_SIZE, MOBILE_MAX_WIDTH } from '@/constants'
+import { MOBILE_MAX_WIDTH } from '@/constants'
 import Pagination from './Pagination'
 
 export default function DataTable({
