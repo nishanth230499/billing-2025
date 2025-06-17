@@ -40,7 +40,7 @@ export async function loginAction(req) {
       }
     }
   }
-
+  throw new Error('Invalid email or password')
   return {
     success: false,
     errors: [{ message: 'Invalid email or password!' }],
