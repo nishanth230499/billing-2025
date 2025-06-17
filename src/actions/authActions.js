@@ -1,12 +1,13 @@
 'use server'
 
-import { z } from 'zod'
-import { createSession, deleteSession } from '@/lib/session'
-import { emailSchema, loginPasswordSchema } from '@/lib/schemas'
-import { cookies, headers } from 'next/headers'
-import User from '@/models/User'
 import bcrypt from 'bcryptjs'
+import { cookies, headers } from 'next/headers'
+import { z } from 'zod'
+
 import connectDB from '@/lib/connectDB'
+import { emailSchema, loginPasswordSchema } from '@/lib/schemas'
+import { createSession, deleteSession } from '@/lib/session'
+import User from '@/models/User'
 
 const loginSchema = z.object({
   email: emailSchema,

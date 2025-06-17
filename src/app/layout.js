@@ -1,10 +1,12 @@
 import './globals.css'
+
+import { CssBaseline, InitColorSchemeScript } from '@mui/material'
+import { ThemeProvider } from '@mui/material/styles'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
 import { Roboto } from 'next/font/google'
-import { ThemeProvider } from '@mui/material/styles'
+
 import theme from '../theme'
 import ClientProviders from './ClientProviders'
-import { CssBaseline, InitColorSchemeScript } from '@mui/material'
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],

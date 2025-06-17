@@ -1,7 +1,8 @@
 'use server'
 
-import { getDefaultAcademicYearAction } from '@/actions/academicYearActions'
 import { redirect } from 'next/navigation'
+
+import { getDefaultAcademicYearAction } from '@/actions/academicYearActions'
 
 export default async function Page() {
   const defaultAcademicYear = await getDefaultAcademicYearAction()

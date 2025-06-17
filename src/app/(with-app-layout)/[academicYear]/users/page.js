@@ -1,11 +1,13 @@
 'use server'
 
-import React, { Suspense } from 'react'
-import TableSkeleton from '@/components/TableSkeleton'
 import { Box, Button, Typography } from '@mui/material'
 import Link from 'next/link'
+import React, { Suspense } from 'react'
+
 import Modal from '@/components/common/Modal'
+import TableSkeleton from '@/components/TableSkeleton'
 import getURLWithSearchParams from '@/lib/getURLWithSearchParams'
+
 import UsersTable from './UsersTable'
 
 export default async function Page({ searchParams: searchParamsPromise }) {

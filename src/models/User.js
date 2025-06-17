@@ -1,5 +1,6 @@
-import { emailRegex } from '@/lib/regex'
 import mongoose from 'mongoose'
+
+import { emailRegex } from '@/lib/regex'
 
 const userSchema = mongoose.Schema({
   emailId: {

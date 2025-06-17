@@ -1,7 +1,8 @@
 'use client'
 
-import { SOMETHING_WENT_WRONG } from '@/constants'
 import { useCallback, useState } from 'react'
+
+import { SOMETHING_WENT_WRONG } from '@/constants'
 
 export default function useServerAction(action) {
   // TODO: loading fails if multiple requests are sent simultaneously.

@@ -1,8 +1,5 @@
 'use client'
 
-import { loginAction } from '@/actions/authActions'
-import useServerAction from '@/hooks/useServerAction'
-import { emailRegex } from '@/lib/regex'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import {
@@ -21,6 +18,10 @@ import {
 import { redirect } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import React, { useCallback, useState } from 'react'
+
+import { loginAction } from '@/actions/authActions'
+import useServerAction from '@/hooks/useServerAction'
+import { emailRegex } from '@/lib/regex'
 
 export default function Page() {
   const [email, setEmail] = useState('')

@@ -1,10 +1,11 @@
 'use server'
 
+import { Box } from '@mui/material'
+import { notFound } from 'next/navigation'
+
 import { getAcademicYearsAction } from '@/actions/academicYearActions'
 import { getLoggedinUserAction } from '@/actions/authActions'
 import AppDrawer from '@/components/AppDrawer'
-import { Box } from '@mui/material'
-import { notFound } from 'next/navigation'
 
 export default async function Layout({ children, params }) {
   const { academicYear: selectedAcademicYear } = await params

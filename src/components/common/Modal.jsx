@@ -40,7 +40,7 @@ export default function Modal({
         slotProps={{
           paper: {
             sx: {
-              height: '90%',
+              maxHeight: '90%',
               borderTopLeftRadius: 16,
               borderTopRightRadius: 16,
             },

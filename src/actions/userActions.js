@@ -1,9 +1,10 @@
+import { DEFAULT_PAGE_SIZE } from '@/constants'
 import connectDB from '@/lib/connectDB'
+import { getPaginatedData } from '@/lib/pagination'
 import { withAuth } from '@/lib/withAuth'
 import User from '@/models/User'
+
 import { getLoggedinUserAction } from './authActions'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
-import { getPaginatedData } from '@/lib/pagination'
 
 async function getUsers(_, pageNumber = 0, pageSize = DEFAULT_PAGE_SIZE) {
   await connectDB()
