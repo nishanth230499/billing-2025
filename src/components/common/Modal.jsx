@@ -1,40 +1,49 @@
 'use client'
 
-import { TABLET_MAX_WIDTH } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import {
   Dialog,
-  DialogContent,
   DialogTitle,
   IconButton,
   SwipeableDrawer,
   useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { redirect } from 'next/navigation'
-import { useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { useCallback, useMemo } from 'react'
 
 export default function Modal({
   children,
   openSearchParamKey,
   title,
   maxWidth = 'md',
+  goBackOnClose = true,
 }) {
-  const [searchParams, getURL] = useHandleSearchParams()
+  const router = useRouter()
+  const { searchParams, getURL } = useHandleSearchParams()
 
   const openSearchParamValue = searchParams.get(openSearchParamKey)
   const open = useMemo(
     () => Boolean(openSearchParamValue) && openSearchParamValue !== 'false'
   )
 
-  const isMobileOrTabletWidth = useMediaQuery(`(max-width:${TABLET_MAX_WIDTH})`)
+  const theme = useTheme()
+  const isMobileWidth = useMediaQuery(theme.breakpoints.down('sm'))
 
-  if (isMobileOrTabletWidth) {
+  const handleClose = useCallback(
+    goBackOnClose
+      ? router.back
+      : () => router.redirect(getURL({ [openSearchParamKey]: null })),
+    [goBackOnClose, router, getURL, openSearchParamKey]
+  )
+
+  if (isMobileWidth) {
     return (
       <SwipeableDrawer
         anchor='bottom'
         open={open}
-        onClose={() => redirect(getURL({ [openSearchParamKey]: null }))}
+        onClose={handleClose}
         disableSwipeToOpen
         sx={{ zIndex: 'modal' }}
         slotProps={{
@@ -47,24 +56,20 @@ export default function Modal({
           },
         }}>
         <DialogTitle>{title}</DialogTitle>
-        <DialogContent>{children}</DialogContent>
+        {children}
       </SwipeableDrawer>
     )
   }
   return (
-    <Dialog
-      fullWidth
-      maxWidth={maxWidth}
-      open={open}
-      onClose={() => redirect(getURL({ [openSearchParamKey]: null }))}>
-      <DialogTitle>{title}</DialogTitle>
+    <Dialog fullWidth maxWidth={maxWidth} open={open} onClose={handleClose}>
       <IconButton
         aria-label='close'
-        onClick={() => redirect(getURL({ [openSearchParamKey]: null }))}
+        onClick={handleClose}
         className='absolute top-2 right-2'>
         <CloseIcon />
       </IconButton>
-      <DialogContent>{children}</DialogContent>
+      <DialogTitle>{title}</DialogTitle>
+      {children}
     </Dialog>
   )
 }

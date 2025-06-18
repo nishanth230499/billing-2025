@@ -9,7 +9,8 @@ const usersTableColumns = {
   name: { label: 'Name' },
   emailId: { label: 'Email ID' },
   type: { label: 'Type' },
-  actions: { label: 'Actions' },
+  _active: { label: 'Active' },
+  _actions: { label: 'Actions' },
 }
 
 export default async function UsersTable({ searchParams }) {
@@ -25,7 +26,8 @@ export default async function UsersTable({ searchParams }) {
           user?._id,
           {
             ...user,
-            actions: (
+            _active: user?.active ? 'Yes' : 'No',
+            _actions: (
               <UsersTableActions user={user} searchParams={searchParams} />
             ),
           },

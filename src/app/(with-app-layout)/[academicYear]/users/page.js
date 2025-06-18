@@ -6,8 +6,11 @@ import React, { Suspense } from 'react'
 
 import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
+import { LOADING } from '@/constants'
 import getURLWithSearchParams from '@/lib/getURLWithSearchParams'
 
+import CreateOrEditUserForm from './CreateOrEditUserForm'
+import EditUserForm from './EditUserForm'
 import UsersTable from './UsersTable'
 
 export default async function Page({ searchParams: searchParamsPromise }) {
@@ -15,17 +18,23 @@ export default async function Page({ searchParams: searchParamsPromise }) {
 
   return (
     <>
-      <Box className='flex items-center justify-between mb-4'>
+      <Box className='flex items-center justify-between mb-4' id='test'>
         <Typography variant='h6'>Users</Typography>
         <Button
-          className='rounded-3xl px-4'
+          className='rounded-3xl'
           variant='outlined'
           href={await getURLWithSearchParams(searchParams, { create: true })}
           LinkComponent={Link}>
           Create new User
         </Button>
-        <Modal openSearchParamKey='create' title='Create User'></Modal>
-        <Modal openSearchParamKey='edit_user' title='Edit User'></Modal>
+        <Modal openSearchParamKey='create' title='Create User'>
+          <CreateOrEditUserForm />
+        </Modal>
+        <Modal openSearchParamKey='edit_user' title='Edit User'>
+          <Suspense fallback={LOADING}>
+            <EditUserForm editingUserId={searchParams.edit_user} />
+          </Suspense>
+        </Modal>
         <Modal
           openSearchParamKey='reset_password_user'
           title='Reset Password'></Modal>

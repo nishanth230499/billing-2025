@@ -6,7 +6,7 @@ import { MenuItem, Select, TablePagination } from '@mui/material'
 import Link from 'next/link'
 
 export default function Pagination({ totalCount }) {
-  const [searchParams, getURL] = useHandleSearchParams()
+  const { searchParams, getURL } = useHandleSearchParams()
 
   const pageNumber = Number(searchParams.get('pageNumber')) || 0
   const pageSize = Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE
@@ -27,11 +27,13 @@ export default function Pagination({ totalCount }) {
             nextButton: {
               component: Link,
               href: getURL({ pageNumber: pageNumber + 1 }),
+              replace: true,
               onClick: null,
             },
             previousButton: {
               component: Link,
               href: getURL({ pageNumber: pageNumber - 1 }),
+              replace: true,
               onClick: null,
             },
           },
@@ -52,6 +54,7 @@ export default function Pagination({ totalCount }) {
                   {...child?.props}
                   href={getURL({ pageSize: child?.props?.value })}
                   component={Link}
+                  replace
                 />
               ))}
             </Select>

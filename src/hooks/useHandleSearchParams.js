@@ -22,5 +22,5 @@ export default function useHandleSearchParams() {
     [pathname, searchParams]
   )
 
-  return [searchParams, generateURL]
+  return { searchParams, getURL: generateURL }
 }

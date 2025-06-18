@@ -2,30 +2,15 @@
 
 import bcrypt from 'bcryptjs'
 import { cookies, headers } from 'next/headers'
-import { z } from 'zod'
 
 import connectDB from '@/lib/connectDB'
-import { emailSchema, loginPasswordSchema } from '@/lib/schemas'
 import { createSession, deleteSession } from '@/lib/session'
 import User from '@/models/User'
-
-const loginSchema = z.object({
-  email: emailSchema,
-  password: loginPasswordSchema,
-})
 
 export async function loginAction(req) {
   await connectDB()
 
-  const result = loginSchema.safeParse(req)
-  if (!result.success) {
-    return {
-      success: false,
-      errors: result.error.issues,
-    }
-  }
-
-  const { email, password } = result.data
+  const { email, password } = req
 
   const user = await User.findOne({ emailId: email })
 
@@ -43,7 +28,7 @@ export async function loginAction(req) {
   }
   return {
     success: false,
-    errors: [{ message: 'Invalid email or password!' }],
+    message: 'Invalid email or password!',
   }
 }
 

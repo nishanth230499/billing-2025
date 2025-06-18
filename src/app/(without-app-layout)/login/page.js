@@ -52,9 +52,7 @@ export default function Page() {
         enqueueSnackbar(res?.message, { variant: 'success' })
         redirect('/')
       } else {
-        res?.errors?.forEach(({ message }) =>
-          enqueueSnackbar(message, { variant: 'error' })
-        )
+        enqueueSnackbar(res?.message, { variant: 'error' })
       }
     },
     [email, login, password]

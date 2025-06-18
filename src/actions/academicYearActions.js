@@ -8,7 +8,9 @@ async function getAcademicYears() {
   await connectDB()
   console.log(' * Page Reloaded')
   const academicYears = await AcademicYear.find({}, { _id: 0 })
-    .sort({ year: 1 })
+    .sort({
+      year: 1,
+    })
     .lean()
 
   return academicYears

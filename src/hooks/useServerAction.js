@@ -19,9 +19,9 @@ export default function useServerAction(action) {
         if (e.digest)
           return {
             success: false,
-            errors: [`${SOMETHING_WENT_WRONG} Digest: ${e.digest}`],
+            message: `${SOMETHING_WENT_WRONG} Digest: ${e.digest}`,
           }
-        return { success: false, errors: [e.toString()] }
+        return { success: false, message: e.toString() }
       }
     },
     [action]

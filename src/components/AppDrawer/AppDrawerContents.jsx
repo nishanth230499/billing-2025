@@ -37,9 +37,7 @@ export default function AppDrawerContents({
       enqueueSnackbar(res?.message, { variant: 'success' })
       redirect('/login')
     } else {
-      res?.errors?.forEach(({ message }) =>
-        enqueueSnackbar(message, { variant: 'error' })
-      )
+      enqueueSnackbar(res?.message, { variant: 'error' })
     }
   }, [logout])
 
