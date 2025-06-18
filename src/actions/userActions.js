@@ -100,20 +100,16 @@ async function editUser(userId, userReq) {
     }
   }
 
-  const user = await User.findOne({ _id: userId }, { hashedPassword: 0 })
-  if (user) {
-    user.name = userReq?.name
-    user.type = userReq?.type
-    user.active = userReq?.active
-    await user.save()
-    return {
-      success: true,
-      message: 'User updated successfully!',
-    }
+  const userUpdateFields = {
+    name: userReq?.name,
+    type: userReq?.type,
+    active: userReq?.active,
   }
+  await User.updateOne({ _id: userId }, userUpdateFields)
+
   return {
-    success: false,
-    message: 'User ID not found',
+    success: true,
+    message: 'User updated successfully!',
   }
 }
 

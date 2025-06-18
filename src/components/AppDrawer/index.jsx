@@ -21,6 +21,7 @@ export default function AppDrawer({
   academicYears,
   selectedAcademicYear,
   userName,
+  userType,
 }) {
   const [isDrawerOpen, setisDrawerOpen] = useState(false)
   const [isMouseInsideDrawer, setIsMouseInsideDrawer] = useState(false)
@@ -56,6 +57,7 @@ export default function AppDrawer({
             academicYears={academicYears}
             selectedAcademicYear={selectedAcademicYear}
             userName={userName}
+            userType={userType}
           />
         </SwipeableDrawer>
         <Paper
@@ -143,6 +145,7 @@ export default function AppDrawer({
           academicYears={academicYears}
           selectedAcademicYear={selectedAcademicYear}
           userName={userName}
+          userType={userType}
         />
       </Box>
     </Drawer>

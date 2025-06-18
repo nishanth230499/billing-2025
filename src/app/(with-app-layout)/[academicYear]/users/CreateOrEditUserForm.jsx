@@ -6,6 +6,7 @@ import useServerAction from '@/hooks/useServerAction'
 import { emailRegex, passwordRegex } from '@/lib/regex'
 import { UserType } from '@/models/User'
 import {
+  Box,
   Button,
   DialogActions,
   DialogContent,
@@ -117,114 +118,117 @@ export default function CreateOrEditUserForm({ editingUser }) {
 
   return (
     <>
-      <DialogContent component='form' onSubmit={handleSubmit}>
-        <Grid container columnSpacing={2}>
-          <Grid size={{ xs: 12, sm: 6 }} alignSelf='center'>
-            {editingUser ? (
-              <Typography>
-                Email: <strong>{editingUser?.emailId}</strong>
-              </Typography>
-            ) : (
+      <DialogContent>
+        <Box component='form' noValidate onSubmit={handleSubmit}>
+          <input type='submit' hidden />
+          <Grid container columnSpacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }} alignSelf='center'>
+              {editingUser ? (
+                <Typography>
+                  Email: <strong>{editingUser?.emailId}</strong>
+                </Typography>
+              ) : (
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  label='Email'
+                  name='email'
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    setEmailError(!emailRegex.test(e.target.value))
+                  }}
+                  error={emailError}
+                />
+              )}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 margin='normal'
                 required
                 fullWidth
-                label='Email'
-                name='email'
-                value={email}
+                autoFocus
+                label='Name'
+                value={name}
                 onChange={(e) => {
-                  setEmail(e.target.value)
-                  setEmailError(!emailRegex.test(e.target.value))
+                  setName(e.target.value)
+                  setNameError(!e.target.value)
                 }}
-                error={emailError}
+                error={nameError}
               />
+            </Grid>
+            {!editingUser && (
+              <>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    label='Password'
+                    type='password'
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      setPasswordError(!passwordRegex.test(e.target.value))
+                    }}
+                    error={passwordError}
+                    helperText='Password must contain atleast 1 number, 1 small letter, 1 capital letter, 1 special character and must be 8 to 15 characters long.'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    margin='normal'
+                    required
+                    fullWidth
+                    label='Confirm Password'
+                    type='password'
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value)
+                      setConfirmPasswordTouched(true)
+                    }}
+                    error={confirmPasswordError}
+                    helperText='Passwords should match'
+                  />
+                </Grid>
+              </>
             )}
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              margin='normal'
-              required
-              fullWidth
-              autoFocus
-              label='Name'
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value)
-                setNameError(!e.target.value)
-              }}
-              error={nameError}
-            />
-          </Grid>
-          {!editingUser && (
-            <>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  margin='normal'
-                  required
-                  fullWidth
-                  label='Password'
-                  type='password'
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value)
-                    setPasswordError(!passwordRegex.test(e.target.value))
-                  }}
-                  error={passwordError}
-                  helperText='Password must contain atleast 1 number, 1 small letter, 1 capital letter, 1 special character and must be 8 to 15 characters long.'
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  margin='normal'
-                  required
-                  fullWidth
-                  label='Confirm Password'
-                  type='password'
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value)
-                    setConfirmPasswordTouched(true)
-                  }}
-                  error={confirmPasswordError}
-                  helperText='Passwords should match'
-                />
-              </Grid>
-            </>
-          )}
 
-          <Grid size={{ xs: 6 }}>
-            <TextField
-              margin='normal'
-              required
-              fullWidth
-              label='User Type'
-              select
-              value={userType}
-              onChange={(e) => {
-                setUserType(e.target.value)
-                setUserTypeError(e.target.value === '')
-              }}
-              error={userTypeError}>
-              {Object.values(UserType).map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Grid size={{ xs: 6 }}>
+              <TextField
+                margin='normal'
+                required
+                fullWidth
+                label='User Type'
+                select
+                value={userType}
+                onChange={(e) => {
+                  setUserType(e.target.value)
+                  setUserTypeError(e.target.value === '')
+                }}
+                error={userTypeError}>
+                {Object.values(UserType).map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 6 }} alignSelf='center'>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={active}
+                    onChange={(e) => setActive(e.target.checked)}
+                  />
+                }
+                label='Active'
+                labelPlacement='start'
+              />
+            </Grid>
           </Grid>
-          <Grid size={{ xs: 6 }} alignSelf='center'>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={active}
-                  onChange={(e) => setActive(e.target.checked)}
-                />
-              }
-              label='Active'
-              labelPlacement='start'
-            />
-          </Grid>
-        </Grid>
+        </Box>
       </DialogContent>
       <DialogActions className='px-6 pb-5'>
         <Button onClick={() => router.back()}>Cancel</Button>

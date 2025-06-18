@@ -20,12 +20,14 @@ import Link from 'next/link'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import MonitorIcon from '@mui/icons-material/Monitor'
+import { UserType } from '@/models/User'
 
 export default function AppDrawerContents({
   isDrawerExpanded,
   academicYears,
   selectedAcademicYear,
   userName,
+  userType,
 }) {
   const pathname = usePathname()
 
@@ -155,10 +157,14 @@ export default function AppDrawerContents({
           {renderDrawerItems(appDrawerItems)}
         </Box>
         <Divider />
-        <Box className={classNames('py-3 pr-3 flex flex-col items-start')}>
-          {renderDrawerItems(adminDrawerItems)}
-        </Box>
-        <Divider />
+        {userType === UserType.ADMIN && (
+          <>
+            <Box className={classNames('py-3 pr-3 flex flex-col items-start')}>
+              {renderDrawerItems(adminDrawerItems)}
+            </Box>
+            <Divider />
+          </>
+        )}
       </Box>
       <Divider />
       <Box className={classNames('py-3 pr-3 flex flex-col items-start')}>
