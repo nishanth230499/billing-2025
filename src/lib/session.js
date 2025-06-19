@@ -1,25 +1,36 @@
 'use server'
 
 import { jwtVerify, SignJWT } from 'jose'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 
-import NoAuthError from './NoAuth'
+import User from '@/models/User'
+
+import connectDB from './connectDB'
+import getLoggedinUserId from './getLoggedinUserId'
 
 const secretKey = process.env.SESSION_SECRET
 const encodedKey = new TextEncoder().encode(secretKey)
 
-export async function createSession(cookieStore, userId) {
-  const accessTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000)
+export async function createSession(
+  cookieStore,
+  userId,
+  loggedinAt = Date.now()
+) {
+  const currentTime = Date.now()
+  // TODO: Use time delta from env
+  const accessTokenExpiresAt = new Date(currentTime + 60 * 60 * 1000)
   const refreshTokenExpiresAt = new Date(
-    Date.now() + 2 * 7 * 24 * 60 * 60 * 1000
+    currentTime + 2 * 7 * 24 * 60 * 60 * 1000
   )
   const accessToken = await encrypt({
     userId,
+    loggedinAt,
     expiresAt: accessTokenExpiresAt,
     type: 'access',
   })
   const refreshToken = await encrypt({
     userId,
+    loggedinAt,
     expiresAt: refreshTokenExpiresAt,
     type: 'refresh',
   })
@@ -44,18 +55,39 @@ export async function verifySession() {
 
     try {
       const accessToken = cookieStore.get('accessToken')?.value
-      const { userId } = await decrypt(accessToken)
-      return { userId, verifyType: 'accessToken' }
+      const { userId, loggedinAt } = await decrypt(accessToken)
+      return { userId, verifyType: 'accessToken', loggedinAt }
       // eslint-disable-next-line no-unused-vars
     } catch (e) {
       const refreshToken = cookieStore.get('refreshToken')?.value
-      const { userId } = await decrypt(refreshToken)
-      return { userId, verifyType: 'refreshToken' }
+      const { userId, loggedinAt } = await decrypt(refreshToken)
+      return { userId, verifyType: 'refreshToken', loggedinAt }
     }
     // eslint-disable-next-line no-unused-vars
   } catch (e) {
-    throw new NoAuthError()
+    throw new Error('Not Authenticated! Please login!')
   }
+}
+
+export async function isSessionActive() {
+  await connectDB()
+  const loggedinAt = parseInt((await headers()).get('x-loggedin-at'))
+  const loggedinUserId = await getLoggedinUserId()
+  const loggedinUser = await User.findOne(
+    { _id: loggedinUserId },
+    { hashedPassword: 0 }
+  )
+  if (!loggedinUser.active) {
+    throw new Error('User is not active! Contact admin!')
+  }
+
+  if (Number.isNaN(loggedinAt) || loggedinUser.passwordChangedAt > loggedinAt) {
+    throw new Error(
+      'Password has been changed! Please re-login with your new password!'
+    )
+  }
+  // TODO: Check if password needs to be changed
+  return loggedinUser
 }
 
 export async function deleteSession() {

@@ -14,6 +14,7 @@ import handleServerAction from '@/lib/handleServerAction'
 
 import CreateOrEditUserForm from './CreateOrEditUserForm'
 import EditUserForm from './EditUserForm'
+import ResetPasswordForm from './ResetPasswordForm'
 import UsersTableActions from './UsersTableActions'
 
 const usersTableColumns = {
@@ -68,9 +69,9 @@ export default function Page() {
         <Modal openSearchParamKey='edit_user' title='Edit User'>
           <EditUserForm refetchUsers={refetchUsers} />
         </Modal>
-        <Modal
-          openSearchParamKey='reset_password_user'
-          title='Reset Password'></Modal>
+        <Modal openSearchParamKey='reset_password_user' title='Reset Password'>
+          <ResetPasswordForm />
+        </Modal>
       </Box>
 
       {isUsersLoading && <TableSkeleton />}

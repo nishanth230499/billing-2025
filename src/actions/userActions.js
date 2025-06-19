@@ -10,12 +10,12 @@ import { passwordRegex } from '@/lib/regex'
 import { withAuth } from '@/lib/withAuth'
 import User from '@/models/User'
 
-import { getLoggedinUserAction } from './authActions'
-
-async function getUsers(pageNumber = 0, pageSize = DEFAULT_PAGE_SIZE) {
+async function getUsers(
+  pageNumber = 0,
+  pageSize = DEFAULT_PAGE_SIZE,
+  loggedinUser
+) {
   await connectDB()
-
-  const loggedinUser = await getLoggedinUserAction()
 
   if (loggedinUser?.type !== 'Admin') {
     throw Error('Only admins can request for all users.')
@@ -29,10 +29,8 @@ async function getUsers(pageNumber = 0, pageSize = DEFAULT_PAGE_SIZE) {
   return { success: true, data: users }
 }
 
-async function getUser(userId) {
+async function getUser(userId, loggedinUser) {
   await connectDB()
-
-  const loggedinUser = await getLoggedinUserAction()
 
   if (loggedinUser?.type !== 'Admin') {
     throw Error('Only admins can request for users.')
@@ -46,10 +44,8 @@ async function getUser(userId) {
   return { success: false, error: 'User not found!' }
 }
 
-async function createUser(userReq) {
+async function createUser(userReq, loggedinUser) {
   await connectDB()
-
-  const loggedinUser = await getLoggedinUserAction()
 
   if (loggedinUser?.type !== 'Admin') {
     return {
@@ -72,6 +68,7 @@ async function createUser(userReq) {
       name: userReq?.name,
       hashedPassword: await bcrypt.hash(userReq?.password, salt),
       passwordChangedAt: new Date(),
+      changePasswordRequired: true,
       type: userReq?.type,
       active: userReq?.active,
     })
@@ -95,10 +92,8 @@ async function createUser(userReq) {
   }
 }
 
-async function editUser(userId, userReq) {
+async function editUser(userId, userReq, loggedinUser) {
   await connectDB()
-
-  const loggedinUser = await getLoggedinUserAction()
 
   if (loggedinUser?.type !== 'Admin') {
     return {
@@ -134,7 +129,53 @@ async function editUser(userId, userReq) {
   }
 }
 
+async function resetPassword(userId, password, loggedinUser) {
+  await connectDB()
+
+  if (loggedinUser?.type !== 'Admin') {
+    return {
+      success: false,
+      error: 'Only Admins can edit users.',
+    }
+  }
+
+  if (!passwordRegex.test(password)) {
+    return {
+      success: false,
+      error: 'Did not meet password requirements',
+    }
+  }
+
+  const salt = await bcrypt.genSalt(10)
+  const userUpdateFields = {
+    hashedPassword: await bcrypt.hash(password, salt),
+    changePasswordRequired: true,
+    passwordChangedAt: new Date(),
+  }
+
+  const oldUser = await User.findOneAndUpdate(
+    { _id: userId },
+    userUpdateFields,
+    {
+      runValidators: true,
+    }
+  ).lean()
+
+  trackUpdates({
+    model: User,
+    documentId: oldUser._id,
+    oldDocument: oldUser,
+    newDocument: userUpdateFields,
+  })
+
+  return {
+    success: true,
+    data: 'Password reset successfully!',
+  }
+}
+
 export const getUsersAction = withAuth(getUsers)
 export const getUserAction = withAuth(getUser)
 export const createUserAction = withAuth(createUser)
 export const editUserAction = withAuth(editUser)
+export const resetPasswordAction = withAuth(resetPassword)

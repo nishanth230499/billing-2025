@@ -23,6 +23,7 @@ import { emailRegex, passwordRegex } from '@/lib/regex'
 import { UserType } from '@/models/User'
 
 export default function CreateOrEditUserForm({
+  isEditing,
   editingUser,
   refetchUsers,
   hidden,
@@ -72,7 +73,7 @@ export default function CreateOrEditUserForm({
   }, [router])
 
   useEffect(() => {
-    if (editingUser) {
+    if (isEditing && editingUser) {
       setName(editingUser?.name)
       setActive(editingUser.active)
       setUserType(editingUser.type)
@@ -81,7 +82,7 @@ export default function CreateOrEditUserForm({
       setActive(true)
       setUserType(UserType.NORMAL)
     }
-  }, [editingUser])
+  }, [editingUser, isEditing])
 
   const handleSubmit = useCallback(
     async (e) => {
@@ -95,7 +96,7 @@ export default function CreateOrEditUserForm({
         setUserTypeError(true)
         error = true
       }
-      if (editingUser) {
+      if (isEditing) {
         if (error) return
         editUser(
           [
@@ -154,8 +155,9 @@ export default function CreateOrEditUserForm({
     [
       name,
       userType,
-      editingUser,
+      isEditing,
       editUser,
+      editingUser?._id,
       active,
       refetchUsers,
       handleClose,
@@ -173,7 +175,7 @@ export default function CreateOrEditUserForm({
           <input type='submit' hidden />
           <Grid container columnSpacing={2}>
             <Grid size={{ xs: 12, sm: 6 }} alignSelf='center'>
-              {editingUser ? (
+              {isEditing ? (
                 <Typography>
                   Email: <strong>{editingUser?.emailId}</strong>
                 </Typography>
@@ -208,7 +210,7 @@ export default function CreateOrEditUserForm({
                 error={nameError}
               />
             </Grid>
-            {!editingUser && (
+            {!isEditing && (
               <>
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
@@ -289,7 +291,7 @@ export default function CreateOrEditUserForm({
           disabled={isCreateUserLoading || isEditUserLoading}
           loading={isCreateUserLoading || isEditUserLoading}
           onClick={handleSubmit}>
-          {editingUser ? 'Save' : 'Create'}
+          {isEditing ? 'Save' : 'Create'}
         </Button>
       </DialogActions>
     </>

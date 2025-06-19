@@ -35,6 +35,7 @@ export default function EditUserForm({ refetchUsers }) {
     <>
       {isUserLoading ? LOADING : null}
       <CreateOrEditUserForm
+        isEditing
         editingUser={userResponse}
         hidden={isUserLoading}
         refetchUsers={refetchUsers}

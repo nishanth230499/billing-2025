@@ -1,17 +1,19 @@
 'use server'
 
+import { Alert } from '@mui/material'
 import { redirect } from 'next/navigation'
 
 import { getDefaultAcademicYearAction } from '@/actions/academicYearActions'
-import NoAuthError from '@/lib/NoAuth'
 
 export default async function Page() {
-  try {
-    const defaultAcademicYear = await getDefaultAcademicYearAction()
-    if (defaultAcademicYear?.year) redirect(`/${defaultAcademicYear?.year}`)
-    return null
-  } catch (e) {
-    if (e instanceof NoAuthError) redirect('/login')
-    else throw e
+  const {
+    success,
+    error: defaultAcademicYearError,
+    data: defaultAcademicYear,
+  } = await getDefaultAcademicYearAction()
+  if (!success) {
+    return <Alert severity='error'>{defaultAcademicYearError}</Alert>
   }
+  if (defaultAcademicYear?.year) redirect(`/${defaultAcademicYear?.year}`)
+  return null
 }

@@ -18,6 +18,7 @@ const userSchema = mongoose.Schema({
   name: { type: String, required: true },
   hashedPassword: { type: String, required: true },
   passwordChangedAt: { type: Date },
+  changePasswordRequired: { type: Boolean, required: true, default: true },
   type: {
     type: String,
     enum: Object.values(UserType),

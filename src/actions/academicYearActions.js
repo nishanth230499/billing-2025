@@ -13,7 +13,7 @@ async function getAcademicYears() {
     })
     .lean()
 
-  return academicYears
+  return { success: true, data: academicYears }
 }
 
 async function getDefaultAcademicYear() {
@@ -27,7 +27,7 @@ async function getDefaultAcademicYear() {
     .limit(1)
     .lean()
 
-  return defaultAcademicYear[0]
+  return { success: true, data: defaultAcademicYear[0] }
 }
 
 export const getAcademicYearsAction = withAuth(getAcademicYears)
