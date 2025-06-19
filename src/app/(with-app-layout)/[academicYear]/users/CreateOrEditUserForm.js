@@ -13,13 +13,11 @@ import {
   Typography,
 } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
-import { redirect, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { createUserAction, editUserAction } from '@/actions/userActions'
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
-import useServerAction from '@/hooks/useServerAction'
 import handleServerAction from '@/lib/handleServerAction'
 import { emailRegex, passwordRegex } from '@/lib/regex'
 import { UserType } from '@/models/User'
@@ -30,7 +28,6 @@ export default function CreateOrEditUserForm({
   hidden,
 }) {
   const router = useRouter()
-  const { getURL } = useHandleSearchParams()
 
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
@@ -56,6 +53,23 @@ export default function CreateOrEditUserForm({
   const { mutate: editUser, isPending: isEditUserLoading } = useMutation({
     mutationFn: (data) => handleServerAction(editUserAction, ...data),
   })
+
+  const handleClose = useCallback(() => {
+    router.back()
+
+    setEmail('')
+    setName('')
+    setPassword('')
+    setConfirmPassword('')
+    setActive(true)
+    setUserType(UserType.NORMAL)
+
+    setEmailError(false)
+    setNameError(false)
+    setPasswordError(false)
+    setConfirmPasswordTouched(false)
+    setUserTypeError(false)
+  }, [router])
 
   useEffect(() => {
     if (editingUser) {
@@ -96,17 +110,17 @@ export default function CreateOrEditUserForm({
             onSuccess: async (data) => {
               enqueueSnackbar(data, { variant: 'success' })
               await refetchUsers()
-              router.back()
+              handleClose()
             },
             onError: (error) =>
               enqueueSnackbar(error.message, { variant: 'error' }),
           }
         )
       } else {
-        if (!emailRegex.test(email)) {
-          setEmailError(true)
-          error = true
-        }
+        // if (!emailRegex.test(email)) {
+        //   setEmailError(true)
+        //   error = true
+        // }
 
         if (!passwordRegex.test(password)) {
           setPasswordError(true)
@@ -129,7 +143,7 @@ export default function CreateOrEditUserForm({
             onSuccess: async (data) => {
               enqueueSnackbar(data, { variant: 'success' })
               await refetchUsers()
-              router.back()
+              handleClose()
             },
             onError: (error) =>
               enqueueSnackbar(error.message, { variant: 'error' }),
@@ -138,17 +152,17 @@ export default function CreateOrEditUserForm({
       }
     },
     [
-      email,
       name,
       userType,
       editingUser,
       editUser,
       active,
+      refetchUsers,
+      handleClose,
+      email,
       password,
       confirmPassword,
       createUser,
-      refetchUsers,
-      router,
     ]
   )
 
@@ -267,7 +281,7 @@ export default function CreateOrEditUserForm({
         </Box>
       </DialogContent>
       <DialogActions className='px-6 pb-5'>
-        <Button onClick={() => router.back()}>Cancel</Button>
+        <Button onClick={handleClose}>Cancel</Button>
         <Button
           className='rounded-3xl'
           variant='contained'

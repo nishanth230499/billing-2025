@@ -3,6 +3,7 @@
 import bcrypt from 'bcryptjs'
 
 import { DEFAULT_PAGE_SIZE } from '@/constants'
+import { trackCreation, trackUpdates } from '@/lib/auditLogUtils'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
 import { passwordRegex } from '@/lib/regex'
@@ -75,6 +76,12 @@ async function createUser(userReq) {
       active: userReq?.active,
     })
     await user.save()
+
+    trackCreation({
+      model: User,
+      documentId: user._id,
+      newDocument: user.toObject(),
+    })
     return {
       success: true,
       data: 'User created successfully!',
@@ -106,8 +113,19 @@ async function editUser(userId, userReq) {
     active: userReq?.active,
   }
 
-  await User.updateOne({ _id: userId }, userUpdateFields, {
-    runValidators: true,
+  const oldUser = await User.findOneAndUpdate(
+    { _id: userId },
+    userUpdateFields,
+    {
+      runValidators: true,
+    }
+  ).lean()
+
+  trackUpdates({
+    model: User,
+    documentId: oldUser._id,
+    oldDocument: oldUser,
+    newDocument: userUpdateFields,
   })
 
   return {

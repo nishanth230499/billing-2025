@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs'
 import { cookies, headers } from 'next/headers'
 
 import connectDB from '@/lib/connectDB'
+import getLoggedinUserId from '@/lib/getLoggedinUserId'
 import { createSession, deleteSession } from '@/lib/session'
 import User from '@/models/User'
 
@@ -43,7 +44,7 @@ export async function logoutAction() {
 export async function getLoggedinUserAction() {
   await connectDB()
 
-  const userId = (await headers()).get('x-loggedin-user')
+  const userId = await getLoggedinUserId()
   const user = await User.findOne({ _id: userId }, { hashedPassword: 0 })
   user._id = user._id.toString()
   return user

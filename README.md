@@ -34,3 +34,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Check list before commiting
+
+- If querying, proper index is generated for the query
+- All the server actions return in the specific format {success: true, data: {}} | {success: false, error: "}
+- useQuery or useMutation is properly used for accessing server actions
+- handleServerAction is used for any server action called from client components
+- All the actions are exported withAuth
+- Either model.save or {runValidators: true} should be given
+- AuditLog along with transaction is added for every server action which updates DB
