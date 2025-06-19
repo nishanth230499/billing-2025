@@ -14,10 +14,15 @@ export async function loginAction(req) {
   const { email, password } = req
 
   const user = await User.findOne({ emailId: email })
-  // TODO: Check if user is active or not
   if (user) {
     const match = await bcrypt.compare(password, user.hashedPassword)
     if (match) {
+      if (!user?.active) {
+        return {
+          success: false,
+          error: 'User is not active! Contact admin!',
+        }
+      }
       const cookieStore = await cookies()
 
       await createSession(cookieStore, user?._id?.toString())
