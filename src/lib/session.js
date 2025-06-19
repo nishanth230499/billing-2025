@@ -3,6 +3,8 @@
 import { jwtVerify, SignJWT } from 'jose'
 import { cookies } from 'next/headers'
 
+import NoAuthError from './NoAuth'
+
 const secretKey = process.env.SESSION_SECRET
 const encodedKey = new TextEncoder().encode(secretKey)
 
@@ -37,16 +39,22 @@ export async function createSession(cookieStore, userId) {
 }
 
 export async function verifySession() {
-  const cookieStore = await cookies()
-
   try {
-    const accessToken = cookieStore.get('accessToken')?.value
-    const { userId } = await decrypt(accessToken)
-    return { userId, verifyType: 'accessToken' }
+    const cookieStore = await cookies()
+
+    try {
+      const accessToken = cookieStore.get('accessToken')?.value
+      const { userId } = await decrypt(accessToken)
+      return { userId, verifyType: 'accessToken' }
+      // eslint-disable-next-line no-unused-vars
+    } catch (e) {
+      const refreshToken = cookieStore.get('refreshToken')?.value
+      const { userId } = await decrypt(refreshToken)
+      return { userId, verifyType: 'refreshToken' }
+    }
+    // eslint-disable-next-line no-unused-vars
   } catch (e) {
-    const refreshToken = cookieStore.get('refreshToken')?.value
-    const { userId } = await decrypt(refreshToken)
-    return { userId, verifyType: 'refreshToken' }
+    throw new NoAuthError()
   }
 }
 

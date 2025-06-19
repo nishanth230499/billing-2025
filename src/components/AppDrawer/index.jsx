@@ -22,6 +22,7 @@ export default function AppDrawer({
   selectedAcademicYear,
   userName,
   userType,
+  firms,
 }) {
   const [isDrawerOpen, setisDrawerOpen] = useState(false)
   const [isMouseInsideDrawer, setIsMouseInsideDrawer] = useState(false)
@@ -47,9 +48,14 @@ export default function AppDrawer({
           onOpen={() => setisDrawerOpen(true)}
           slotProps={{ paper: { className: 'max-h-screen w-3xs' } }}>
           <Box className='flex justify-around p-3'>
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocIRCsd8SrY92ohtV7FAiX2Xm5gydzTo5V4OcsDkiWTtbj8l8t1M=s288-c-no' />
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocL_UzuRNE07fm1oTzTxdWvLlLUOVaewORhWo4jgOIdxOYJj9w=s288-c-no' />
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocJKNw1Ycyf8irfjZSkOUN5oskeE5izE5t2oFynam2t7cb5yOms=s288-c-no' />
+            {firms?.map((firm) => (
+              <Avatar
+                key={firm?._id}
+                sx={{ border: `2px solid ${firm?.color}` }}
+                src={`/logos/${firm?.icon}`}
+                alt={`${firm?.name} Icon`}
+              />
+            ))}
           </Box>
           <Divider />
           <AppDrawerContents
@@ -109,9 +115,14 @@ export default function AppDrawer({
         })}>
         {isDrawerExpanded && (
           <Box className='flex gap-4'>
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocIRCsd8SrY92ohtV7FAiX2Xm5gydzTo5V4OcsDkiWTtbj8l8t1M=s288-c-no' />
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocL_UzuRNE07fm1oTzTxdWvLlLUOVaewORhWo4jgOIdxOYJj9w=s288-c-no' />
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocJKNw1Ycyf8irfjZSkOUN5oskeE5izE5t2oFynam2t7cb5yOms=s288-c-no' />
+            {firms?.map((firm) => (
+              <Avatar
+                key={firm?._id}
+                sx={{ border: `2px solid ${firm?.color}` }}
+                src={`/logos/${firm?.icon}`}
+                alt={`${firm?.name} Icon`}
+              />
+            ))}
           </Box>
         )}
         <IconButton onClick={() => setisDrawerOpen(!isDrawerOpen)}>

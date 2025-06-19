@@ -8,6 +8,7 @@ import { getUsersAction } from '@/actions/userActions'
 import DataTable from '@/components/common/DataTable'
 import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
+import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
 

@@ -1,26 +1,29 @@
 'use client'
 
 import { CalendarMonth } from '@mui/icons-material'
-import { Box, Divider, useColorScheme } from '@mui/material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import classNames from 'classnames'
-import AppDrawerButton from './AppDrawerButton'
-import Dropdown from '../common/Dropdown'
-import { isMobile } from 'react-device-detect'
-import { adminDrawerItems, appDrawerItems } from './AppDrawerConstants'
-import PersonIcon from '@mui/icons-material/Person'
-import LogoutIcon from '@mui/icons-material/Logout'
-import { PiPasswordBold } from 'react-icons/pi'
-import { useCallback, useMemo } from 'react'
-import { logoutAction } from '@/actions/authActions'
-import useServerAction from '@/hooks/useServerAction'
-import { enqueueSnackbar } from 'notistack'
-import { redirect, usePathname } from 'next/navigation'
-import Link from 'next/link'
-import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import LogoutIcon from '@mui/icons-material/Logout'
 import MonitorIcon from '@mui/icons-material/Monitor'
+import PersonIcon from '@mui/icons-material/Person'
+import { Box, Divider, useColorScheme } from '@mui/material'
+import { useMutation } from '@tanstack/react-query'
+import classNames from 'classnames'
+import Link from 'next/link'
+import { redirect, usePathname } from 'next/navigation'
+import { enqueueSnackbar } from 'notistack'
+import { useCallback, useMemo } from 'react'
+import { isMobile } from 'react-device-detect'
+import { PiPasswordBold } from 'react-icons/pi'
+
+import { logoutAction } from '@/actions/authActions'
+import handleServerAction from '@/lib/handleServerAction'
 import { UserType } from '@/models/User'
+
+import Dropdown from '../common/Dropdown'
+import AppDrawerButton from './AppDrawerButton'
+import { adminDrawerItems, appDrawerItems } from './AppDrawerConstants'
 
 export default function AppDrawerContents({
   isDrawerExpanded,
@@ -31,16 +34,18 @@ export default function AppDrawerContents({
 }) {
   const pathname = usePathname()
 
-  const [logout, logoutLoading] = useServerAction(logoutAction)
+  const { mutate: logout, isPending: isLogoutLoading } = useMutation({
+    mutationFn: () => handleServerAction(logoutAction),
+  })
 
   const handleLogout = useCallback(async () => {
-    const res = await logout()
-    if (res?.success) {
-      enqueueSnackbar(res?.message, { variant: 'success' })
-      redirect('/login')
-    } else {
-      enqueueSnackbar(res?.message, { variant: 'error' })
-    }
+    logout(null, {
+      onSuccess: (data) => {
+        enqueueSnackbar(data, { variant: 'success' })
+        redirect('/login')
+      },
+      onError: (error) => enqueueSnackbar(error.message, { variant: 'error' }),
+    })
   }, [logout])
 
   const renderDrawerItems = useCallback(
@@ -195,7 +200,7 @@ export default function AppDrawerContents({
               name: 'Logout',
               key: 'logout',
               icon: LogoutIcon,
-              loading: logoutLoading,
+              loading: isLogoutLoading,
               onClick: handleLogout,
             },
           ]}

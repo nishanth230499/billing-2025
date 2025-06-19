@@ -1,7 +1,7 @@
 'use server'
 
 import bcrypt from 'bcryptjs'
-import { cookies, headers } from 'next/headers'
+import { cookies } from 'next/headers'
 
 import connectDB from '@/lib/connectDB'
 import getLoggedinUserId from '@/lib/getLoggedinUserId'
@@ -23,13 +23,13 @@ export async function loginAction(req) {
       await createSession(cookieStore, user?._id?.toString())
       return {
         success: true,
-        message: 'Login Successful!',
+        data: 'Login Successful!',
       }
     }
   }
   return {
     success: false,
-    message: 'Invalid email or password!',
+    error: 'Invalid email or password!',
   }
 }
 
@@ -37,7 +37,7 @@ export async function logoutAction() {
   await deleteSession()
   return {
     success: true,
-    message: 'Logout Successful!',
+    data: 'Logout Successful!',
   }
 }
 
