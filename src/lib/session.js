@@ -86,7 +86,10 @@ export async function isSessionActive() {
       'Password has been changed! Please re-login with your new password!'
     )
   }
-  // TODO: Check if password needs to be changed
+  // TODO: Build change password logic and uncomment this
+  // if (loggedinUser?.changePasswordRequired) {
+  //   throw new Error('Password change is required. Please change your password!')
+  // }
   return loggedinUser
 }
 
