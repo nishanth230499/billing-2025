@@ -117,10 +117,10 @@ export default function CreateOrEditUserForm({
           }
         )
       } else {
-        // if (!emailRegex.test(email)) {
-        //   setEmailError(true)
-        //   error = true
-        // }
+        if (!emailRegex.test(email)) {
+          setEmailError(true)
+          error = true
+        }
 
         if (!passwordRegex.test(password)) {
           setPasswordError(true)
