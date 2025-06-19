@@ -25,7 +25,7 @@ async function getUsers(pageNumber = 0, pageSize = DEFAULT_PAGE_SIZE) {
     pageSize,
     project: { hashedPassword: 0 },
   })
-  return users
+  return { success: true, data: users }
 }
 
 async function getUser(userId) {
@@ -40,9 +40,9 @@ async function getUser(userId) {
   const user = await User.findOne({ _id: userId }, { hashedPassword: 0 }).lean()
   if (user) {
     user._id = user._id.toString()
-    return user
+    return { success: true, data: user }
   }
-  throw new Error('User not Found!')
+  return { success: false, error: 'User not found!' }
 }
 
 async function createUser(userReq) {
@@ -53,14 +53,14 @@ async function createUser(userReq) {
   if (loggedinUser?.type !== 'Admin') {
     return {
       success: false,
-      message: 'Only Admins can create users.',
+      error: 'Only Admins can create users.',
     }
   }
 
   if (!passwordRegex.test(userReq?.password)) {
     return {
       success: false,
-      message: 'Did not meet password requirements',
+      error: 'Did not meet password requirements',
     }
   }
 
@@ -77,13 +77,13 @@ async function createUser(userReq) {
     await user.save()
     return {
       success: true,
-      message: 'User created successfully!',
+      data: 'User created successfully!',
     }
   } catch (e) {
     console.error(e)
     return {
       success: false,
-      message: e.message,
+      error: e.message,
     }
   }
 }
@@ -96,7 +96,7 @@ async function editUser(userId, userReq) {
   if (loggedinUser?.type !== 'Admin') {
     return {
       success: false,
-      message: 'Only Admins can edit users.',
+      error: 'Only Admins can edit users.',
     }
   }
 
@@ -105,11 +105,14 @@ async function editUser(userId, userReq) {
     type: userReq?.type,
     active: userReq?.active,
   }
-  await User.updateOne({ _id: userId }, userUpdateFields)
+
+  await User.updateOne({ _id: userId }, userUpdateFields, {
+    runValidators: true,
+  })
 
   return {
     success: true,
-    message: 'User updated successfully!',
+    data: 'User updated successfully!',
   }
 }
 

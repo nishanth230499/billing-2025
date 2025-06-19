@@ -1,21 +1,54 @@
-'use server'
+'use client'
 
-import { Box, Button, Typography } from '@mui/material'
-import Link from 'next/link'
-import React, { Suspense } from 'react'
+import { Alert, Box, Button, Typography } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import React, { useMemo } from 'react'
 
+import { getUsersAction } from '@/actions/userActions'
+import DataTable from '@/components/common/DataTable'
 import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
-import { LOADING } from '@/constants'
-import getURLWithSearchParams from '@/lib/getURLWithSearchParams'
+import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import handleServerAction from '@/lib/handleServerAction'
 
 import CreateOrEditUserForm from './CreateOrEditUserForm'
 import EditUserForm from './EditUserForm'
-import UsersTable from './UsersTable'
+import UsersTableActions from './UsersTableActions'
 
-export default async function Page({ searchParams: searchParamsPromise }) {
-  const searchParams = await searchParamsPromise
+const usersTableColumns = {
+  name: { label: 'Name' },
+  emailId: { label: 'Email ID' },
+  type: { label: 'Type' },
+  active: {
+    label: 'Active',
+    component: ({ data: user }) => (user?.active ? 'Yes' : 'No'),
+  },
+  actions: { label: 'Actions', component: UsersTableActions },
+}
 
+export default function Page() {
+  const { getURL, searchParams } = useHandleSearchParams()
+
+  const pageNumber = useMemo(
+    () => Number(searchParams.get('pageNumber')) || 0,
+    [searchParams]
+  )
+  const pageSize = useMemo(
+    () => Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE,
+    [searchParams]
+  )
+
+  const {
+    data: usersResponse,
+    isLoading: isUsersLoading,
+    isError: isUsersError,
+    error: usersError,
+    refetch: refetchUsers,
+  } = useQuery({
+    queryFn: async () =>
+      await handleServerAction(getUsersAction, pageNumber, pageSize),
+    queryKey: [pageNumber, pageSize],
+  })
   return (
     <>
       <Box className='flex items-center justify-between mb-4' id='test'>
@@ -23,26 +56,37 @@ export default async function Page({ searchParams: searchParamsPromise }) {
         <Button
           className='rounded-3xl'
           variant='outlined'
-          href={await getURLWithSearchParams(searchParams, { create: true })}
-          LinkComponent={Link}>
-          Create new User
+          onClick={() =>
+            window.history.pushState({}, '', getURL({ create: true }))
+          }>
+          Create User
         </Button>
         <Modal openSearchParamKey='create' title='Create User'>
-          <CreateOrEditUserForm />
+          <CreateOrEditUserForm refetchUsers={refetchUsers} />
         </Modal>
         <Modal openSearchParamKey='edit_user' title='Edit User'>
-          <Suspense fallback={LOADING}>
-            <EditUserForm editingUserId={searchParams.edit_user} />
-          </Suspense>
+          <EditUserForm refetchUsers={refetchUsers} />
         </Modal>
         <Modal
           openSearchParamKey='reset_password_user'
           title='Reset Password'></Modal>
       </Box>
-      <Suspense fallback={<TableSkeleton />}>
-        <UsersTable searchParams={searchParams} />
-        {/* <TableSkeleton /> */}
-      </Suspense>
+
+      {isUsersLoading && <TableSkeleton />}
+      {isUsersError ? (
+        <Alert severity='error'>{usersError.message}</Alert>
+      ) : (
+        <DataTable
+          hidden={isUsersLoading}
+          data={Object.fromEntries(
+            usersResponse?.paginatedResults?.map((user) => [user?._id, user]) ||
+              []
+          )}
+          dataOrder={usersResponse?.paginatedResults?.map((user) => user?._id)}
+          columns={usersTableColumns}
+          totalCount={usersResponse?.totalCount}
+        />
+      )}
     </>
   )
 }

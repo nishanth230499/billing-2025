@@ -52,7 +52,10 @@ export default function Pagination({ totalCount }) {
               {selectProps?.children.map((child) => (
                 <MenuItem
                   {...child?.props}
-                  href={getURL({ pageSize: child?.props?.value })}
+                  href={getURL({
+                    pageSize: child?.props?.value,
+                    pageNumber: 0,
+                  })}
                   component={Link}
                   replace
                 />

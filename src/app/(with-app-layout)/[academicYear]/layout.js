@@ -9,7 +9,6 @@ import AppDrawer from '@/components/AppDrawer'
 
 export default async function Layout({ children, params }) {
   const { academicYear: selectedAcademicYear } = await params
-
   const [academicYears, user] = await Promise.all([
     getAcademicYearsAction(),
     getLoggedinUserAction(),

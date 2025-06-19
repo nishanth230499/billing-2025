@@ -8,16 +8,17 @@ import {
   Paper,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableRow,
   useMediaQuery,
 } from '@mui/material'
+import TableCell from '@mui/material/TableCell'
 import { MOBILE_MAX_WIDTH } from '@/constants'
 import Pagination from './Pagination'
 
 export default function DataTable({
+  hidden,
   data,
   dataOrder,
   columns,
@@ -105,7 +106,7 @@ export default function DataTable({
   )
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} hidden={hidden}>
       <Table stickyHeader size={isMobileWidth ? 'small' : 'medium'}>
         <TableHead>
           <TableRow>

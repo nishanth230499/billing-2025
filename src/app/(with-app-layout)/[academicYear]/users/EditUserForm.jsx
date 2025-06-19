@@ -1,13 +1,44 @@
-'use server'
+'use client'
 
 import { getUserAction } from '@/actions/userActions'
 import CreateOrEditUserForm from './CreateOrEditUserForm'
 import { Alert } from '@mui/material'
+import { useSearchParams } from 'next/navigation'
+import { LOADING } from '@/constants'
+import { Fragment, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import handleServerAction from '@/lib/handleServerAction'
 
-export default async function EditUserForm({ editingUserId }) {
-  if (editingUserId) {
-    const user = await getUserAction(editingUserId)
-    return <CreateOrEditUserForm editingUser={user} />
+export default function EditUserForm({ refetchUsers }) {
+  const searchParams = useSearchParams()
+
+  const editingUserId = useMemo(
+    () => searchParams.get('edit_user'),
+    [searchParams]
+  )
+
+  const {
+    data: userResponse,
+    isLoading: isUserLoading,
+    isError: isUserError,
+    error: userError,
+  } = useQuery({
+    queryFn: async () => await handleServerAction(getUserAction, editingUserId),
+    queryKey: [editingUserId],
+    enabled: Boolean(editingUserId),
+  })
+
+  if (isUserError) {
+    return <Alert severity='error'>{userError?.message}</Alert>
   }
-  return <Alert severity='error'>No user selected for editing!</Alert>
+  return (
+    <>
+      {isUserLoading ? LOADING : null}
+      <CreateOrEditUserForm
+        editingUser={userResponse}
+        hidden={isUserLoading}
+        refetchUsers={refetchUsers}
+      />
+    </>
+  )
 }

@@ -76,16 +76,22 @@ export default function DataRow({
           className={classNames({
             'border-inherit border-t border-b border-dashed': isDragging,
           })}>
-          {column?.editable ? (
-            <input
-              ref={(ele) => setInputRef(ele, columnKey)}
-              onKeyDown={(e) => handleInputKeyDown(e, columnKey)}
-              value={data?.[columnKey]}
-              onChange={(e) => handleInputChange(e, columnKey)}
-            />
-          ) : (
-            data?.[columnKey]
-          )}
+          {(() => {
+            if (column?.component) {
+              return column?.component({ data })
+            }
+            if (column?.editable) {
+              return (
+                <input
+                  ref={(ele) => setInputRef(ele, columnKey)}
+                  onKeyDown={(e) => handleInputKeyDown(e, columnKey)}
+                  value={data?.[columnKey]}
+                  onChange={(e) => handleInputChange(e, columnKey)}
+                />
+              )
+            }
+            return data?.[columnKey]
+          })()}
         </TableCell>
       ))}
     </TableRow>

@@ -1,10 +1,5 @@
 'use client'
 
-import { createUserAction, editUserAction } from '@/actions/userActions'
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
-import useServerAction from '@/hooks/useServerAction'
-import { emailRegex, passwordRegex } from '@/lib/regex'
-import { UserType } from '@/models/User'
 import {
   Box,
   Button,
@@ -17,11 +12,23 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { useMutation } from '@tanstack/react-query'
 import { redirect, useRouter } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-export default function CreateOrEditUserForm({ editingUser }) {
+import { createUserAction, editUserAction } from '@/actions/userActions'
+import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useServerAction from '@/hooks/useServerAction'
+import handleServerAction from '@/lib/handleServerAction'
+import { emailRegex, passwordRegex } from '@/lib/regex'
+import { UserType } from '@/models/User'
+
+export default function CreateOrEditUserForm({
+  editingUser,
+  refetchUsers,
+  hidden,
+}) {
   const router = useRouter()
   const { getURL } = useHandleSearchParams()
 
@@ -43,8 +50,12 @@ export default function CreateOrEditUserForm({ editingUser }) {
     [confirmPassword, confirmPasswordTouched, password]
   )
 
-  const [createUser, isCreateUserLoading] = useServerAction(createUserAction)
-  const [editUser, isEditUserLoading] = useServerAction(editUserAction)
+  const { mutate: createUser, isPending: isCreateUserLoading } = useMutation({
+    mutationFn: (data) => handleServerAction(createUserAction, data),
+  })
+  const { mutate: editUser, isPending: isEditUserLoading } = useMutation({
+    mutationFn: (data) => handleServerAction(editUserAction, ...data),
+  })
 
   useEffect(() => {
     if (editingUser) {
@@ -56,7 +67,7 @@ export default function CreateOrEditUserForm({ editingUser }) {
       setActive(true)
       setUserType(UserType.NORMAL)
     }
-  }, [editingUser, open])
+  }, [editingUser])
 
   const handleSubmit = useCallback(
     async (e) => {
@@ -72,17 +83,25 @@ export default function CreateOrEditUserForm({ editingUser }) {
       }
       if (editingUser) {
         if (error) return
-        const res = await editUser(editingUser?._id, {
-          name,
-          active,
-          type: userType,
-        })
-        if (res?.success) {
-          enqueueSnackbar(res?.message, { variant: 'success' })
-          redirect(getURL({ edit_user: null }))
-        } else {
-          enqueueSnackbar(res?.message, { variant: 'error' })
-        }
+        editUser(
+          [
+            editingUser?._id,
+            {
+              name,
+              active,
+              type: userType,
+            },
+          ],
+          {
+            onSuccess: async (data) => {
+              enqueueSnackbar(data, { variant: 'success' })
+              await refetchUsers()
+              router.back()
+            },
+            onError: (error) =>
+              enqueueSnackbar(error.message, { variant: 'error' }),
+          }
+        )
       } else {
         if (!emailRegex.test(email)) {
           setEmailError(true)
@@ -98,27 +117,44 @@ export default function CreateOrEditUserForm({ editingUser }) {
           error = true
         }
         if (error) return
-        const res = await createUser({
-          name,
-          password,
-          emailId: email,
-          active,
-          type: userType,
-        })
-        if (res?.success) {
-          enqueueSnackbar(res?.message, { variant: 'success' })
-          redirect(getURL({ create: null }))
-        } else {
-          enqueueSnackbar(res?.message, { variant: 'error' })
-        }
+        createUser(
+          {
+            name,
+            password,
+            emailId: email,
+            active,
+            type: userType,
+          },
+          {
+            onSuccess: async (data) => {
+              enqueueSnackbar(data, { variant: 'success' })
+              await refetchUsers()
+              router.back()
+            },
+            onError: (error) =>
+              enqueueSnackbar(error.message, { variant: 'error' }),
+          }
+        )
       }
     },
-    [name, email, password, active, userType, getURL]
+    [
+      email,
+      name,
+      userType,
+      editingUser,
+      editUser,
+      active,
+      password,
+      confirmPassword,
+      createUser,
+      refetchUsers,
+      router,
+    ]
   )
 
   return (
     <>
-      <DialogContent>
+      <DialogContent hidden={hidden}>
         <Box component='form' noValidate onSubmit={handleSubmit}>
           <input type='submit' hidden />
           <Grid container columnSpacing={2}>
