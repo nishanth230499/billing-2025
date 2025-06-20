@@ -25,7 +25,11 @@ const usersTableColumns = {
     label: 'Active',
     component: ({ data: user }) => (user?.active ? 'Yes' : 'No'),
   },
-  actions: { label: 'Actions', component: UsersTableActions },
+  actions: {
+    label: 'Actions',
+    component: UsersTableActions,
+    slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
+  },
 }
 
 export default function Page() {

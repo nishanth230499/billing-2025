@@ -74,7 +74,7 @@ export default function AppDrawer({
               : 'left 195ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
           }}
           className={classNames(
-            'fixed bottom-4 z-[1201] rounded-l-none rounded-r-3xl',
+            'fixed bottom-4 z-[1201] rounded-l-none rounded-r-3xl print:hidden',
             {
               'left-64 shadow-none': isDrawerOpen,
               'left-0': !isDrawerOpen,
@@ -94,6 +94,7 @@ export default function AppDrawer({
   return (
     <Drawer
       variant='permanent'
+      className='print:hidden'
       slotProps={{
         paper: {
           elevation: 1,

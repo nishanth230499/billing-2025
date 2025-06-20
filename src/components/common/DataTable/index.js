@@ -1,10 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useRef } from 'react'
-
-import DataRow from './DataRow'
 import {
-  MenuItem,
   Paper,
   Table,
   TableBody,
@@ -14,7 +10,11 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import TableCell from '@mui/material/TableCell'
+import { useCallback, useMemo, useRef } from 'react'
+
 import { MOBILE_MAX_WIDTH } from '@/constants'
+
+import DataRow from './DataRow'
 import Pagination from './Pagination'
 
 export default function DataTable({
@@ -36,7 +36,7 @@ export default function DataTable({
   const isMobileWidth = useMediaQuery(`(max-width:${MOBILE_MAX_WIDTH})`)
 
   const getinputsRef = useCallback((dataKey) => {
-    if (!(dataKey in inputsRef?.current)) inputsRef.current[dataKey] = {}
+    if (!(dataKey in inputsRef.current)) inputsRef.current[dataKey] = {}
     return inputsRef.current[dataKey]
   }, [])
 
@@ -48,7 +48,7 @@ export default function DataTable({
       newDataOrder.splice(targetDataIndex, 0, ...movingDataKeys)
       onDataOrderChange(newDataOrder)
     },
-    [dataOrder]
+    [dataOrder, onDataOrderChange]
   )
 
   const handleInputKeyDown = useCallback(
@@ -112,9 +112,7 @@ export default function DataTable({
           <TableRow>
             {canUpdateOrder && <TableCell className='w-[40px] pr-0' />}
             {Object.entries(columns).map(([columnKey, column]) => (
-              <TableCell key={columnKey} className='bg-inherit'>
-                {column?.label}
-              </TableCell>
+              <TableCell key={columnKey}>{column?.label}</TableCell>
             ))}
           </TableRow>
         </TableHead>
@@ -140,9 +138,10 @@ export default function DataTable({
         </TableBody>
       </Table>
       {totalCount ? (
-        <Pagination totalCount={totalCount}>
-          <MenuItem /> <MenuItem />
-        </Pagination>
+        <Pagination
+          totalCount={totalCount}
+          className='sticky bottom-0 bg-inherit'
+        />
       ) : null}
     </TableContainer>
   )

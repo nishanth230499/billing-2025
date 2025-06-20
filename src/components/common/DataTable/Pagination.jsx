@@ -20,9 +20,11 @@ export default function Pagination({ totalCount }) {
         rowsPerPage={pageSize}
         page={pageNumber}
         labelRowsPerPage='Page Size:'
+        className='sticky bottom-0 left-0 bg-inherit'
         // onPageChange={handleChangePage}
         // onRowsPerPageChange={handleChangeRowsPerPage}
         slotProps={{
+          toolbar: { className: 'pr-0' },
           actions: {
             nextButton: {
               component: Link,

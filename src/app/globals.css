@@ -27,6 +27,9 @@
   width: 0.5rem;
   height: 0.5rem;
 }
+::-webkit-scrollbar-corner {
+  background-color: inherit;
+}
 html.light * {
   &::-webkit-scrollbar-track {
     background: #f1f1f1;

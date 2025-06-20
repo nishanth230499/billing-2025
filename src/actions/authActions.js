@@ -4,7 +4,8 @@ import bcrypt from 'bcryptjs'
 import { cookies } from 'next/headers'
 
 import connectDB from '@/lib/connectDB'
-import { createSession, deleteSession } from '@/lib/session'
+import createSession from '@/lib/session/createSession'
+import deleteSession from '@/lib/session/deleteSession'
 import { withAuth } from '@/lib/withAuth'
 import User from '@/models/User'
 

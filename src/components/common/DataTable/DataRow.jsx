@@ -75,7 +75,8 @@ export default function DataRow({
           key={columnKey}
           className={classNames({
             'border-inherit border-t border-b border-dashed': isDragging,
-          })}>
+          })}
+          {...(column?.slotProps?.tableBodyCell || {})}>
           {(() => {
             if (column?.component) {
               return column?.component({ data })

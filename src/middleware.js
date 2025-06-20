@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
-import { createSession, verifySession } from '@/lib/session'
+import createSession from './lib/session/createSession'
+import verifySession from './lib/session/verifySession'
 
 export async function middleware(request) {
   if (request.nextUrl.pathname === '/login') {

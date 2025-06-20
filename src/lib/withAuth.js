@@ -1,4 +1,5 @@
-import { isSessionActive, verifySession } from './session'
+import isSessionActive from './session/isSessionActive'
+import verifySession from './session/verifySession'
 
 export function withAuth(action) {
   return async function (...args) {
