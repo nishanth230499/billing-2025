@@ -1,6 +1,6 @@
 'use client'
 
-import { Autocomplete, TextField } from '@mui/material'
+import { Alert, Autocomplete, TextField } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useDebounce } from 'use-debounce'
@@ -43,6 +43,10 @@ export default function UserSelector() {
     queryKey: [selectedUserId],
     enabled: Boolean(selectedUserId),
   })
+
+  if (isUsersError) return <Alert severity='error'>{usersError.message}</Alert>
+
+  if (isUserError) return <Alert severity='error'>{userError.message}</Alert>
 
   return (
     <Autocomplete
