@@ -39,6 +39,8 @@ export default function Pagination({ totalCount }) {
               onClick: null,
             },
           },
+          select: { className: 'mr-4' },
+          displayedRows: { className: '-mr-2' },
         }}
         slots={{
           select: (selectProps) => (

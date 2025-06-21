@@ -2,6 +2,7 @@
 
 import AuditLog from '@/models/AuditLog'
 
+import { AuditLogType } from '../models/AuditLog'
 import getLoggedinUserId from './getLoggedinUserId'
 
 const ignoredFields = ['_id', '__v']
@@ -25,8 +26,9 @@ export async function trackUpdates({
   const newLog = new AuditLog({
     collectionName: model.collection.collectionName,
     documentId: documentId.toString(),
+    type: AuditLogType.UPDATED,
     updatedFields: updatedFields,
-    updatedBy: await getLoggedinUserId(),
+    updatedById: await getLoggedinUserId(),
   })
 
   await newLog.save()
@@ -44,8 +46,9 @@ export async function trackCreation({ model, documentId, newDocument }) {
   const newLog = new AuditLog({
     collectionName: model.collection.collectionName,
     documentId: documentId.toString(),
+    type: AuditLogType.CREATED,
     updatedFields: updatedFields,
-    updatedBy: await getLoggedinUserId(),
+    updatedById: await getLoggedinUserId(),
   })
   await newLog.save()
 }

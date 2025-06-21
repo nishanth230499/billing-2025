@@ -11,21 +11,37 @@ import { withAuth } from '@/lib/withAuth'
 import User from '@/models/User'
 
 async function getUsers(
-  pageNumber = 0,
-  pageSize = DEFAULT_PAGE_SIZE,
+  { pageNumber = 0, pageSize = DEFAULT_PAGE_SIZE, searchKey = '' },
   loggedinUser
 ) {
   await connectDB()
 
   if (loggedinUser?.type !== 'Admin') {
-    throw Error('Only admins can request for all users.')
+    return {
+      success: false,
+      error: 'Only admins can request for all users.',
+    }
   }
 
   const users = await getPaginatedData(User, {
+    filters: searchKey
+      ? [
+          {
+            $search: {
+              index: 'name_search_index', // optional, defaults to "default"
+              autocomplete: {
+                query: searchKey,
+                path: 'name',
+              },
+            },
+          },
+        ]
+      : [],
     pageNumber,
     pageSize,
-    project: { hashedPassword: 0 },
+    paginatedResultsPipeline: [{ $project: { hashedPassword: 0 } }],
   })
+
   return { success: true, data: users }
 }
 

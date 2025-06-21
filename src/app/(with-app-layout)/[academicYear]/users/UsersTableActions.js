@@ -1,8 +1,9 @@
 'use client'
 
-import { Box, IconButton } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import LockResetIcon from '@mui/icons-material/LockReset'
+import { Box, IconButton } from '@mui/material'
+
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 
 export default function UsersTableActions({ data: user }) {

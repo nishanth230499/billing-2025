@@ -52,12 +52,12 @@ export default function Page() {
     refetch: refetchUsers,
   } = useQuery({
     queryFn: async () =>
-      await handleServerAction(getUsersAction, pageNumber, pageSize),
+      await handleServerAction(getUsersAction, { pageNumber, pageSize }),
     queryKey: [pageNumber, pageSize],
   })
   return (
     <>
-      <Box className='flex items-center justify-between mb-4' id='test'>
+      <Box className='flex items-center justify-between mb-4'>
         <Typography variant='h6'>Users</Typography>
         <Button
           className='rounded-3xl'

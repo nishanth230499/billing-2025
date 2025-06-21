@@ -2,6 +2,7 @@ import BackspaceIcon from '@mui/icons-material/Backspace'
 import BusinessIcon from '@mui/icons-material/Business'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import GroupIcon from '@mui/icons-material/Group'
+import HistoryIcon from '@mui/icons-material/History'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 import ReceiptIcon from '@mui/icons-material/Receipt'
@@ -126,5 +127,11 @@ export const adminDrawerItems = [
     icon: GroupIcon,
     name: 'Users',
     href: (academicYear) => `/${academicYear}/users`,
+  },
+  {
+    key: 'audit-logs',
+    icon: HistoryIcon,
+    name: 'Audit Logs',
+    href: (academicYear) => `/${academicYear}/audit-logs`,
   },
 ]

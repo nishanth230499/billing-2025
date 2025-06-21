@@ -1,16 +1,27 @@
 import mongoose from 'mongoose'
 
+export const AuditLogType = Object.freeze({
+  CREATED: 'Created',
+  UPDATED: 'Updated',
+  DELETED: 'Deleted',
+})
+
 const auditLogSchema = mongoose.Schema({
   collectionName: {
     type: String,
     required: true,
   },
   documentId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    enum: Object.values(AuditLogType),
     required: true,
   },
   updatedFields: { type: Object, required: true },
-  updatedBy: {
+  updatedById: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
