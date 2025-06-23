@@ -17,7 +17,7 @@ const userSchema = mongoose.Schema(
       match: [emailRegex, 'Invalid email id!'],
     },
     name: { type: String, required: true },
-    hashedPassword: { type: String, required: true },
+    hashedPassword: { type: String, required: true, select: false },
     passwordChangedAt: { type: Date },
     changePasswordRequired: { type: Boolean, required: true, default: true },
     type: {

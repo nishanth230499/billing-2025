@@ -1,5 +1,5 @@
-const { default: connectDB } = require('@/lib/connectDB')
-const { default: Firm } = require('@/models/Firm')
+import connectDB from '@/lib/connectDB'
+import Firm from '@/models/Firm'
 
 export default async function getFirmsAction() {
   await connectDB()

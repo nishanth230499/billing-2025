@@ -15,7 +15,7 @@ export default function UserSelector() {
   const { getURL, searchParams } = useHandleSearchParams()
 
   const selectedUserId = useMemo(
-    () => searchParams.get('selectedUser') ?? '',
+    () => searchParams.get('updatedById') ?? '',
     [searchParams]
   )
 
@@ -61,7 +61,7 @@ export default function UserSelector() {
         window.history.replaceState(
           {},
           '',
-          getURL({ selectedUser: option?.key })
+          getURL({ updatedById: option?.key })
         )
         setInputValue(option?.label)
       }}

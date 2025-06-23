@@ -24,6 +24,7 @@ const auditLogSchema = mongoose.Schema({
   updatedById: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: 'User',
   },
   updatedAt: { type: Date, required: true, default: Date.now },
 })

@@ -38,8 +38,8 @@ const auditLogColumns = {
 export default function Page() {
   const { searchParams } = useHandleSearchParams()
 
-  const selectedUserId = useMemo(
-    () => searchParams.get('selectedUser') ?? '',
+  const updatedById = useMemo(
+    () => searchParams.get('updatedById') ?? '',
     [searchParams]
   )
   const pageNumber = useMemo(
@@ -61,9 +61,9 @@ export default function Page() {
       await handleServerAction(getAuditLogsAction, {
         pageNumber,
         pageSize,
-        updatedById: selectedUserId,
+        updatedById,
       }),
-    queryKey: [pageNumber, pageSize, selectedUserId],
+    queryKey: [pageNumber, pageSize, updatedById],
   })
 
   return (

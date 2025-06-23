@@ -1,5 +1,7 @@
 'use server'
 
+import { diff } from 'json-diff'
+
 import AuditLog from '@/models/AuditLog'
 
 import { AuditLogType } from '../models/AuditLog'
@@ -12,22 +14,24 @@ export async function trackUpdates({
   oldDocument,
   newDocument,
 }) {
-  const updatedFields = {}
+  const newFields = {}
+  const oldFields = {}
+
   for (const key in newDocument) {
-    if (
-      !ignoredFields.includes(key) &&
-      JSON.stringify(oldDocument[key]) !== JSON.stringify(newDocument[key])
-    ) {
-      updatedFields[key] = newDocument[key]
+    if (!ignoredFields.includes(key)) {
+      newFields[key] = newDocument[key]
+      oldFields[key] = oldDocument[key]
     }
   }
-  if (Object.keys(updatedFields).length === 0) return
+
+  const differences = diff(oldFields, newFields)
+  if (!differences) return
 
   const newLog = new AuditLog({
     collectionName: model.collection.collectionName,
     documentId: documentId.toString(),
     type: AuditLogType.UPDATED,
-    updatedFields: updatedFields,
+    updatedFields: differences,
     updatedById: await getLoggedinUserId(),
   })
 
