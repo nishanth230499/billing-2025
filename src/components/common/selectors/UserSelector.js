@@ -2,14 +2,13 @@
 
 import { Alert, Autocomplete, TextField } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 
+import { getUserAction, getUsersAction } from '@/actions/userActions'
+import { LOADING } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
-
-import { getUserAction, getUsersAction } from '../../actions/userActions'
-import { LOADING } from '../../constants'
 
 export default function UserSelector() {
   const { getURL, searchParams } = useHandleSearchParams()
@@ -21,6 +20,7 @@ export default function UserSelector() {
 
   const [inputValue, setInputValue] = useState('')
   const [searchKey] = useDebounce(inputValue, 1000)
+
   const {
     data: usersResponse,
     isLoading: isUsersLoading,
@@ -43,6 +43,10 @@ export default function UserSelector() {
     queryKey: [selectedUserId],
     enabled: Boolean(selectedUserId),
   })
+
+  useEffect(() => {
+    setInputValue(userResponse?.name)
+  }, [userResponse?.name])
 
   if (isUsersError) return <Alert severity='error'>{usersError.message}</Alert>
 

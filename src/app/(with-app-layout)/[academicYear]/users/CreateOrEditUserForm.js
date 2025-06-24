@@ -76,7 +76,7 @@ export default function CreateOrEditUserForm({
     if (isEditing && editingUser) {
       setName(editingUser?.name)
       setActive(editingUser.active)
-      setUserType(editingUser.type)
+      setUserType(editingUser?.type || UserType.NORMAL)
     } else {
       setName('')
       setActive(true)

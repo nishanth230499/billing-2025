@@ -24,7 +24,7 @@ async function getUsers(
   }
 
   const users = await getPaginatedData(User, {
-    filters: searchKey
+    filtersPipeline: searchKey
       ? [
           {
             $search: {

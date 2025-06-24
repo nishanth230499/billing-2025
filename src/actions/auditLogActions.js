@@ -18,18 +18,30 @@ async function getAuditLogs(filters = {}, loggedinUser) {
     pageNumber = 0,
     pageSize = DEFAULT_PAGE_SIZE,
     updatedById = '',
+    collectionName = '',
+    startDateTime = '',
+    endDateTime = '',
   } = filters
 
   const auditLogs = await getPaginatedData(AuditLog, {
-    filters: updatedById
-      ? [
-          {
-            $match: {
-              updatedById: new mongoose.Types.ObjectId(updatedById),
-            },
-          },
-        ]
-      : [],
+    filtersPipeline: [
+      {
+        $match: {
+          ...(updatedById
+            ? { updatedById: new mongoose.Types.ObjectId(updatedById) }
+            : {}),
+          ...(collectionName ? { collectionName } : {}),
+          ...(startDateTime || endDateTime
+            ? {
+                updatedAt: {
+                  ...(startDateTime ? { $gt: new Date(startDateTime) } : {}),
+                  ...(endDateTime ? { $lt: new Date(endDateTime) } : {}),
+                },
+              }
+            : {}),
+        },
+      },
+    ],
     pageNumber,
     pageSize,
     paginatedResultsPipeline: [

@@ -2,14 +2,14 @@ import { DEFAULT_PAGE_SIZE } from '@/constants'
 
 export async function getPaginatedData(model, options = {}) {
   const {
-    filters = [],
+    filtersPipeline = [],
     pageNumber = 0,
     pageSize = DEFAULT_PAGE_SIZE,
     paginatedResultsPipeline = [],
   } = options
 
   const pipeline = [
-    ...filters,
+    ...filtersPipeline,
     {
       $facet: {
         paginatedResults: [

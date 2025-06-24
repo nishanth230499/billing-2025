@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
 
+import { modelConstants } from './constants'
+
 export const AuditLogType = Object.freeze({
   CREATED: 'Created',
   UPDATED: 'Updated',
@@ -29,5 +31,11 @@ const auditLogSchema = mongoose.Schema({
   updatedAt: { type: Date, required: true, default: Date.now },
 })
 
-export default mongoose.models?.AuditLog ||
-  mongoose.model('AuditLog', auditLogSchema, 'audit_log')
+const collectionName = 'audit_log'
+
+export default mongoose.models?.[modelConstants?.[collectionName]?.modelName] ||
+  mongoose.model(
+    modelConstants?.[collectionName]?.modelName,
+    auditLogSchema,
+    collectionName
+  )

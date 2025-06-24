@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
 
+import { modelConstants } from './constants'
+
 const firmSchema = mongoose.Schema({
   _id: { type: String, required: true },
   name: {
@@ -10,5 +12,11 @@ const firmSchema = mongoose.Schema({
   icon: { type: String, required: true },
 })
 
-export default mongoose.models?.Firm ||
-  mongoose.model('Firm', firmSchema, 'firm')
+const collectionName = 'firm'
+
+export default mongoose.models?.[modelConstants?.[collectionName]?.modelName] ||
+  mongoose.model(
+    modelConstants?.[collectionName]?.modelName,
+    firmSchema,
+    collectionName
+  )

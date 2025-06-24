@@ -2,6 +2,8 @@ import mongoose from 'mongoose'
 
 import { emailRegex } from '@/lib/regex'
 
+import { modelConstants } from './constants'
+
 export const UserType = Object.freeze({
   NORMAL: 'Normal',
   ADMIN: 'Admin',
@@ -65,5 +67,11 @@ userSchema.searchIndex({
   },
 })
 
-export default mongoose.models?.User ||
-  mongoose.model('User', userSchema, 'user')
+const collectionName = 'user'
+
+export default mongoose.models?.[modelConstants?.[collectionName]?.modelName] ||
+  mongoose.model(
+    modelConstants?.[collectionName]?.modelName,
+    userSchema,
+    collectionName
+  )
