@@ -2,22 +2,14 @@
 
 import { Alert, Autocomplete, TextField } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 
 import { getUserAction, getUsersAction } from '@/actions/userActions'
 import { LOADING } from '@/constants'
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
 
-export default function UserSelector() {
-  const { getURL, searchParams } = useHandleSearchParams()
-
-  const selectedUserId = useMemo(
-    () => searchParams.get('updatedById') ?? '',
-    [searchParams]
-  )
-
+export default function UserSelector({ selectedUserId, setSelectedUserId }) {
   const [inputValue, setInputValue] = useState('')
   const [searchKey] = useDebounce(inputValue, 1000)
 
@@ -62,11 +54,7 @@ export default function UserSelector() {
       }}
       value={selectedUserId}
       onChange={(_, option) => {
-        window.history.replaceState(
-          {},
-          '',
-          getURL({ updatedById: option?.key })
-        )
+        setSelectedUserId(option?.key)
         setInputValue(option?.label)
       }}
       options={

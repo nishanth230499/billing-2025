@@ -1,36 +1,36 @@
-import { TextField } from '@mui/material'
-import { useMemo } from 'react'
+import ClearIcon from '@mui/icons-material/Clear'
+import { IconButton, InputAdornment, TextField } from '@mui/material'
 
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import { formatForDateTimeInput } from '@/lib/utils/dateUtils'
 
-export default function DateSelector({ label, searchKeyParam }) {
-  const { getURL, searchParams } = useHandleSearchParams()
-
-  const dateTime = useMemo(() => {
-    const timeString = searchParams.get(searchKeyParam) || ''
-    if (timeString) return new Date(Number(timeString))
-    return timeString
-  }, [searchKeyParam, searchParams])
-
+export default function DateSelector({
+  label,
+  selectedDateTime,
+  setSelectedDateTime,
+}) {
   return (
     <TextField
       type='datetime-local'
       fullWidth
       label={label}
-      value={formatForDateTimeInput(dateTime)}
+      value={formatForDateTimeInput(selectedDateTime)}
       onChange={(e) => {
-        window.history.replaceState(
-          {},
-          '',
-          getURL({
-            [searchKeyParam]: e.target.value
-              ? Number(new Date(e.target.value))
-              : null,
-          })
+        setSelectedDateTime(
+          e.target.value ? Number(new Date(e.target.value)) : null
         )
       }}
-      slotProps={{ inputLabel: { shrink: true } }}
+      slotProps={{
+        inputLabel: { shrink: true },
+        input: {
+          endAdornment: selectedDateTime ? (
+            <InputAdornment position='end'>
+              <IconButton onClick={() => setSelectedDateTime(null)}>
+                <ClearIcon />
+              </IconButton>
+            </InputAdornment>
+          ) : null,
+        },
+      }}
     />
   )
 }

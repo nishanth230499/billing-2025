@@ -56,3 +56,22 @@ export async function trackCreation({ model, documentId, newDocument }) {
   })
   await newLog.save()
 }
+
+export async function trackDeletion({ model, documentId, oldDocument }) {
+  const deletedFields = {}
+  for (const key in oldDocument) {
+    if (!ignoredFields.includes(key)) {
+      deletedFields[key] = oldDocument[key]
+    }
+  }
+  if (Object.keys(deletedFields).length === 0) return
+
+  const newLog = new AuditLog({
+    collectionName: model.collection.collectionName,
+    documentId: documentId.toString(),
+    type: AuditLogType.DELETED,
+    updatedFields: deletedFields,
+    updatedById: await getLoggedinUserId(),
+  })
+  await newLog.save()
+}

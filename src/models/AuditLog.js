@@ -28,7 +28,12 @@ const auditLogSchema = mongoose.Schema({
     required: true,
     ref: 'User',
   },
-  updatedAt: { type: Date, required: true, default: Date.now },
+  updatedAt: {
+    type: Date,
+    required: true,
+    default: Date.now,
+    index: 1,
+  },
 })
 
 const collectionName = 'audit_log'

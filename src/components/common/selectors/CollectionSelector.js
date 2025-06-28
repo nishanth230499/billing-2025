@@ -1,26 +1,23 @@
 'use client'
 
 import { Autocomplete, TextField } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import { modelConstants } from '@/models/constants'
 
-export default function UserSelector() {
-  const { getURL, searchParams } = useHandleSearchParams()
-
-  const collectionName = useMemo(
-    () => searchParams.get('collectionName') ?? '',
-    [searchParams]
-  )
-
+export default function CollectionSelector({
+  selectedCollectionName,
+  setSelectedCollectionName,
+}) {
   const selectedModelName = useMemo(
-    () => modelConstants?.[collectionName]?.modelName ?? '',
-    [collectionName]
+    () => modelConstants?.[selectedCollectionName]?.modelName ?? '',
+    [selectedCollectionName]
   )
 
-  const [inputValue, setInputValue] = useState(selectedModelName ?? '')
-
+  const [inputValue, setInputValue] = useState(selectedModelName)
+  useEffect(() => {
+    setInputValue(selectedModelName)
+  }, [selectedModelName])
   return (
     <Autocomplete
       inputValue={inputValue ?? ''}
@@ -28,13 +25,9 @@ export default function UserSelector() {
         if (reason === 'input') setInputValue(val)
         if (reason === 'blur') setInputValue(selectedModelName)
       }}
-      value={collectionName}
+      value={selectedCollectionName}
       onChange={(_, option) => {
-        window.history.replaceState(
-          {},
-          '',
-          getURL({ collectionName: option?.key })
-        )
+        setSelectedCollectionName(option?.key)
         setInputValue(option?.label)
       }}
       options={
