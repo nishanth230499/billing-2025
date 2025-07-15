@@ -1,6 +1,7 @@
 'use server'
 
 import { diff } from 'json-diff'
+import { Model, Schema } from 'mongoose'
 
 import AuditLog from '@/models/AuditLog'
 
@@ -8,14 +9,25 @@ import { AuditLogType } from '../models/AuditLog'
 import getLoggedinUserId from './getLoggedinUserId'
 
 const ignoredFields = ['_id', '__v']
+
+interface ITrackParams {
+  model: Model<any>
+  documentId: Schema.Types.ObjectId | string
+}
+
+interface ITrackUpdatesParams extends ITrackParams {
+  oldDocument: { [key: string]: any }
+  newDocument: { [key: string]: any }
+}
+
 export async function trackUpdates({
   model,
   documentId,
   oldDocument,
   newDocument,
-}) {
-  const newFields = {}
-  const oldFields = {}
+}: ITrackUpdatesParams): Promise<undefined> {
+  const newFields: { [key: string]: any } = {}
+  const oldFields: { [key: string]: any } = {}
 
   for (const key in newDocument) {
     if (!ignoredFields.includes(key)) {
@@ -38,8 +50,16 @@ export async function trackUpdates({
   await newLog.save()
 }
 
-export async function trackCreation({ model, documentId, newDocument }) {
-  const updatedFields = {}
+interface ITrackCreationParams extends ITrackParams {
+  newDocument: { [key: string]: any }
+}
+
+export async function trackCreation({
+  model,
+  documentId,
+  newDocument,
+}: ITrackCreationParams): Promise<undefined> {
+  const updatedFields: { [key: string]: any } = {}
   for (const key in newDocument) {
     if (!ignoredFields.includes(key)) {
       updatedFields[key] = newDocument[key]
@@ -57,8 +77,16 @@ export async function trackCreation({ model, documentId, newDocument }) {
   await newLog.save()
 }
 
-export async function trackDeletion({ model, documentId, oldDocument }) {
-  const deletedFields = {}
+interface ITrackDeletionParams extends ITrackParams {
+  oldDocument: { [key: string]: any }
+}
+
+export async function trackDeletion({
+  model,
+  documentId,
+  oldDocument,
+}: ITrackDeletionParams) {
+  const deletedFields: { [key: string]: any } = {}
   for (const key in oldDocument) {
     if (!ignoredFields.includes(key)) {
       deletedFields[key] = oldDocument[key]

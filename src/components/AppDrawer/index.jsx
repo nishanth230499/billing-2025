@@ -18,8 +18,8 @@ import AppDrawerContents from './AppDrawerContents'
 import { TABLET_MAX_WIDTH } from '@/constants'
 
 export default function AppDrawer({
-  academicYears,
-  selectedAcademicYear,
+  stockCycles,
+  selectedStockCycle,
   userName,
   userType,
   firms,
@@ -60,8 +60,8 @@ export default function AppDrawer({
           <Divider />
           <AppDrawerContents
             isDrawerExpanded
-            academicYears={academicYears}
-            selectedAcademicYear={selectedAcademicYear}
+            stockCycles={stockCycles}
+            selectedStockCycle={selectedStockCycle}
             userName={userName}
             userType={userType}
           />
@@ -154,8 +154,8 @@ export default function AppDrawer({
       >
         <AppDrawerContents
           isDrawerExpanded={isDrawerExpanded}
-          academicYears={academicYears}
-          selectedAcademicYear={selectedAcademicYear}
+          stockCycles={stockCycles}
+          selectedStockCycle={selectedStockCycle}
           userName={userName}
           userType={userType}
         />

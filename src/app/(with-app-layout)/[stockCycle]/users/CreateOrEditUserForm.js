@@ -74,9 +74,9 @@ export default function CreateOrEditUserForm({
 
   useEffect(() => {
     if (isEditing && editingUser) {
-      setName(editingUser?.name)
-      setActive(editingUser.active)
-      setUserType(editingUser?.type || UserType.NORMAL)
+      setName(editingUser?.name ?? '')
+      setActive(editingUser.active ?? false)
+      setUserType(editingUser?.type ?? UserType.NORMAL)
     } else {
       setName('')
       setActive(true)

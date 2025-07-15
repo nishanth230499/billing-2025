@@ -25,6 +25,7 @@ export default function ClientProviders({ children }) {
         defaultOptions: {
           queries: {
             retry: false,
+            refetchOnWindowFocus: false,
           },
         },
       })

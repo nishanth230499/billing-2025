@@ -3,24 +3,24 @@
 import { Alert, Box } from '@mui/material'
 import { notFound } from 'next/navigation'
 
-import { getAcademicYearsAction } from '@/actions/academicYearActions'
 import { getLoggedinUserAction } from '@/actions/authActions'
 import getFirmsAction from '@/actions/firmActions'
+import { getStockCyclesAction } from '@/actions/stockCycleActions'
 import AppDrawer from '@/components/AppDrawer'
 
 export default async function Layout({ children, params }) {
-  const { academicYear: selectedAcademicYear } = await params
+  const { stockCycle: selectedStockCycle } = await params
   const [
     { success: isUserSucces, data: loggedinUser, error: userError },
     {
-      success: isAcademicYearsSuccess,
-      data: academicYears,
-      error: academicYearsError,
+      success: isStockCyclesSuccess,
+      data: stockCycles,
+      error: stockCyclesError,
     },
     firms,
   ] = await Promise.all([
     getLoggedinUserAction(),
-    getAcademicYearsAction(),
+    getStockCyclesAction(),
     getFirmsAction(),
   ])
 
@@ -28,16 +28,15 @@ export default async function Layout({ children, params }) {
     // Redirect to login or change password, based on the userError string
     return <Alert severity='error'>{userError}</Alert>
   }
-  if (!isAcademicYearsSuccess) {
-    return <Alert severity='error'>{academicYearsError}</Alert>
+  if (!isStockCyclesSuccess) {
+    return <Alert severity='error'>{stockCyclesError}</Alert>
   }
-  if (!academicYears?.find(({ year }) => year === selectedAcademicYear))
-    notFound()
+  if (!stockCycles?.find(({ name }) => name === selectedStockCycle)) notFound()
   return (
     <Box className='flex'>
       <AppDrawer
-        academicYears={academicYears}
-        selectedAcademicYear={selectedAcademicYear}
+        stockCycles={stockCycles}
+        selectedStockCycle={selectedStockCycle}
         userName={loggedinUser?.name}
         userType={loggedinUser?.type}
         firms={firms}

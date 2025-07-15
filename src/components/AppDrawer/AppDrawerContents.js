@@ -27,8 +27,8 @@ import { adminDrawerItems, appDrawerItems } from './AppDrawerConstants'
 
 export default function AppDrawerContents({
   isDrawerExpanded,
-  academicYears,
-  selectedAcademicYear,
+  stockCycles,
+  selectedStockCycle,
   userName,
   userType,
 }) {
@@ -56,7 +56,7 @@ export default function AppDrawerContents({
             if (menuItem?.href) {
               const href =
                 typeof menuItem?.href === 'function'
-                  ? menuItem?.href(selectedAcademicYear)
+                  ? menuItem?.href(selectedStockCycle)
                   : menuItem?.href
               return {
                 ...menuItem,
@@ -87,7 +87,7 @@ export default function AppDrawerContents({
         }
         const href =
           typeof item?.href === 'function'
-            ? item?.href(selectedAcademicYear)
+            ? item?.href(selectedStockCycle)
             : item?.href
         return (
           <AppDrawerButton
@@ -101,7 +101,7 @@ export default function AppDrawerContents({
           </AppDrawerButton>
         )
       }),
-    [isDrawerExpanded, pathname, selectedAcademicYear]
+    [isDrawerExpanded, pathname, selectedStockCycle]
   )
 
   const { mode, setMode } = useColorScheme()
@@ -141,14 +141,14 @@ export default function AppDrawerContents({
               startIcon={CalendarMonth}
               endIcon={ArrowDropDownIcon}
               {...props}>
-              {selectedAcademicYear}
+              {selectedStockCycle}
             </AppDrawerButton>
           )}
-          menuItems={academicYears?.map(({ year }) => ({
-            name: year,
-            key: year,
-            selected: year === selectedAcademicYear,
-            href: `/${year}`,
+          menuItems={stockCycles?.map(({ name }) => ({
+            name: name,
+            key: name,
+            selected: name === selectedStockCycle,
+            href: `/${name}`,
           }))}
           slotProps={{ menuItem: { component: Link } }}
         />

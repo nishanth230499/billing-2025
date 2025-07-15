@@ -37,8 +37,8 @@ async function getAuditLogs(filters = {}, loggedinUser) {
           ...(startDateTime || endDateTime
             ? {
                 updatedAt: {
-                  ...(startDateTime ? { $gt: new Date(startDateTime) } : {}),
-                  ...(endDateTime ? { $lt: new Date(endDateTime) } : {}),
+                  ...(startDateTime ? { $gte: new Date(startDateTime) } : {}),
+                  ...(endDateTime ? { $lte: new Date(endDateTime) } : {}),
                 },
               }
             : {}),

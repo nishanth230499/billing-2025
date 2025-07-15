@@ -3,17 +3,17 @@
 import { Alert } from '@mui/material'
 import { redirect } from 'next/navigation'
 
-import { getDefaultAcademicYearAction } from '@/actions/academicYearActions'
+import { getDefaultStockCycleAction } from '@/actions/stockCycleActions'
 
 export default async function Page() {
   const {
     success,
-    error: defaultAcademicYearError,
-    data: defaultAcademicYear,
-  } = await getDefaultAcademicYearAction()
+    error: defaultStockCycleError,
+    data: defaultStockCycle,
+  } = await getDefaultStockCycleAction()
   if (!success) {
-    return <Alert severity='error'>{defaultAcademicYearError}</Alert>
+    return <Alert severity='error'>{defaultStockCycleError}</Alert>
   }
-  if (defaultAcademicYear?.year) redirect(`/${defaultAcademicYear?.year}`)
+  if (defaultStockCycle?.name) redirect(`/${defaultStockCycle?.name}`)
   return null
 }

@@ -1,14 +1,15 @@
+/* eslint-disable no-unused-vars */
 import mongoose from 'mongoose'
 
 import { modelConstants } from './constants'
 
-export const AuditLogType = Object.freeze({
-  CREATED: 'Created',
-  UPDATED: 'Updated',
-  DELETED: 'Deleted',
-})
+export enum AuditLogType {
+  CREATED = 'Created',
+  UPDATED = 'Updated',
+  DELETED = 'Deleted',
+}
 
-const auditLogSchema = mongoose.Schema({
+const auditLogSchema = new mongoose.Schema({
   collectionName: {
     type: String,
     required: true,
@@ -16,6 +17,7 @@ const auditLogSchema = mongoose.Schema({
   documentId: {
     type: String,
     required: true,
+    index: 1,
   },
   type: {
     type: String,
@@ -27,6 +29,7 @@ const auditLogSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'User',
+    index: 1,
   },
   updatedAt: {
     type: Date,

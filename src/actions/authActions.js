@@ -14,7 +14,10 @@ export async function loginAction(req) {
 
   const { email, password } = req
 
-  const user = await User.findOne({ emailId: email })
+  const user = await User.findOne(
+    { emailId: email },
+    { hashedPassword: 1, active: 1, _id: 1 }
+  )
   if (user) {
     const match = await bcrypt.compare(password, user.hashedPassword)
     if (match) {

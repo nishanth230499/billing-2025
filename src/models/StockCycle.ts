@@ -2,18 +2,18 @@ import mongoose from 'mongoose'
 
 import { modelConstants } from './constants'
 
-const academicYearSchema = mongoose.Schema({
-  year: { type: String, required: true, unique: true, index: true },
+const stockCycleSchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true, index: true },
   default: Boolean,
 })
 
-academicYearSchema.index({ default: 1, year: -1 })
+stockCycleSchema.index({ default: 1, name: -1 })
 
-const collectionName = 'academic_year'
+const collectionName = 'stock_cycle'
 
 export default mongoose.models?.[modelConstants?.[collectionName]?.modelName] ||
   mongoose.model(
     modelConstants?.[collectionName]?.modelName,
-    academicYearSchema,
+    stockCycleSchema,
     collectionName
   )

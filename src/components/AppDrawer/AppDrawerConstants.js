@@ -22,7 +22,7 @@ export const appDrawerItems = [
     menuItems: [
       {
         key: 'schools',
-        href: (academicYear) => `/${academicYear}`,
+        href: (stockCycle) => `/${stockCycle}`,
         icon: FaSchoolFlag,
         name: 'Schools',
       },
@@ -126,12 +126,12 @@ export const adminDrawerItems = [
     key: 'users',
     icon: GroupIcon,
     name: 'Users',
-    href: (academicYear) => `/${academicYear}/users`,
+    href: (stockCycle) => `/${stockCycle}/users`,
   },
   {
     key: 'audit-logs',
     icon: HistoryIcon,
     name: 'Audit Logs',
-    href: (academicYear) => `/${academicYear}/audit-logs`,
+    href: (stockCycle) => `/${stockCycle}/audit-logs`,
   },
 ]

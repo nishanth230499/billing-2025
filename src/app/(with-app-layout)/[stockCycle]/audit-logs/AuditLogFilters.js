@@ -56,8 +56,9 @@ export default function AuditLogFilters() {
     useState(collectionName)
   const [selectedDocumentId, setSelectedDocumentId] = useState(documentId)
   const [selectedUserId, setSelectedUserId] = useState(updatedById)
-  const [selectedStartDateTime, setSelectedStartDateTime] = useState()
-  const [selectedEndDateTime, setSelectedEndDateTime] = useState()
+  const [selectedStartDateTime, setSelectedStartDateTime] =
+    useState(startDateTime)
+  const [selectedEndDateTime, setSelectedEndDateTime] = useState(endDateTime)
 
   const handleApplyFilters = useCallback(() => {
     window.history.replaceState(
@@ -172,7 +173,10 @@ export default function AuditLogFilters() {
               </Button>
             </Grid>
             <Grid>
-              <Button variant='contained' onClick={handleApplyFilters}>
+              <Button
+                className='rounded-3xl'
+                variant='contained'
+                onClick={handleApplyFilters}>
                 Apply
               </Button>
             </Grid>
