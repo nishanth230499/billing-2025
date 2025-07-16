@@ -67,11 +67,7 @@ userSchema.searchIndex({
   },
 })
 
-const collectionName = 'user'
+const model = modelConstants.user
 
-export default mongoose.models?.[modelConstants?.[collectionName]?.modelName] ||
-  mongoose.model(
-    modelConstants?.[collectionName]?.modelName,
-    userSchema,
-    collectionName
-  )
+export default mongoose.models?.[model?.modelName] ||
+  mongoose.model(model?.modelName, userSchema, model?.collectionName)

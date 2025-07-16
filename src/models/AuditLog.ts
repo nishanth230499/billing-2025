@@ -39,11 +39,7 @@ const auditLogSchema = new mongoose.Schema({
   },
 })
 
-const collectionName = 'audit_log'
+const model = modelConstants.audit_log
 
-export default mongoose.models?.[modelConstants?.[collectionName]?.modelName] ||
-  mongoose.model(
-    modelConstants?.[collectionName]?.modelName,
-    auditLogSchema,
-    collectionName
-  )
+export default mongoose.models?.[model?.modelName] ||
+  mongoose.model(model?.modelName, auditLogSchema, model?.collectionName)

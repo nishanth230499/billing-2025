@@ -16,15 +16,15 @@ import { SiBookstack } from 'react-icons/si'
 
 export const appDrawerItems = [
   {
-    key: 'school',
+    key: 'Customer',
     icon: FaSchoolFlag,
-    name: 'School Pages',
+    name: 'Customer Pages',
     menuItems: [
       {
-        key: 'schools',
+        key: 'customers',
         href: (stockCycle) => `/${stockCycle}`,
         icon: FaSchoolFlag,
-        name: 'Schools',
+        name: 'Customers',
       },
       {
         key: 'create-sales-order',

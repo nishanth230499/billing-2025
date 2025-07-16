@@ -12,11 +12,7 @@ const firmSchema = mongoose.Schema({
   icon: { type: String, required: true },
 })
 
-const collectionName = 'firm'
+const model = modelConstants.firm
 
-export default mongoose.models?.[modelConstants?.[collectionName]?.modelName] ||
-  mongoose.model(
-    modelConstants?.[collectionName]?.modelName,
-    firmSchema,
-    collectionName
-  )
+export default mongoose.models?.[model?.modelName] ||
+  mongoose.model(model?.modelName, firmSchema, model?.collectionName)

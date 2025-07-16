@@ -1,4 +1,10 @@
-type ModelConstantsKeyType = 'user' | 'stock_cycle' | 'audit_log' | 'firm'
+type ModelConstantsKeyType =
+  | 'user'
+  | 'stock_cycle'
+  | 'audit_log'
+  | 'firm'
+  | 'customer'
+  | 'customer_details'
 
 type ModelConstantsType = {
   [key in ModelConstantsKeyType]: {
@@ -23,5 +29,13 @@ export const modelConstants: ModelConstantsType = {
   firm: {
     modelName: 'Firm',
     collectionName: 'firm',
+  },
+  customer: {
+    modelName: 'Customer',
+    collectionName: 'customer',
+  },
+  customer_details: {
+    modelName: 'Customer Details',
+    collectionName: 'customer_details',
   },
 }
