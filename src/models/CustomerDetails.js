@@ -9,7 +9,7 @@ import {
 import { modelConstants } from './constants'
 
 const customerDetailsSchema = mongoose.Schema({
-  _id: AUTO_GENERATE_CUSTOMER_ID
+  customerId: AUTO_GENERATE_CUSTOMER_ID
     ? {
         type: Schema.Types.ObjectId,
         required: true,
@@ -25,26 +25,26 @@ const customerDetailsSchema = mongoose.Schema({
     modelConstants.stock_cycle.collectionName
   )
     ? {
-        stock_cycle_id: {
+        stockCycleId: {
           type: Schema.Types.ObjectId,
           required: true,
           ref: modelConstants.stock_cycle.modelName,
         },
       }
     : {}),
-  billing_name: {
+  billingName: {
     type: String,
     required: true,
   },
-  billing_address: {
+  billingAddress: {
     type: String,
     required: true,
   },
-  phone_number: {
+  phoneNumber: {
     type: String,
     required: true,
   },
-  email_address: {
+  emailAddress: {
     type: String,
     required: true,
   },
@@ -52,12 +52,12 @@ const customerDetailsSchema = mongoose.Schema({
 
 customerDetailsSchema.index(
   {
-    _id: 1,
+    customerId: 1,
     ...(CUSTOMER_DETAILS_SPECIFIC_TO.includes(
       modelConstants.stock_cycle.collectionName
     )
       ? {
-          stock_cycle_id: 1,
+          stockCycleId: 1,
         }
       : {}),
   },

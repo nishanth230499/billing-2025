@@ -3,6 +3,7 @@ import './globals.css'
 import { CssBaseline, InitColorSchemeScript } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
+import appConfig from 'appConfig'
 import { Roboto } from 'next/font/google'
 
 import theme from '../theme'
@@ -27,7 +28,7 @@ export default function RootLayout({ children }) {
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
             <InitColorSchemeScript attribute='class' />
-            <ClientProviders>
+            <ClientProviders appConfig={appConfig}>
               <CssBaseline />
               {children}
             </ClientProviders>

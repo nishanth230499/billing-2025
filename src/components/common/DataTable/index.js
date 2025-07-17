@@ -25,6 +25,7 @@ export default function DataTable({
   totalCount,
   onDataChange,
   onDataOrderChange,
+  getHighLightColor,
 }) {
   const inputsRef = useRef({})
 
@@ -133,6 +134,7 @@ export default function DataTable({
               handleInputChange={(e, columnKey) =>
                 handleInputChange(e, dataKey, columnKey)
               }
+              getHighLightColor={getHighLightColor}
             />
           ))}
         </TableBody>

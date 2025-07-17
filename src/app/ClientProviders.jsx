@@ -7,7 +7,7 @@ import { DndProvider } from 'react-dnd'
 import { isMobile } from 'react-device-detect'
 import { TouchBackend } from 'react-dnd-touch-backend'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { useState } from 'react'
+import { createContext, useState } from 'react'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
 function SnackbarCloseButton({ snackbarKey }) {
@@ -18,7 +18,9 @@ function SnackbarCloseButton({ snackbarKey }) {
   )
 }
 
-export default function ClientProviders({ children }) {
+export const AppContext = createContext({})
+
+export default function ClientProviders({ children, appConfig }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -38,7 +40,9 @@ export default function ClientProviders({ children }) {
           <SnackbarCloseButton snackbarKey={snackbarKey} />
         )}>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <AppContext.Provider value={{ appConfig }}>
+            {children}
+          </AppContext.Provider>
         </QueryClientProvider>
       </SnackbarProvider>
     </DndProvider>

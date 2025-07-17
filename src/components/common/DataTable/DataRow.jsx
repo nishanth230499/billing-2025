@@ -15,6 +15,7 @@ export default function DataRow({
   handleInputKeyDown,
   handleInputChange,
   handleMoveRow,
+  getHighLightColor,
 }) {
   const setInputRef = useCallback(
     (ele, columnKey) => {
@@ -60,6 +61,11 @@ export default function DataRow({
       ref={(ele) => dragPreview(drop(ele))}
       sx={{
         opacity: isDragging ? 0.3 : 1,
+        '& > td:first-child': {
+          borderLeft: getHighLightColor
+            ? `3px solid ${getHighLightColor(data)}`
+            : undefined,
+        },
       }}>
       {canUpdateOrder && (
         <TableCell
