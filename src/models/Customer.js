@@ -29,6 +29,15 @@ const customerSchema = mongoose.Schema(
   { autoSearchIndex: true }
 )
 
+customerSchema.virtual('customerDetails', {
+  ref: modelConstants.customer_details.modelName,
+  localField: '_id',
+  foreignField: 'customerId',
+})
+
+customerSchema.set('toJSON', { virtuals: true })
+customerSchema.set('toObject', { virtuals: true })
+
 customerSchema.searchIndex({
   name: 'id_name_place_search_index',
   definition: {

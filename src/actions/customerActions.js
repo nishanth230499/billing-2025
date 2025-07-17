@@ -7,11 +7,15 @@ import { trackCreation } from '@/lib/auditLogUtils'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
 import { withAuth } from '@/lib/withAuth'
+import withTransaction from '@/lib/withTransaction'
 import { modelConstants } from '@/models/constants'
 import Customer from '@/models/Customer'
 import CustomerDetails from '@/models/CustomerDetails'
 
-import { CUSTOMER_DETAILS_SPECIFIC_TO } from '../../appConfig'
+import {
+  AUTO_GENERATE_CUSTOMER_ID,
+  CUSTOMER_DETAILS_SPECIFIC_TO,
+} from '../../appConfig'
 
 async function getCustomers({
   pageNumber = 0,
@@ -103,12 +107,74 @@ async function getCustomer(customerId) {
     )
       ? customerId
       : new mongoose.Types.ObjectId(customerId),
-  }).lean()
+  })
+    .populate({
+      path: 'customerDetails',
+      options: { sort: { _id: -1 }, limit: 1 },
+    })
+    .lean()
   if (customer) {
     customer._id = customer._id.toString()
     return { success: true, data: customer }
   }
   return { success: false, error: 'User not found!' }
+}
+
+async function createCustomer(customerReq) {
+  await connectDB()
+
+  try {
+    const { customer, customerDetails } = await withTransaction(
+      async ({ session }) => {
+        const customer = new Customer({
+          _id: AUTO_GENERATE_CUSTOMER_ID ? undefined : customerReq?._id,
+          name: customerReq?.name,
+          place: customerReq?.place,
+          firmId: customerReq?.firmId,
+          openingBalance: customerReq?.openingBalance,
+        })
+
+        const customerDetails = new CustomerDetails({
+          customerId: customer._id,
+          stockCycleId: CUSTOMER_DETAILS_SPECIFIC_TO.includes(
+            modelConstants.stock_cycle.collectionName
+          )
+            ? customerReq?.stockCycleId
+            : undefined,
+          billingName: customerReq?.billingName,
+          billingAddress: customerReq?.billingAddress,
+          emailId: customerReq?.emailId,
+          phoneNumber: customerReq?.phoneNumber,
+        })
+
+        await customer.save({ session })
+        await customerDetails.save({ session })
+
+        return { customer, customerDetails }
+      }
+    )
+
+    trackCreation({
+      model: Customer,
+      documentId: customer._id,
+      newDocument: customer.toObject(),
+    })
+    trackCreation({
+      model: CustomerDetails,
+      documentId: customerDetails._id,
+      newDocument: customerDetails.toObject(),
+    })
+    return {
+      success: true,
+      data: 'Customer created successfully!',
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      success: false,
+      error: e.message,
+    }
+  }
 }
 
 async function addCustomer(customerReq) {
@@ -138,4 +204,5 @@ async function addCustomer(customerReq) {
 
 export const getCustomersAction = withAuth(getCustomers)
 export const getCustomerAction = withAuth(getCustomer)
+export const createCustomerAction = withAuth(createCustomer)
 export const addCustomerAction = withAuth(addCustomer)

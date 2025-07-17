@@ -12,12 +12,14 @@ const customerDetailsSchema = mongoose.Schema({
   customerId: AUTO_GENERATE_CUSTOMER_ID
     ? {
         type: Schema.Types.ObjectId,
+        index: 1,
         required: true,
         ref: modelConstants.customer.modelName,
       }
     : {
         type: String,
         match: customerIdRegex,
+        index: 1,
         required: true,
         ref: modelConstants?.customer.modelName,
       },

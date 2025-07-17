@@ -9,6 +9,7 @@ export default function AutoComplete({
   setSelectedKey,
   options = [],
   autoFilterOptions = false,
+  error = false,
   loading = false,
   placeholder = 'Search',
   noOptionsText = 'Not Found',
@@ -22,6 +23,7 @@ export default function AutoComplete({
   setSelectedKey: (key: string) => void
   options: { key: string; label: string }[]
   autoFilterOptions?: boolean
+  error?: boolean
   loading?: boolean
   placeholder?: string
   noOptionsText?: string
@@ -46,7 +48,12 @@ export default function AutoComplete({
       options={options}
       getOptionKey={(option) => option?.key}
       renderInput={({ ...params }) => (
-        <TextField {...params} label={placeholder} margin='normal' />
+        <TextField
+          {...params}
+          label={placeholder}
+          margin='normal'
+          error={error}
+        />
       )}
       isOptionEqualToValue={(option, selectedOption) =>
         option?.key === selectedOption?.key

@@ -13,7 +13,7 @@ import {
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useParams, useRouter } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { addCustomerAction, getCustomerAction } from '@/actions/customerActions'
 import CustomerSelector from '@/components/common/selectors/CustomerSelector'
@@ -63,17 +63,20 @@ export default function AddExistingCustomerForm({ refetchCustomers }) {
     setBillingAddressError(false)
   }, [router])
 
-  // useEffect(() => {
-  //   if (isEditing && editingUser) {
-  //     setName(editingUser?.name ?? '')
-  //     setActive(editingUser.active ?? false)
-  //     setUserType(editingUser?.type ?? UserType.NORMAL)
-  //   } else {
-  //     setName('')
-  //     setActive(true)
-  //     setUserType(UserType.NORMAL)
-  //   }
-  // }, [editingUser, isEditing])
+  useEffect(() => {
+    const customerDetails = customerResponse?.customerDetails?.[0]
+    if (customerDetails) {
+      setBillingName(customerDetails?.billingName)
+      setBillingAddress(customerDetails?.billingAddress)
+      setEmailId(customerDetails?.emailId)
+      setPhoneNumber(customerDetails?.phoneNumber)
+    } else {
+      setBillingName('')
+      setBillingAddress('')
+      setEmailId('')
+      setPhoneNumber('')
+    }
+  }, [customerResponse?.customerDetails])
 
   const handleSubmit = useCallback(
     async (e) => {
@@ -145,10 +148,14 @@ export default function AddExistingCustomerForm({ refetchCustomers }) {
             </Grid>
           </Grid>
         </Box>
-        <Divider />
+        <Divider className='my-4' />
         <Box component='form' noValidate onSubmit={handleSubmit}>
           <input type='submit' hidden />
           <Grid container columnSpacing={2} columns={{ xs: 1, sm: 2 }}>
+            <Grid size={{ xs: 1, sm: 2 }}>
+              The following fields are specific to the selected{' '}
+              <b>Stock Cycle</b>.
+            </Grid>
             <Grid size={1}>
               <TextField
                 margin='normal'

@@ -9,3 +9,5 @@ export const passwordRegex = new RegExp(
 )
 
 export const customerIdRegex = new RegExp(CUSTOMER_ID_REGEX)
+
+export const amountRegex = new RegExp(/^\d+(\.\d{1,2})?$/)

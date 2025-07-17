@@ -17,6 +17,7 @@ import handleServerAction from '@/lib/handleServerAction'
 import { modelConstants } from '@/models/constants'
 
 import AddExistingCustomerForm from './AddExistingCustomerForm'
+import CreateCustomerForm from './CreateCustomerForm'
 
 const customersTableColumns = {
   _id: { label: 'ID' },
@@ -109,8 +110,11 @@ export default function Page() {
         </Box>
       )}
       <Box className='mb-4'>
-        <SearchBar label='Search For Schools' />
+        <SearchBar label='Search for Customers' />
       </Box>
+      <Modal openSearchParamKey='create' title='Add Existing Customer'>
+        <CreateCustomerForm refetchCustomers={refetchCustomers} />
+      </Modal>
       <Modal openSearchParamKey='add' title='Add Existing Customer'>
         <AddExistingCustomerForm refetchCustomers={refetchCustomers} />
       </Modal>
