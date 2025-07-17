@@ -10,6 +10,7 @@ export default function DateSelector({
 }) {
   return (
     <TextField
+      margin='normal'
       type='datetime-local'
       fullWidth
       label={label}

@@ -38,7 +38,7 @@ export default function ResetPasswordForm() {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getUserAction, resettingPasswordUserId),
-    queryKey: [resettingPasswordUserId],
+    queryKey: ['getUserAction', resettingPasswordUserId],
     enabled: Boolean(resettingPasswordUserId),
   })
 

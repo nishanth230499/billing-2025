@@ -53,7 +53,7 @@ export default function Page() {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getUsersAction, { pageNumber, pageSize }),
-    queryKey: [pageNumber, pageSize],
+    queryKey: ['getUsersAction', pageNumber, pageSize],
   })
   return (
     <>

@@ -28,7 +28,7 @@ export default function ViewAuditLogUpdates() {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getAuditLogAction, viewAuditLogId),
-    queryKey: [viewAuditLogId],
+    queryKey: ['getAuditLogAction', viewAuditLogId],
     enabled: Boolean(viewAuditLogId),
   })
 

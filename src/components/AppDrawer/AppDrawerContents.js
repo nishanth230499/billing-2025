@@ -144,11 +144,11 @@ export default function AppDrawerContents({
               {selectedStockCycle}
             </AppDrawerButton>
           )}
-          menuItems={stockCycles?.map(({ name }) => ({
+          menuItems={stockCycles?.map(({ _id, name }) => ({
             name: name,
-            key: name,
-            selected: name === selectedStockCycle,
-            href: `/${name}`,
+            key: _id,
+            selected: _id === selectedStockCycle,
+            href: `/${_id}`,
           }))}
           slotProps={{ menuItem: { component: Link } }}
         />

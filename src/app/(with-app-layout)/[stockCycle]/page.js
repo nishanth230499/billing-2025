@@ -8,12 +8,15 @@ import React, { useContext, useMemo } from 'react'
 import { getCustomersAction } from '@/actions/customerActions'
 import { AppContext } from '@/app/ClientProviders'
 import DataTable from '@/components/common/DataTable'
+import Modal from '@/components/common/Modal'
 import SearchBar from '@/components/common/SearchBar'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
 import { modelConstants } from '@/models/constants'
+
+import AddExistingCustomerForm from './AddExistingCustomerForm'
 
 const customersTableColumns = {
   _id: { label: 'ID' },
@@ -47,6 +50,7 @@ export default function Page() {
     isLoading: isCustomersLoading,
     isError: isCustomersError,
     error: customersError,
+    refetch: refetchCustomers,
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getCustomersAction, {
@@ -60,7 +64,7 @@ export default function Page() {
           : {},
         sortFields: searchText ? {} : { _id: 1 },
       }),
-    queryKey: [pageNumber, pageSize, searchText],
+    queryKey: ['getCustomersAction', pageNumber, pageSize, searchText],
   })
 
   return (
@@ -85,7 +89,7 @@ export default function Page() {
               onClick={() =>
                 window.history.pushState({}, '', getURL({ add: true }))
               }>
-              Add Customer From Previous Records
+              Add Existing Customer
             </Button>
           )}
         </Box>
@@ -100,13 +104,16 @@ export default function Page() {
             onClick={() =>
               window.history.pushState({}, '', getURL({ add: true }))
             }>
-            Add Customer From Previous Records
+            Add Existing Customer
           </Button>
         </Box>
       )}
       <Box className='mb-4'>
         <SearchBar label='Search For Schools' />
       </Box>
+      <Modal openSearchParamKey='add' title='Add Existing Customer'>
+        <AddExistingCustomerForm refetchCustomers={refetchCustomers} />
+      </Modal>
       {isCustomersLoading && <TableSkeleton />}
       {isCustomersError ? (
         <Alert severity='error'>{customersError.message}</Alert>

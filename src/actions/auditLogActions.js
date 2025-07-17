@@ -44,6 +44,7 @@ async function getAuditLogs(filters = {}, loggedinUser) {
             : {}),
         },
       },
+      { $sort: { updatedAt: -1 } },
     ],
     pageNumber,
     pageSize,

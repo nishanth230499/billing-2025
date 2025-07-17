@@ -1,13 +1,14 @@
 'use client'
 
-import { Alert, Autocomplete, TextField } from '@mui/material'
+import { Alert } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useDebounce } from 'use-debounce'
 
 import { getUserAction, getUsersAction } from '@/actions/userActions'
-import { LOADING } from '@/constants'
 import handleServerAction from '@/lib/handleServerAction'
+
+import AutoComplete from '../AutoComplete'
 
 export default function UserSelector({ selectedUserId, setSelectedUserId }) {
   const [inputValue, setInputValue] = useState('')
@@ -21,7 +22,7 @@ export default function UserSelector({ selectedUserId, setSelectedUserId }) {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getUsersAction, { searchKey }),
-    queryKey: [searchKey],
+    queryKey: ['getUsersAction', searchKey],
   })
 
   const {
@@ -32,48 +33,30 @@ export default function UserSelector({ selectedUserId, setSelectedUserId }) {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getUserAction, selectedUserId),
-    queryKey: [selectedUserId],
+    queryKey: ['getUserAction', selectedUserId],
     enabled: Boolean(selectedUserId),
   })
-
-  useEffect(() => {
-    setInputValue(userResponse?.name)
-  }, [userResponse?.name])
 
   if (isUsersError) return <Alert severity='error'>{usersError.message}</Alert>
 
   if (isUserError) return <Alert severity='error'>{userError.message}</Alert>
 
   return (
-    <Autocomplete
-      loading={isUsersLoading}
-      inputValue={inputValue ?? ''}
-      onInputChange={(_, val, reason) => {
-        if (reason === 'input') setInputValue(val)
-        if (reason === 'blur') setInputValue(userResponse?.name)
-      }}
-      value={selectedUserId}
-      onChange={(_, option) => {
-        setSelectedUserId(option?.key)
-        setInputValue(option?.label)
-      }}
+    <AutoComplete
+      loading={isUsersLoading || isUserLoading}
+      inputValue={inputValue}
+      setInputValue={setInputValue}
+      selectedKey={selectedUserId}
+      selectedLabel={userResponse?.name ?? ''}
+      setSelectedKey={setSelectedUserId}
       options={
         usersResponse?.paginatedResults?.map((user) => ({
           key: user?._id,
           label: user?.name,
         })) || []
       }
-      getOptionKey={(option) => option?.key}
-      renderInput={({ value, ...params }) => (
-        <TextField
-          {...params}
-          label='Search for Users'
-          value={isUserLoading ? LOADING : value}
-        />
-      )}
-      isOptionEqualToValue={(option, value) => option?.key === value}
+      placeholder='Search for Users'
       noOptionsText='No Users Found'
-      filterOptions={(options) => options}
     />
   )
 }

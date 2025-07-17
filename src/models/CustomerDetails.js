@@ -26,7 +26,7 @@ const customerDetailsSchema = mongoose.Schema({
   )
     ? {
         stockCycleId: {
-          type: Schema.Types.ObjectId,
+          type: String,
           required: true,
           ref: modelConstants.stock_cycle.modelName,
         },
@@ -44,7 +44,7 @@ const customerDetailsSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  emailAddress: {
+  emailId: {
     type: String,
     required: true,
   },
@@ -63,6 +63,14 @@ customerDetailsSchema.index(
   },
   { unique: true }
 )
+
+// if (
+//   CUSTOMER_DETAILS_SPECIFIC_TO.includes(
+//     modelConstants.stock_cycle.collectionName
+//   )
+// ) {
+//   customerDetailsSchema.index({ stockCycleId: 1, _id: 1 })
+// }
 
 const model = modelConstants.customer_details
 

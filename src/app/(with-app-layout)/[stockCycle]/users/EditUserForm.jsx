@@ -24,7 +24,7 @@ export default function EditUserForm({ refetchUsers }) {
     error: userError,
   } = useQuery({
     queryFn: async () => await handleServerAction(getUserAction, editingUserId),
-    queryKey: [editingUserId],
+    queryKey: ['getUserAction', editingUserId],
     enabled: Boolean(editingUserId),
   })
 

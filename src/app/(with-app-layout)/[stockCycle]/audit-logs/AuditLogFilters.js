@@ -112,11 +112,7 @@ export default function AuditLogFilters() {
           </IconButton>
         </Box>
         <Collapse in={filtersExpanded} timeout='auto' unmountOnExit>
-          <Grid
-            container
-            spacing={2}
-            columns={{ xs: 1, sm: 2, md: 3 }}
-            className='mt-2'>
+          <Grid container columnSpacing={2} columns={{ xs: 1, sm: 2, md: 3 }}>
             <Grid size={1}>
               <CollectionSelector
                 selectedCollectionName={selectedCollectionName}
@@ -125,6 +121,7 @@ export default function AuditLogFilters() {
             </Grid>
             <Grid size={1}>
               <TextField
+                margin='normal'
                 label='Search for Document ID'
                 fullWidth
                 value={selectedDocumentId}

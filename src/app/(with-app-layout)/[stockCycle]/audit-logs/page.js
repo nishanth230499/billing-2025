@@ -88,6 +88,7 @@ export default function Page() {
         endDateTime,
       }),
     queryKey: [
+      'getAuditLogsAction',
       pageNumber,
       pageSize,
       collectionName,

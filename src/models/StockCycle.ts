@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import { modelConstants } from './constants'
 
 const stockCycleSchema = new mongoose.Schema({
+  _id: { type: String },
   name: { type: String, required: true, unique: true, index: true },
   default: Boolean,
 })

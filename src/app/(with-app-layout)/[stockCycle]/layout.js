@@ -31,7 +31,7 @@ export default async function Layout({ children, params }) {
   if (!isStockCyclesSuccess) {
     return <Alert severity='error'>{stockCyclesError}</Alert>
   }
-  if (!stockCycles?.find(({ name }) => name === selectedStockCycle)) notFound()
+  if (!stockCycles?.find(({ _id }) => _id === selectedStockCycle)) notFound()
   return (
     <Box className='flex'>
       <AppDrawer
