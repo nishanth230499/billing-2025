@@ -38,7 +38,7 @@ export default function CreateCustomerForm({ refetchCustomers }) {
   const [name, setName] = useState('')
   const [place, setPlace] = useState('')
   const [firmId, setFirmId] = useState('')
-  const [openingBalance, setOpeningBalance] = useState('0')
+  const [openingBalance, setOpeningBalance] = useState('0.00')
   const [billingName, setBillingName] = useState('')
   const [billingAddress, setBillingAddress] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -64,7 +64,7 @@ export default function CreateCustomerForm({ refetchCustomers }) {
     setName('')
     setPlace('')
     setFirmId('')
-    setOpeningBalance('0')
+    setOpeningBalance('0.00')
     setBillingName('')
     setBillingAddress('')
     setPhoneNumber('')
@@ -304,7 +304,7 @@ export default function CreateCustomerForm({ refetchCustomers }) {
           </Grid>
         </Box>
       </DialogContent>
-      <DialogActions className='px-6 pb-5'>
+      <DialogActions className='px-6 pb-4'>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           className='rounded-3xl'

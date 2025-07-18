@@ -1,10 +1,11 @@
 'use client'
 
-import { Alert, Button, DialogActions, DialogContent } from '@mui/material'
+import { Button, DialogActions, DialogContent } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
 
+import ErrorAlert from '@/components/common/ErrorAlert'
 import { LOADING } from '@/constants'
 import handleServerAction from '@/lib/handleServerAction'
 
@@ -32,19 +33,17 @@ export default function ViewAuditLogUpdates() {
     enabled: Boolean(viewAuditLogId),
   })
 
-  if (isAuditLogError) {
-    return <Alert severity='error'>{auditLogError?.message}</Alert>
-  }
-
   return (
     <>
       {isAuditLogLoading ? LOADING : null}
       <DialogContent hidden={isAuditLogLoading}>
-        <pre className='border p-4 rounded overflow-auto'>
-          {JSON.stringify(auditLogResponse?.updatedFields, null, 2)}
-        </pre>
+        <ErrorAlert isError={isAuditLogError} error={auditLogError}>
+          <pre className='border p-4 rounded overflow-auto'>
+            {JSON.stringify(auditLogResponse?.updatedFields, null, 2)}
+          </pre>
+        </ErrorAlert>
       </DialogContent>
-      <DialogActions className='px-6 pb-5'>
+      <DialogActions className='px-6 pb-4'>
         <Button onClick={router.back}>Close</Button>
       </DialogActions>
     </>

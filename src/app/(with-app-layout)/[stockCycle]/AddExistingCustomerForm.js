@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  Alert,
   Box,
   Button,
   DialogActions,
@@ -16,6 +15,7 @@ import { enqueueSnackbar } from 'notistack'
 import { useCallback, useEffect, useState } from 'react'
 
 import { addCustomerAction, getCustomerAction } from '@/actions/customerActions'
+import ErrorAlert from '@/components/common/ErrorAlert'
 import CustomerSelector from '@/components/common/selectors/CustomerSelector'
 import handleServerAction from '@/lib/handleServerAction'
 
@@ -126,91 +126,90 @@ export default function AddExistingCustomerForm({ refetchCustomers }) {
     ]
   )
 
-  if (isCustomerError)
-    return <Alert severity='error'>{customerError.message}</Alert>
-
   return (
     <>
       <DialogContent>
-        <Box>
-          <Grid container columnSpacing={2} columns={{ xs: 1, sm: 2 }}>
-            <Grid size={1}>
-              <CustomerSelector
-                selectedCustomerId={selectedCustomerId}
-                setSelectedCustomerId={setSelectedCustomerId}
-                filter={{ stockCycle: { id: stockCycleId, exists: false } }}
-                isLoading={isCustomerLoading}
-                customerResponse={customerResponse}
-              />
+        <ErrorAlert isError={isCustomerError} error={customerError}>
+          <Box>
+            <Grid container columnSpacing={2} columns={{ xs: 1, sm: 2 }}>
+              <Grid size={1}>
+                <CustomerSelector
+                  selectedCustomerId={selectedCustomerId}
+                  setSelectedCustomerId={setSelectedCustomerId}
+                  filter={{ stockCycle: { id: stockCycleId, exists: false } }}
+                  isLoading={isCustomerLoading}
+                  customerResponse={customerResponse}
+                />
+              </Grid>
+              <Grid size={1} className='py-2' alignSelf='center'>
+                Customer ID: {selectedCustomerId}
+              </Grid>
             </Grid>
-            <Grid size={1} className='py-2' alignSelf='center'>
-              Customer ID: {selectedCustomerId}
+          </Box>
+          <Divider className='my-4' />
+          <Box component='form' noValidate onSubmit={handleSubmit}>
+            <input type='submit' hidden />
+            <Grid container columnSpacing={2} columns={{ xs: 1, sm: 2 }}>
+              <Grid size={{ xs: 1, sm: 2 }}>
+                The following fields are specific to the selected{' '}
+                <b>Stock Cycle</b>.
+              </Grid>
+              <Grid size={1}>
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  label='Billing Name'
+                  name='billingName'
+                  value={billingName}
+                  onChange={(e) => {
+                    setBillingName(e.target.value)
+                    setBillingNameError(e.target.value === '')
+                  }}
+                  error={billingNameError}
+                />
+              </Grid>
+              <Grid size={1}>
+                <TextField
+                  margin='normal'
+                  required
+                  fullWidth
+                  label='Billing Address'
+                  name='billingAddress'
+                  multiline
+                  value={billingAddress}
+                  onChange={(e) => {
+                    setBillingAddress(e.target.value)
+                    setBillingAddressError(e.target.value === '')
+                  }}
+                  error={billingAddressError}
+                />
+              </Grid>
+              <Grid size={1}>
+                <TextField
+                  margin='normal'
+                  fullWidth
+                  label='Email Address'
+                  name='email'
+                  value={emailId}
+                  onChange={(e) => setEmailId(e.target.value)}
+                />
+              </Grid>
+              <Grid size={1}>
+                <TextField
+                  margin='normal'
+                  fullWidth
+                  label='Phone Number'
+                  name='phoneNumber'
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
-        <Divider className='my-4' />
-        <Box component='form' noValidate onSubmit={handleSubmit}>
-          <input type='submit' hidden />
-          <Grid container columnSpacing={2} columns={{ xs: 1, sm: 2 }}>
-            <Grid size={{ xs: 1, sm: 2 }}>
-              The following fields are specific to the selected{' '}
-              <b>Stock Cycle</b>.
-            </Grid>
-            <Grid size={1}>
-              <TextField
-                margin='normal'
-                required
-                fullWidth
-                label='Billing Name'
-                name='billingName'
-                value={billingName}
-                onChange={(e) => {
-                  setBillingName(e.target.value)
-                  setBillingNameError(e.target.value === '')
-                }}
-                error={billingNameError}
-              />
-            </Grid>
-            <Grid size={1}>
-              <TextField
-                margin='normal'
-                required
-                fullWidth
-                label='Billing Address'
-                name='billingAddress'
-                multiline
-                value={billingAddress}
-                onChange={(e) => {
-                  setBillingAddress(e.target.value)
-                  setBillingAddressError(e.target.value === '')
-                }}
-                error={billingAddressError}
-              />
-            </Grid>
-            <Grid size={1}>
-              <TextField
-                margin='normal'
-                fullWidth
-                label='Email Address'
-                name='email'
-                value={emailId}
-                onChange={(e) => setEmailId(e.target.value)}
-              />
-            </Grid>
-            <Grid size={1}>
-              <TextField
-                margin='normal'
-                fullWidth
-                label='Phone Number'
-                name='phoneNumber'
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
-            </Grid>
-          </Grid>
-        </Box>
+          </Box>
+        </ErrorAlert>
       </DialogContent>
-      <DialogActions className='px-6 pb-5'>
+      <DialogActions className='px-6 pb-4'>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           className='rounded-3xl'

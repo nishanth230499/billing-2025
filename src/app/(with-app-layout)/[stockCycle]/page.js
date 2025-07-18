@@ -1,6 +1,6 @@
 'use client'
 
-import { Alert, Box, Button, Typography } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import React, { useContext, useMemo } from 'react'
@@ -8,6 +8,7 @@ import React, { useContext, useMemo } from 'react'
 import { getCustomersAction } from '@/actions/customerActions'
 import { AppContext } from '@/app/ClientProviders'
 import DataTable from '@/components/common/DataTable'
+import ErrorAlert from '@/components/common/ErrorAlert'
 import Modal from '@/components/common/Modal'
 import SearchBar from '@/components/common/SearchBar'
 import TableSkeleton from '@/components/TableSkeleton'
@@ -119,9 +120,7 @@ export default function Page() {
         <AddExistingCustomerForm refetchCustomers={refetchCustomers} />
       </Modal>
       {isCustomersLoading && <TableSkeleton />}
-      {isCustomersError ? (
-        <Alert severity='error'>{customersError.message}</Alert>
-      ) : (
+      <ErrorAlert isError={isCustomersError} error={customersError}>
         <DataTable
           hidden={isCustomersLoading}
           data={Object.fromEntries(
@@ -139,7 +138,7 @@ export default function Page() {
             return data?.firm?.[0]?.color
           }}
         />
-      )}
+      </ErrorAlert>
     </>
   )
 }

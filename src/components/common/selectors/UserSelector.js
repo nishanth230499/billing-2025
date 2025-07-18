@@ -1,6 +1,5 @@
 'use client'
 
-import { Alert } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useDebounce } from 'use-debounce'
@@ -9,6 +8,7 @@ import { getUserAction, getUsersAction } from '@/actions/userActions'
 import handleServerAction from '@/lib/handleServerAction'
 
 import AutoComplete from '../AutoComplete'
+import ErrorAlert from '../ErrorAlert'
 
 export default function UserSelector({ selectedUserId, setSelectedUserId }) {
   const [inputValue, setInputValue] = useState('')
@@ -37,26 +37,26 @@ export default function UserSelector({ selectedUserId, setSelectedUserId }) {
     enabled: Boolean(selectedUserId),
   })
 
-  if (isUsersError) return <Alert severity='error'>{usersError.message}</Alert>
-
-  if (isUserError) return <Alert severity='error'>{userError.message}</Alert>
-
   return (
-    <AutoComplete
-      loading={isUsersLoading || isUserLoading}
-      inputValue={inputValue}
-      setInputValue={setInputValue}
-      selectedKey={selectedUserId}
-      selectedLabel={userResponse?.name ?? ''}
-      setSelectedKey={setSelectedUserId}
-      options={
-        usersResponse?.paginatedResults?.map((user) => ({
-          key: user?._id,
-          label: user?.name,
-        })) || []
-      }
-      placeholder='Search for Users'
-      noOptionsText='No Users Found'
-    />
+    <ErrorAlert isError={isUsersError} error={usersError}>
+      <ErrorAlert isError={isUserError} error={userError}>
+        <AutoComplete
+          loading={isUsersLoading || isUserLoading}
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          selectedKey={selectedUserId}
+          selectedLabel={userResponse?.name ?? ''}
+          setSelectedKey={setSelectedUserId}
+          options={
+            usersResponse?.paginatedResults?.map((user) => ({
+              key: user?._id,
+              label: user?.name,
+            })) || []
+          }
+          placeholder='Search for Users'
+          noOptionsText='No Users Found'
+        />
+      </ErrorAlert>
+    </ErrorAlert>
   )
 }

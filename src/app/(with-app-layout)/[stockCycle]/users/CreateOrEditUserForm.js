@@ -282,7 +282,7 @@ export default function CreateOrEditUserForm({
           </Grid>
         </Box>
       </DialogContent>
-      <DialogActions className='px-6 pb-5'>
+      <DialogActions className='px-6 pb-4'>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           className='rounded-3xl'

@@ -1,11 +1,12 @@
 'use client'
 
-import { Alert, Box, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import React, { useMemo } from 'react'
 
 import { getAuditLogsAction } from '@/actions/auditLogActions'
 import DataTable from '@/components/common/DataTable'
+import ErrorAlert from '@/components/common/ErrorAlert'
 import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
@@ -109,9 +110,7 @@ export default function Page() {
         <ViewAuditLogUpdates />
       </Modal>
       {isAuditLogLoading && <TableSkeleton />}
-      {isAuditLogError ? (
-        <Alert severity='error'>{auditLogError.message}</Alert>
-      ) : (
+      <ErrorAlert isError={isAuditLogError} error={auditLogError}>
         <DataTable
           hidden={isAuditLogLoading}
           data={Object.fromEntries(
@@ -126,7 +125,7 @@ export default function Page() {
           columns={auditLogColumns}
           totalCount={auditLogResponse?.totalCount}
         />
-      )}
+      </ErrorAlert>
     </>
   )
 }

@@ -1,11 +1,12 @@
 'use client'
 
-import { Alert, Box, Button, Typography } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import React, { useMemo } from 'react'
 
 import { getUsersAction } from '@/actions/userActions'
 import DataTable from '@/components/common/DataTable'
+import ErrorAlert from '@/components/common/ErrorAlert'
 import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
@@ -79,9 +80,7 @@ export default function Page() {
       </Box>
 
       {isUsersLoading && <TableSkeleton />}
-      {isUsersError ? (
-        <Alert severity='error'>{usersError.message}</Alert>
-      ) : (
+      <ErrorAlert isError={isUsersError} error={usersError}>
         <DataTable
           hidden={isUsersLoading}
           data={Object.fromEntries(
@@ -92,7 +91,7 @@ export default function Page() {
           columns={usersTableColumns}
           totalCount={usersResponse?.totalCount}
         />
-      )}
+      </ErrorAlert>
     </>
   )
 }

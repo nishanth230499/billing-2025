@@ -2,12 +2,12 @@
 
 import { getUserAction } from '@/actions/userActions'
 import CreateOrEditUserForm from './CreateOrEditUserForm'
-import { Alert } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
 import { LOADING } from '@/constants'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import handleServerAction from '@/lib/handleServerAction'
+import ErrorAlert from '@/components/common/ErrorAlert'
 
 export default function EditUserForm({ refetchUsers }) {
   const searchParams = useSearchParams()
@@ -28,18 +28,17 @@ export default function EditUserForm({ refetchUsers }) {
     enabled: Boolean(editingUserId),
   })
 
-  if (isUserError) {
-    return <Alert severity='error'>{userError?.message}</Alert>
-  }
   return (
     <>
       {isUserLoading ? LOADING : null}
-      <CreateOrEditUserForm
-        isEditing
-        editingUser={userResponse}
-        hidden={isUserLoading}
-        refetchUsers={refetchUsers}
-      />
+      <ErrorAlert isError={isUserError} error={userError}>
+        <CreateOrEditUserForm
+          isEditing
+          editingUser={userResponse}
+          hidden={isUserLoading}
+          refetchUsers={refetchUsers}
+        />
+      </ErrorAlert>
     </>
   )
 }

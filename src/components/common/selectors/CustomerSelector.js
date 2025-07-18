@@ -1,6 +1,5 @@
 'use client'
 
-import { Alert } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useDebounce } from 'use-debounce'
@@ -9,6 +8,7 @@ import { getCustomersAction } from '@/actions/customerActions'
 import handleServerAction from '@/lib/handleServerAction'
 
 import AutoComplete from '../AutoComplete'
+import ErrorAlert from '../ErrorAlert'
 
 export default function CustomerSelector({
   filter,
@@ -31,29 +31,28 @@ export default function CustomerSelector({
     queryKey: ['getCustomersAction', searchText],
   })
 
-  if (isCustomersError)
-    return <Alert severity='error'>{customersError.message}</Alert>
-
   return (
-    <AutoComplete
-      loading={isCustomersLoading || isLoading}
-      inputValue={inputValue}
-      setInputValue={setInputValue}
-      selectedKey={selectedCustomerId}
-      selectedLabel={
-        customerResponse
-          ? `${customerResponse?.name}, ${customerResponse?.place}`
-          : ''
-      }
-      setSelectedKey={setSelectedCustomerId}
-      options={
-        customersResponse?.paginatedResults?.map((customer) => ({
-          key: customer?._id,
-          label: `${customer?.name}, ${customer?.place}`,
-        })) || []
-      }
-      placeholder='Search for Customers to Add'
-      noOptionsText='No Customers Found'
-    />
+    <ErrorAlert isError={isCustomersError} error={customersError}>
+      <AutoComplete
+        loading={isCustomersLoading || isLoading}
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        selectedKey={selectedCustomerId}
+        selectedLabel={
+          customerResponse
+            ? `${customerResponse?.name}, ${customerResponse?.place}`
+            : ''
+        }
+        setSelectedKey={setSelectedCustomerId}
+        options={
+          customersResponse?.paginatedResults?.map((customer) => ({
+            key: customer?._id,
+            label: `${customer?.name}, ${customer?.place}`,
+          })) || []
+        }
+        placeholder='Search for Customers to Add'
+        noOptionsText='No Customers Found'
+      />
+    </ErrorAlert>
   )
 }

@@ -25,7 +25,7 @@ export default async function Layout({ children, params }) {
   ])
 
   if (!isUserSucces) {
-    // Redirect to login or change password, based on the userError string
+    // TODO: Redirect to login or change password, based on the userError string
     return <Alert severity='error'>{userError}</Alert>
   }
   if (!isStockCyclesSuccess) {
