@@ -7,7 +7,6 @@ import React, { useMemo } from 'react'
 import { getAuditLogsAction } from '@/actions/auditLogActions'
 import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
-import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
@@ -106,9 +105,7 @@ export default function Page() {
         <Typography variant='h6'>Audit Logs</Typography>
       </Box>
       <AuditLogFilters />
-      <Modal openSearchParamKey='view_audit_log_updates' title='Updates'>
-        <ViewAuditLogUpdates />
-      </Modal>
+      <ViewAuditLogUpdates />
       {isAuditLogLoading && <TableSkeleton />}
       <ErrorAlert isError={isAuditLogError} error={auditLogError}>
         <DataTable

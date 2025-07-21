@@ -9,16 +9,14 @@ import { getCustomersAction } from '@/actions/customerActions'
 import { AppContext } from '@/app/ClientProviders'
 import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
-import Modal from '@/components/common/Modal'
 import SearchBar from '@/components/common/SearchBar'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
-import { modelConstants } from '@/models/constants'
 
-import AddExistingCustomerForm from './AddExistingCustomerForm'
-import CreateCustomerForm from './CreateCustomerForm'
+import AddExistingCustomerFormModal from './AddExistingCustomerFormModal'
+import CreateCustomerFormModal from './CreateCustomerFormModal'
 
 const customersTableColumns = {
   _id: { label: 'ID' },
@@ -45,7 +43,7 @@ export default function Page() {
     [searchParams]
   )
   const { appConfig } = useContext(AppContext)
-  const { CUSTOMER_DETAILS_SPECIFIC_TO } = appConfig
+  const { IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE } = appConfig
 
   const {
     data: customersResponse,
@@ -59,10 +57,8 @@ export default function Page() {
         pageNumber,
         pageSize,
         searchText,
-        filter: CUSTOMER_DETAILS_SPECIFIC_TO.includes(
-          modelConstants.stock_cycle.collectionName
-        )
-          ? { stockCycle: { id: stockCycleId, exists: true } }
+        filter: IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
+          ? { stockCycle: { id: stockCycleId } }
           : {},
         sortFields: searchText ? {} : { _id: 1 },
       }),
@@ -82,9 +78,7 @@ export default function Page() {
             }>
             Create New Customer
           </Button>
-          {CUSTOMER_DETAILS_SPECIFIC_TO.includes(
-            modelConstants.stock_cycle.collectionName
-          ) && (
+          {IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE && (
             <Button
               className='rounded-3xl hidden sm:block'
               variant='outlined'
@@ -96,9 +90,7 @@ export default function Page() {
           )}
         </Box>
       </Box>
-      {CUSTOMER_DETAILS_SPECIFIC_TO.includes(
-        modelConstants.stock_cycle.collectionName
-      ) && (
+      {IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE && (
         <Box className='flex items-center justify-end mb-4 sm:hidden'>
           <Button
             className='rounded-3xl'
@@ -113,12 +105,8 @@ export default function Page() {
       <Box className='mb-4'>
         <SearchBar label='Search for Customers' />
       </Box>
-      <Modal openSearchParamKey='create' title='Add Existing Customer'>
-        <CreateCustomerForm refetchCustomers={refetchCustomers} />
-      </Modal>
-      <Modal openSearchParamKey='add' title='Add Existing Customer'>
-        <AddExistingCustomerForm refetchCustomers={refetchCustomers} />
-      </Modal>
+      <CreateCustomerFormModal refetchCustomers={refetchCustomers} />
+      <AddExistingCustomerFormModal refetchCustomers={refetchCustomers} />
       {isCustomersLoading && <TableSkeleton />}
       <ErrorAlert isError={isCustomersError} error={customersError}>
         <DataTable
@@ -135,7 +123,7 @@ export default function Page() {
           columns={customersTableColumns}
           totalCount={customersResponse?.totalCount}
           getHighLightColor={(data) => {
-            return data?.firm?.[0]?.color
+            return data?.firm?.color
           }}
         />
       </ErrorAlert>

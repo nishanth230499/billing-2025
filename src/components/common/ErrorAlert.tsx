@@ -6,10 +6,10 @@ export default function ErrorAlert({
   error,
   children,
 }: {
-  isError: Boolean
-  error: Error
+  isError?: Boolean
+  error?: Error
   children?: ReactNode
 }) {
-  if (isError) return <Alert severity='error'>{error.message}</Alert>
+  if (isError) return <Alert severity='error'>{error?.message}</Alert>
   return children
 }

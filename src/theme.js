@@ -31,6 +31,9 @@ const theme = createTheme({
       fontSize: 16,
     },
   },
+  zIndex: {
+    loader: 1600,
+  },
   components: {
     MuiTableCell: {
       styleOverrides: {

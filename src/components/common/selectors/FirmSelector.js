@@ -13,6 +13,7 @@ export default function FirmSelector({
   selectedFirmId,
   setSelectedFirmId,
   error,
+  required,
 }) {
   const [inputValue, setInputValue] = useState('')
 
@@ -35,6 +36,7 @@ export default function FirmSelector({
     <ErrorAlert isError={isFirmsError} error={firmsError}>
       <AutoComplete
         error={error}
+        required={required}
         loading={isFirmsLoading}
         inputValue={inputValue}
         setInputValue={setInputValue}

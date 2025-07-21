@@ -1,7 +1,9 @@
 'use client'
 
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import CloseIcon from '@mui/icons-material/Close'
 import {
+  Backdrop,
+  CircularProgress,
   Dialog,
   DialogTitle,
   IconButton,
@@ -9,41 +11,24 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import { useRouter } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
 
 export default function Modal({
-  children,
-  openSearchParamKey,
   title,
+  children,
+  open,
+  onClose,
+  isLoading,
   maxWidth = 'md',
-  goBackOnClose = true,
 }) {
-  const router = useRouter()
-  const { searchParams, getURL } = useHandleSearchParams()
-
-  const openSearchParamValue = searchParams.get(openSearchParamKey)
-  const open = useMemo(
-    () => Boolean(openSearchParamValue) && openSearchParamValue !== 'false'
-  )
-
   const theme = useTheme()
   const isMobileWidth = useMediaQuery(theme.breakpoints.down('sm'))
-
-  const handleClose = useCallback(
-    goBackOnClose
-      ? router.back
-      : () => router.redirect(getURL({ [openSearchParamKey]: null })),
-    [goBackOnClose, router, getURL, openSearchParamKey]
-  )
 
   if (isMobileWidth) {
     return (
       <SwipeableDrawer
         anchor='bottom'
         open={open}
-        onClose={handleClose}
+        onClose={onClose}
         disableSwipeToOpen
         sx={{ zIndex: 'modal' }}
         slotProps={{
@@ -55,16 +40,26 @@ export default function Modal({
             },
           },
         }}>
+        <Backdrop
+          open={isLoading}
+          slotProps={{ root: { sx: { zIndex: 'loader' } } }}>
+          <CircularProgress color='inherit' />
+        </Backdrop>
         <DialogTitle>{title}</DialogTitle>
         {children}
       </SwipeableDrawer>
     )
   }
   return (
-    <Dialog fullWidth maxWidth={maxWidth} open={open} onClose={handleClose}>
+    <Dialog fullWidth maxWidth={maxWidth} open={open} onClose={onClose}>
+      <Backdrop
+        open={isLoading}
+        slotProps={{ root: { sx: { zIndex: 'loader' } } }}>
+        <CircularProgress color='inherit' />
+      </Backdrop>
       <IconButton
         aria-label='close'
-        onClick={handleClose}
+        onClick={onClose}
         className='absolute top-2 right-2'>
         <CloseIcon />
       </IconButton>

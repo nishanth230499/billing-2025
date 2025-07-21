@@ -7,15 +7,14 @@ import React, { useMemo } from 'react'
 import { getUsersAction } from '@/actions/userActions'
 import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
-import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
 
-import CreateOrEditUserForm from './CreateOrEditUserForm'
-import EditUserForm from './EditUserForm'
-import ResetPasswordForm from './ResetPasswordForm'
+import CreateUserFormModal from './CreateUserFormModal'
+import EditUserFormModal from './EditUserFormModal'
+import ResetPasswordFormModal from './ResetPasswordFormModal'
 import UsersTableActions from './UsersTableActions'
 
 const usersTableColumns = {
@@ -68,15 +67,9 @@ export default function Page() {
           }>
           Create User
         </Button>
-        <Modal openSearchParamKey='create' title='Create User'>
-          <CreateOrEditUserForm refetchUsers={refetchUsers} />
-        </Modal>
-        <Modal openSearchParamKey='edit_user' title='Edit User'>
-          <EditUserForm refetchUsers={refetchUsers} />
-        </Modal>
-        <Modal openSearchParamKey='reset_password_user' title='Reset Password'>
-          <ResetPasswordForm />
-        </Modal>
+        <CreateUserFormModal refetchUsers={refetchUsers} />
+        <EditUserFormModal refetchUsers={refetchUsers} />
+        <ResetPasswordFormModal />
       </Box>
 
       {isUsersLoading && <TableSkeleton />}

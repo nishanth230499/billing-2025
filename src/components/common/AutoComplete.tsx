@@ -11,6 +11,7 @@ export default function AutoComplete({
   autoFilterOptions = false,
   error = false,
   loading = false,
+  required = false,
   placeholder = 'Search',
   noOptionsText = 'Not Found',
 }: {
@@ -25,6 +26,7 @@ export default function AutoComplete({
   autoFilterOptions?: boolean
   error?: boolean
   loading?: boolean
+  required?: boolean
   placeholder?: string
   noOptionsText?: string
 }) {
@@ -50,6 +52,7 @@ export default function AutoComplete({
       renderInput={({ ...params }) => (
         <TextField
           {...params}
+          required={required}
           label={placeholder}
           margin='normal'
           error={error}

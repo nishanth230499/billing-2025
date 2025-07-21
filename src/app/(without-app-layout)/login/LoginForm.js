@@ -55,10 +55,8 @@ export default function LoginForm() {
             enqueueSnackbar(data, { variant: 'success' })
             router.push('/')
           },
-          onError: (error) => {
-            console.log(error)
-            enqueueSnackbar(error.message, { variant: 'error' })
-          },
+          onError: (error) =>
+            enqueueSnackbar(error.message, { variant: 'error' }),
         }
       )
     },

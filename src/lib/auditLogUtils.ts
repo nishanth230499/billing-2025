@@ -8,7 +8,7 @@ import AuditLog from '@/models/AuditLog'
 import { AuditLogType } from '../models/AuditLog'
 import getLoggedinUserId from './getLoggedinUserId'
 
-const ignoredFields = ['_id', '__v']
+const ignoredFields = ['_id', '__v', 'hashedPassword']
 
 interface ITrackParams {
   model: Model<any>

@@ -15,6 +15,8 @@ export default function CustomerSelector({
   selectedCustomerId,
   setSelectedCustomerId,
   isLoading,
+  required,
+  error,
   customerResponse,
 }) {
   const [inputValue, setInputValue] = useState('')
@@ -28,12 +30,14 @@ export default function CustomerSelector({
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getCustomersAction, { searchText, filter }),
-    queryKey: ['getCustomersAction', searchText],
+    queryKey: ['getCustomersAction', searchText, filter],
   })
 
   return (
     <ErrorAlert isError={isCustomersError} error={customersError}>
       <AutoComplete
+        error={error}
+        required={required}
         loading={isCustomersLoading || isLoading}
         inputValue={inputValue}
         setInputValue={setInputValue}
