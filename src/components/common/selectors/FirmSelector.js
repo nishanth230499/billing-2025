@@ -44,9 +44,10 @@ export default function FirmSelector({
         selectedLabel={selectedLabel}
         setSelectedKey={setSelectedFirmId}
         options={
-          firmsResponse?.map(({ _id, name }) => ({
+          firmsResponse?.map(({ _id, name, color }) => ({
             key: _id,
             label: name,
+            highlightColor: color,
           })) || []
         }
         placeholder='Search for Firms'

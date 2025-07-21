@@ -114,7 +114,7 @@ export default function Page() {
           data={Object.fromEntries(
             customersResponse?.paginatedResults?.map((user) => [
               user?._id,
-              user,
+              { ...user, _metaData: { highlightColor: user?.firm?.color } },
             ]) || []
           )}
           dataOrder={customersResponse?.paginatedResults?.map(
@@ -122,9 +122,6 @@ export default function Page() {
           )}
           columns={customersTableColumns}
           totalCount={customersResponse?.totalCount}
-          getHighLightColor={(data) => {
-            return data?.firm?.color
-          }}
         />
       </ErrorAlert>
     </>

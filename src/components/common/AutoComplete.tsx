@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from '@mui/material'
+import { Autocomplete, Box, TextField } from '@mui/material'
 import { useEffect } from 'react'
 
 export default function AutoComplete({
@@ -22,7 +22,7 @@ export default function AutoComplete({
   selectedLabel: string
   // eslint-disable-next-line no-unused-vars
   setSelectedKey: (key: string) => void
-  options: { key: string; label: string }[]
+  options: { key: string; label: string; highlightColor?: string }[]
   autoFilterOptions?: boolean
   error?: boolean
   loading?: boolean
@@ -57,6 +57,18 @@ export default function AutoComplete({
           margin='normal'
           error={error}
         />
+      )}
+      renderOption={(props, option) => (
+        <Box
+          component='li'
+          {...props}
+          sx={{
+            borderLeft: option.highlightColor
+              ? `4px solid ${option.highlightColor}`
+              : undefined,
+          }}>
+          {option.label}
+        </Box>
       )}
       isOptionEqualToValue={(option, selectedOption) =>
         option?.key === selectedOption?.key

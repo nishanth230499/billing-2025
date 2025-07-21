@@ -52,6 +52,7 @@ export default function CustomerSelector({
           customersResponse?.paginatedResults?.map((customer) => ({
             key: customer?._id,
             label: `${customer?.name}, ${customer?.place}`,
+            highlightColor: customer?.firm?.color,
           })) || []
         }
         placeholder='Search for Customers to Add'
