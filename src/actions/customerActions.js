@@ -254,7 +254,69 @@ async function addCustomer(customerId, customerReq) {
   }
 }
 
+async function editCustomer(customerId, customerReq) {
+  await connectDB()
+
+  try {
+    const { oldCustomer, newCustomer } = await withTransaction(
+      async ({ session }) => {
+        const customer = await Customer.findById(customerId)
+          .session(session)
+          .exec()
+        const oldCustomer = customer.toObject()
+
+        customer.name = customerReq?.name
+        customer.place = customerReq?.place
+        customer.openingBalance = customerReq?.openingBalance
+
+        if (IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE) {
+          const overrides = customer.stockCycleOverrides.id(
+            customerReq?.stockCycleId
+          )
+
+          Object.keys(additionalCustomerFields).forEach((fieldName) => {
+            if (STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)) {
+              overrides[fieldName] = customerReq?.[fieldName]
+            } else {
+              customer[fieldName] = customerReq?.[fieldName]
+            }
+          })
+        } else {
+          Object.keys(additionalCustomerFields).forEach((fieldName) => {
+            if (!STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)) {
+              customer[fieldName] = customerReq?.[fieldName]
+            }
+          })
+        }
+
+        await customer.save({ session })
+        const newCustomer = customer.toObject()
+        return { oldCustomer, newCustomer }
+      }
+    )
+
+    trackUpdates({
+      model: Customer,
+      documentId: oldCustomer._id,
+      oldDocument: oldCustomer,
+      newDocument: newCustomer,
+    })
+
+    return {
+      success: true,
+      data: 'Customer saved successfully!',
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      success: false,
+      error: e.message,
+    }
+  }
+}
+
 export const getCustomersAction = withAuth(getCustomers)
 export const getCustomerAction = withAuth(getCustomer)
 export const createCustomerAction = withAuth(createCustomer)
 export const addCustomerAction = withAuth(addCustomer)
+export const editCustomerAction = withAuth(editCustomer)

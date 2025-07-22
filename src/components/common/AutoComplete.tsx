@@ -60,8 +60,9 @@ export default function AutoComplete({
       )}
       renderOption={(props, option) => (
         <Box
-          component='li'
           {...props}
+          component='li'
+          key={option.key}
           sx={{
             borderLeft: option.highlightColor
               ? `4px solid ${option.highlightColor}`

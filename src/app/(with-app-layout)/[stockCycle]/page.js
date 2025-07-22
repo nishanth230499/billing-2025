@@ -17,11 +17,18 @@ import handleServerAction from '@/lib/handleServerAction'
 
 import AddExistingCustomerFormModal from './AddExistingCustomerFormModal'
 import CreateCustomerFormModal from './CreateCustomerFormModal'
+import CustomerTableActions from './CustomerTableActions'
+import EditCustomerFormModal from './EditCustomerFormModal'
 
 const customersTableColumns = {
   _id: { label: 'ID' },
   name: { label: 'Name' },
   place: { label: 'Place' },
+  actions: {
+    label: 'Actions',
+    component: CustomerTableActions,
+    slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
+  },
 }
 
 export default function Page() {
@@ -107,6 +114,7 @@ export default function Page() {
       </Box>
       <CreateCustomerFormModal refetchCustomers={refetchCustomers} />
       <AddExistingCustomerFormModal refetchCustomers={refetchCustomers} />
+      <EditCustomerFormModal refetchCustomers={refetchCustomers} />
       {isCustomersLoading && <TableSkeleton />}
       <ErrorAlert isError={isCustomersError} error={customersError}>
         <DataTable

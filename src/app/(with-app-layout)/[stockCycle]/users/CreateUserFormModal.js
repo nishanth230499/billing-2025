@@ -15,7 +15,7 @@ export default function CreateOrEditUserForm({ refetchUsers }) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const isMOdalOpen = useMemo(
+  const isModalOpen = useMemo(
     () => Boolean(searchParams.get('create')),
     [searchParams]
   )
@@ -123,7 +123,7 @@ export default function CreateOrEditUserForm({ refetchUsers }) {
 
   return (
     <FormModal
-      open={isMOdalOpen}
+      open={isModalOpen}
       title='Create User'
       formId='createUser'
       submitButtonLabel='Create'

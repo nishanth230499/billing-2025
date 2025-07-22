@@ -20,15 +20,15 @@ export default function AddExistingCustomerFormModal({ refetchCustomers }) {
 
   const stockCycleId = params.stockCycle
 
-  const isMOdalOpen = useMemo(() => searchParams.get('add'), [searchParams])
+  const isModalOpen = useMemo(() => searchParams.get('add'), [searchParams])
 
   const { CUSTOMER_ID_REGEX, STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS } = appConfig
 
   const [selectedCustomerId, setSelectedCustomerId] = useState('')
 
   useEffect(() => {
-    if (!isMOdalOpen) setSelectedCustomerId('')
-  }, [isMOdalOpen])
+    if (!isModalOpen) setSelectedCustomerId('')
+  }, [isModalOpen])
 
   const {
     data: customerResponse,
@@ -177,7 +177,7 @@ export default function AddExistingCustomerFormModal({ refetchCustomers }) {
 
   return (
     <FormModal
-      open={isMOdalOpen}
+      open={isModalOpen}
       title='Add Existing Customer'
       formId='addExistingCustomer'
       submitButtonLabel='Add'

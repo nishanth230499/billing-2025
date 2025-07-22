@@ -45,6 +45,16 @@ export default function SearchBar({ label, className }) {
             </InputAdornment>
           ),
         },
+        inputLabel: {
+          sx: {
+            marginLeft: 2,
+          },
+        },
+      }}
+      sx={{
+        '& legend': {
+          marginLeft: 2,
+        },
       }}
       className={className}
       label={label}

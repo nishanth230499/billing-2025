@@ -1,14 +1,16 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useContext, useMemo } from 'react'
 
-import { createCustomerAction } from '@/actions/customerActions'
+import {
+  editCustomerAction,
+  getCustomerAction,
+} from '@/actions/customerActions'
 import { AppContext } from '@/app/ClientProviders'
 import FormModal from '@/components/common/FormModal'
-import FirmSelector from '@/components/common/selectors/FirmSelector'
 import handleServerAction from '@/lib/handleServerAction'
 import {
   multilineNonEmptyRegex,
@@ -16,7 +18,7 @@ import {
   nonEmptyRegex,
 } from '@/lib/regex'
 
-export default function CreateCustomerFormModal({ refetchCustomers }) {
+export default function EditCustomerFormModal({ refetchCustomers }) {
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
@@ -24,21 +26,36 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
 
   const stockCycleId = params.stockCycle
 
-  const isModalOpen = useMemo(
-    () => Boolean(searchParams.get('create')),
+  const editingCustomerId = useMemo(
+    () => searchParams.get('edit_customer'),
     [searchParams]
   )
 
   const {
     AUTO_GENERATE_CUSTOMER_ID,
-    CUSTOMER_ID_REGEX,
     IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
     STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
   } = appConfig
 
-  const { mutate: createCustomer, isPending: isCreateCustomerLoading } =
+  const {
+    data: customerResponse,
+    isLoading: isCustomerLoading,
+    isError: isCustomerError,
+    error: customerError,
+  } = useQuery({
+    queryFn: async () =>
+      await handleServerAction(
+        getCustomerAction,
+        editingCustomerId,
+        stockCycleId
+      ),
+    queryKey: ['getCustomerAction', editingCustomerId, stockCycleId],
+    enabled: Boolean(editingCustomerId),
+  })
+
+  const { mutate: editCustomer, isPending: isEditCustomerLoading } =
     useMutation({
-      mutationFn: (data) => handleServerAction(createCustomerAction, data),
+      mutationFn: (data) => handleServerAction(editCustomerAction, ...data),
     })
 
   const additionalFields = useMemo(
@@ -72,20 +89,29 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
     []
   )
 
-  const createCustomerFormFields = useMemo(
+  const editCustomerFormFields = useMemo(
     () => ({
       ...(AUTO_GENERATE_CUSTOMER_ID
         ? {}
         : {
             id: {
-              type: 'input',
-              label: 'ID',
-              autoFocus: true,
-              required: true,
-              validator: (val) => new RegExp(CUSTOMER_ID_REGEX).test(val),
+              type: 'text',
+              text: (
+                <>
+                  ID: <b>{customerResponse?._id ?? ''}</b>
+                </>
+              ),
             },
           }),
 
+      firmId: {
+        type: 'text',
+        text: (
+          <>
+            Firm: <b>{customerResponse?.firm?.name ?? ''}</b>
+          </>
+        ),
+      },
       name: {
         type: 'input',
         label: 'Name',
@@ -96,18 +122,6 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
         type: 'input',
         label: 'Place',
         required: true,
-        validator: (val) => nonEmptyRegex.test(val),
-      },
-      firmId: {
-        type: 'custom',
-        component: ({ value, onChange, error }) => (
-          <FirmSelector
-            selectedFirmId={value}
-            setSelectedFirmId={onChange}
-            required
-            error={error}
-          />
-        ),
         validator: (val) => nonEmptyRegex.test(val),
       },
       openingBalance: {
@@ -144,27 +158,35 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
     }),
     [
       AUTO_GENERATE_CUSTOMER_ID,
-      CUSTOMER_ID_REGEX,
       IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
       STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
       additionalFields,
+      customerResponse?._id,
+      customerResponse?.firm?.name,
     ]
   )
 
   const initialFormFieldValues = useMemo(
     () => ({
-      id: '',
-      name: '',
-      place: '',
-      openingBalance: '0.00',
-      firmId: '',
-      billingName: '',
-      billingAddress: '',
-      gstin: '',
-      emailId: '',
-      phoneNumber: '',
+      name: customerResponse?.name,
+      place: customerResponse?.place,
+      openingBalance: customerResponse?.openingBalance?.toFixed(2),
+      billingName: customerResponse?.billingName,
+      billingAddress: customerResponse?.billingAddress,
+      gstin: customerResponse?.gstin,
+      emailId: customerResponse?.emailId,
+      phoneNumber: customerResponse?.phoneNumber,
     }),
-    []
+    [
+      customerResponse?.billingAddress,
+      customerResponse?.billingName,
+      customerResponse?.emailId,
+      customerResponse?.gstin,
+      customerResponse?.name,
+      customerResponse?.openingBalance,
+      customerResponse?.phoneNumber,
+      customerResponse?.place,
+    ]
   )
 
   const handleClose = useCallback(() => {
@@ -173,22 +195,24 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
 
   const handleSubmit = useCallback(
     async (formFieldValues) => {
-      createCustomer(
-        {
-          _id: formFieldValues?.id,
-          name: formFieldValues?.name?.trim(),
-          place: formFieldValues?.place?.trim(),
-          firmId: formFieldValues?.firmId,
-          openingBalance: parseFloat(formFieldValues?.openingBalance),
-          stockCycleId: IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
-            ? stockCycleId
-            : undefined,
-          billingName: formFieldValues?.billingName?.trim(),
-          billingAddress: formFieldValues?.billingAddress?.trim(),
-          gstin: formFieldValues?.gstin?.trim(),
-          emailId: formFieldValues?.emailId?.trim(),
-          phoneNumber: formFieldValues?.phoneNumber?.trim(),
-        },
+      editCustomer(
+        [
+          editingCustomerId,
+          {
+            name: formFieldValues?.name?.trim(),
+            place: formFieldValues?.place?.trim(),
+            firmId: formFieldValues?.firmId,
+            openingBalance: parseFloat(formFieldValues?.openingBalance),
+            stockCycleId: IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
+              ? stockCycleId
+              : undefined,
+            billingName: formFieldValues?.billingName?.trim(),
+            billingAddress: formFieldValues?.billingAddress?.trim(),
+            gstin: formFieldValues?.gstin?.trim(),
+            emailId: formFieldValues?.emailId?.trim(),
+            phoneNumber: formFieldValues?.phoneNumber?.trim(),
+          },
+        ],
         {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
@@ -201,7 +225,8 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
       )
     },
     [
-      createCustomer,
+      editCustomer,
+      editingCustomerId,
       IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
       stockCycleId,
       refetchCustomers,
@@ -211,13 +236,16 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
 
   return (
     <FormModal
-      open={isModalOpen}
-      title='Create Customer'
-      formId='createCustomer'
-      submitButtonLabel='Create'
-      formFields={createCustomerFormFields}
+      open={Boolean(editingCustomerId)}
+      title='Edit Customer'
+      formId='editCustomer'
+      submitButtonLabel='Save'
+      formFields={editCustomerFormFields}
       initialFormFieldValues={initialFormFieldValues}
-      isSubmitLoading={isCreateCustomerLoading}
+      isError={isCustomerError}
+      error={customerError}
+      isFormLoading={isCustomerLoading}
+      isSubmitLoading={isEditCustomerLoading}
       onSubmit={handleSubmit}
       onClose={handleClose}
     />
