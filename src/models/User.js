@@ -7,6 +7,7 @@ import { modelConstants } from './constants'
 export const UserType = Object.freeze({
   NORMAL: 'Normal',
   ADMIN: 'Admin',
+  SUPER_ADMIN: 'Super Admin',
 })
 
 const userSchema = mongoose.Schema(

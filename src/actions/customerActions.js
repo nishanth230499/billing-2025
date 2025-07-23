@@ -1,9 +1,9 @@
 'use server'
 
 import { DEFAULT_PAGE_SIZE } from '@/constants'
-import { trackCreation, trackUpdates } from '@/lib/auditLogUtils'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
+import { trackCreation, trackUpdates } from '@/lib/utils/auditLogUtils'
 import { withAuth } from '@/lib/withAuth'
 import withTransaction from '@/lib/withTransaction'
 import { modelConstants } from '@/models/constants'

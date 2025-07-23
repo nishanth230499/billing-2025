@@ -3,10 +3,9 @@
 import { diff } from 'json-diff'
 import { Model, Schema } from 'mongoose'
 
-import AuditLog from '@/models/AuditLog'
+import AuditLog, { AuditLogType } from '@/models/AuditLog'
 
-import { AuditLogType } from '../models/AuditLog'
-import getLoggedinUserId from './getLoggedinUserId'
+import getLoggedinUserId from '../getLoggedinUserId'
 
 const ignoredFields = ['_id', '__v', 'hashedPassword']
 

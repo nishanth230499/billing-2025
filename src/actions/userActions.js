@@ -3,10 +3,11 @@
 import bcrypt from 'bcryptjs'
 
 import { DEFAULT_PAGE_SIZE } from '@/constants'
-import { trackCreation, trackUpdates } from '@/lib/auditLogUtils'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
 import { passwordRegex } from '@/lib/regex'
+import { trackCreation, trackUpdates } from '@/lib/utils/auditLogUtils'
+import { isAdmin } from '@/lib/utils/userUtils'
 import { withAuth } from '@/lib/withAuth'
 import User from '@/models/User'
 
@@ -16,7 +17,7 @@ async function getUsers(
 ) {
   await connectDB()
 
-  if (loggedinUser?.type !== 'Admin') {
+  if (!isAdmin(loggedinUser)) {
     return {
       success: false,
       error: 'Only admins can request for all users.',
@@ -48,7 +49,7 @@ async function getUsers(
 async function getUser(userId, loggedinUser) {
   await connectDB()
 
-  if (loggedinUser?.type !== 'Admin') {
+  if (!isAdmin(loggedinUser)) {
     throw Error('Only admins can request for users.')
   }
 
@@ -63,7 +64,7 @@ async function getUser(userId, loggedinUser) {
 async function createUser(userReq, loggedinUser) {
   await connectDB()
 
-  if (loggedinUser?.type !== 'Admin') {
+  if (!isAdmin(loggedinUser)) {
     return {
       success: false,
       error: 'Only Admins can create users.',
@@ -111,7 +112,7 @@ async function createUser(userReq, loggedinUser) {
 async function editUser(userId, userReq, loggedinUser) {
   await connectDB()
 
-  if (loggedinUser?.type !== 'Admin') {
+  if (!isAdmin(loggedinUser)) {
     return {
       success: false,
       error: 'Only Admins can edit users.',
@@ -148,7 +149,7 @@ async function editUser(userId, userReq, loggedinUser) {
 async function resetPassword(userId, password, loggedinUser) {
   await connectDB()
 
-  if (loggedinUser?.type !== 'Admin') {
+  if (!isAdmin(loggedinUser)) {
     return {
       success: false,
       error: 'Only Admins can edit users.',

@@ -2,13 +2,15 @@
 
 import mongoose from 'mongoose'
 
+import { isAdmin } from '@/lib/utils/userUtils'
+
 import { DEFAULT_PAGE_SIZE } from '../constants'
 import { getPaginatedData } from '../lib/pagination'
 import { withAuth } from '../lib/withAuth'
 import AuditLog from '../models/AuditLog'
 
 async function getAuditLogs(filters = {}, loggedinUser) {
-  if (loggedinUser?.type !== 'Admin') {
+  if (!isAdmin(loggedinUser)) {
     return {
       success: false,
       error: 'Only admins can request this.',
@@ -80,7 +82,7 @@ async function getAuditLogs(filters = {}, loggedinUser) {
 }
 
 async function getAuditLog(auditLogId, loggedinUser) {
-  if (loggedinUser?.type !== 'Admin') {
+  if (!isAdmin(loggedinUser)) {
     return {
       success: false,
       error: 'Only admins can request this.',

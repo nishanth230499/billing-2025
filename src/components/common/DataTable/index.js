@@ -112,7 +112,11 @@ export default function DataTable({
           <TableRow>
             {canUpdateOrder && <TableCell className='w-[40px] pr-0' />}
             {Object.entries(columns).map(([columnKey, column]) => (
-              <TableCell key={columnKey}>{column?.label}</TableCell>
+              <TableCell
+                key={columnKey}
+                sx={{ backgroundImage: 'var(--mui-overlays-8)' }}>
+                {column?.label}
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>

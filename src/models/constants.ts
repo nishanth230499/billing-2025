@@ -4,7 +4,6 @@ type ModelConstantsKeyType =
   | 'audit_log'
   | 'firm'
   | 'customer'
-  | 'customer_details'
 
 type ModelConstantsType = {
   [key in ModelConstantsKeyType]: {
@@ -33,9 +32,5 @@ export const modelConstants: ModelConstantsType = {
   customer: {
     modelName: 'Customer',
     collectionName: 'customer',
-  },
-  customer_details: {
-    modelName: 'Customer Details',
-    collectionName: 'customer_details',
   },
 }
