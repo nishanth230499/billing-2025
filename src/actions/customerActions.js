@@ -33,7 +33,7 @@ async function getCustomers({
         ? [
             {
               $search: {
-                index: 'id_name_place_search_index',
+                index: 'id_name_place_searchIndex',
                 compound: {
                   should: [
                     { autocomplete: { query: searchText, path: '_id' } },

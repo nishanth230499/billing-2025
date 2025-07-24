@@ -50,6 +50,10 @@ export default function Page() {
     () => searchParams.get('documentId') ?? '',
     [searchParams]
   )
+  const updateType = useMemo(
+    () => searchParams.get('updateType') ?? '',
+    [searchParams]
+  )
   const updatedById = useMemo(
     () => searchParams.get('updatedById') ?? '',
     [searchParams]
@@ -83,6 +87,7 @@ export default function Page() {
         pageSize,
         collectionName,
         documentId,
+        updateType,
         updatedById,
         startDateTime,
         endDateTime,
@@ -93,6 +98,7 @@ export default function Page() {
       pageSize,
       collectionName,
       documentId,
+      updateType,
       updatedById,
       startDateTime,
       endDateTime,

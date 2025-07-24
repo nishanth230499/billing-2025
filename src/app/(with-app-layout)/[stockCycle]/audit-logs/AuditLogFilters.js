@@ -8,6 +8,7 @@ import {
   Grid,
   IconButton,
   InputAdornment,
+  MenuItem,
   Paper,
   TextField,
   Typography,
@@ -18,6 +19,7 @@ import CollectionSelector from '@/components/common/selectors/CollectionSelector
 import DateSelector from '@/components/common/selectors/DateSelector'
 import UserSelector from '@/components/common/selectors/UserSelector'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import { AuditLogType } from '@/models/AuditLog'
 
 export default function AuditLogFilters() {
   const { getURL, searchParams } = useHandleSearchParams()
@@ -32,6 +34,10 @@ export default function AuditLogFilters() {
   )
   const updatedById = useMemo(
     () => searchParams.get('updatedById') ?? '',
+    [searchParams]
+  )
+  const updateType = useMemo(
+    () => searchParams.get('updateType') ?? '',
     [searchParams]
   )
   const startDateTime = useMemo(
@@ -55,6 +61,7 @@ export default function AuditLogFilters() {
   const [selectedCollectionName, setSelectedCollectionName] =
     useState(collectionName)
   const [selectedDocumentId, setSelectedDocumentId] = useState(documentId)
+  const [selectedUpdateType, setSelectedUpdateType] = useState(updateType)
   const [selectedUserId, setSelectedUserId] = useState(updatedById)
   const [selectedStartDateTime, setSelectedStartDateTime] =
     useState(startDateTime)
@@ -67,6 +74,7 @@ export default function AuditLogFilters() {
       getURL({
         collectionName: selectedCollectionName || null,
         documentId: selectedDocumentId || null,
+        updateType: selectedUpdateType || null,
         updatedById: selectedUserId || null,
         startDateTime: selectedStartDateTime || null,
         endDateTime: selectedEndDateTime || null,
@@ -78,12 +86,14 @@ export default function AuditLogFilters() {
     selectedDocumentId,
     selectedEndDateTime,
     selectedStartDateTime,
+    selectedUpdateType,
     selectedUserId,
   ])
 
   const handleClearFilters = useCallback(() => {
     setSelectedCollectionName('')
     setSelectedDocumentId('')
+    setSelectedUpdateType('')
     setSelectedUserId('')
     setSelectedStartDateTime(0)
     setSelectedEndDateTime(0)
@@ -139,7 +149,22 @@ export default function AuditLogFilters() {
                 }}
               />
             </Grid>
-            <Grid size={1}></Grid>
+            <Grid size={1}>
+              <TextField
+                select
+                margin='normal'
+                fullWidth
+                label='Type'
+                value={selectedUpdateType}
+                onChange={(e) => setSelectedUpdateType(e.target.value)}>
+                <MenuItem value=''>All</MenuItem>
+                {Object.values(AuditLogType)?.map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
             <Grid size={1}>
               <UserSelector
                 selectedUserId={selectedUserId}

@@ -27,7 +27,7 @@ async function getCompanies({
         ? [
             {
               $search: {
-                index: 'id_name_tags_search_index',
+                index: 'id_name_shortName_tags_searchIndex',
                 compound: {
                   should: [
                     { autocomplete: { query: searchText, path: '_id' } },
@@ -35,6 +35,12 @@ async function getCompanies({
                       autocomplete: {
                         query: searchText,
                         path: 'name',
+                      },
+                    },
+                    {
+                      autocomplete: {
+                        query: searchText,
+                        path: 'shortName',
                       },
                     },
                     { autocomplete: { query: searchText, path: 'tags' } },

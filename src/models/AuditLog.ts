@@ -28,7 +28,7 @@ const auditLogSchema = new mongoose.Schema({
   updatedById: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User',
+    ref: modelConstants.user.modelName,
     index: 1,
   },
   updatedAt: {

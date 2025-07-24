@@ -21,6 +21,7 @@ async function getAuditLogs(filters = {}, loggedinUser) {
     pageSize = DEFAULT_PAGE_SIZE,
     updatedById = '',
     collectionName = '',
+    updateType = '',
     documentId = '',
     startDateTime = '',
     endDateTime = '',
@@ -33,6 +34,7 @@ async function getAuditLogs(filters = {}, loggedinUser) {
         $match: {
           ...(collectionName ? { collectionName } : {}),
           ...(documentId ? { documentId } : {}),
+          ...(updateType ? { type: updateType } : {}),
           ...(updatedById
             ? { updatedById: new mongoose.Types.ObjectId(updatedById) }
             : {}),

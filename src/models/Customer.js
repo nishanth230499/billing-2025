@@ -79,7 +79,7 @@ const customerSchema = mongoose.Schema(
 )
 
 customerSchema.searchIndex({
-  name: 'id_name_place_search_index',
+  name: 'id_name_place_searchIndex',
   definition: {
     mappings: {
       dynamic: false,
