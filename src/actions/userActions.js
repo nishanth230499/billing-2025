@@ -40,7 +40,9 @@ async function getUsers(
       : [],
     pageNumber,
     pageSize,
-    paginatedResultsPipeline: [{ $project: { hashedPassword: 0 } }],
+    paginatedResultsPipeline: [
+      { $project: { _id: 1, emailId: 1, name: 1, type: 1, active: 1 } },
+    ],
   })
 
   return { success: true, data: users }
@@ -53,7 +55,10 @@ async function getUser(userId, loggedinUser) {
     throw Error('Only admins can request for users.')
   }
 
-  const user = await User.findOne({ _id: userId }, { hashedPassword: 0 }).lean()
+  const user = await User.findOne(
+    { _id: userId },
+    { _id: 1, emailId: 1, name: 1, type: 1, active: 1 }
+  ).lean()
   if (user) {
     user._id = user._id.toString()
     return { success: true, data: user }

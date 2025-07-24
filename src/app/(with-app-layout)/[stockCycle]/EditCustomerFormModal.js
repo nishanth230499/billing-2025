@@ -32,7 +32,6 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
   )
 
   const {
-    AUTO_GENERATE_CUSTOMER_ID,
     IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
     STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
   } = appConfig
@@ -91,19 +90,14 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
 
   const editCustomerFormFields = useMemo(
     () => ({
-      ...(AUTO_GENERATE_CUSTOMER_ID
-        ? {}
-        : {
-            id: {
-              type: 'text',
-              text: (
-                <>
-                  ID: <b>{customerResponse?._id ?? ''}</b>
-                </>
-              ),
-            },
-          }),
-
+      id: {
+        type: 'text',
+        text: (
+          <>
+            ID: <b>{customerResponse?._id ?? ''}</b>
+          </>
+        ),
+      },
       firmId: {
         type: 'text',
         text: (
@@ -157,7 +151,6 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
       ),
     }),
     [
-      AUTO_GENERATE_CUSTOMER_ID,
       IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
       STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
       additionalFields,

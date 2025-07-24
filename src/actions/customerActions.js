@@ -1,5 +1,7 @@
 'use server'
 
+import mongoose from 'mongoose'
+
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
@@ -79,11 +81,6 @@ async function getCustomers({
     ],
     paginatedResultsPipeline: [
       {
-        $project: {
-          stockCycleOverrides: 0,
-        },
-      },
-      {
         $lookup: {
           from: modelConstants.firm.collectionName,
           localField: 'firmId',
@@ -94,6 +91,14 @@ async function getCustomers({
       {
         $set: {
           firm: { $first: '$firm' },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          place: 1,
+          'firm.color': 1,
         },
       },
     ],
@@ -160,7 +165,7 @@ async function getCustomer(customerId, stockCycleId = '') {
     customer[0]._id = customer[0]._id.toString()
     return { success: true, data: customer[0] }
   }
-  return { success: false, error: 'User not found!' }
+  return { success: false, error: 'Customer not found!' }
 }
 
 async function createCustomer(customerReq) {
@@ -260,7 +265,11 @@ async function editCustomer(customerId, customerReq) {
   try {
     const { oldCustomer, newCustomer } = await withTransaction(
       async ({ session }) => {
-        const customer = await Customer.findById(customerId)
+        const customer = await Customer.findById(
+          AUTO_GENERATE_CUSTOMER_ID
+            ? mongoose.Types.ObjectId(customerId)
+            : customerId
+        )
           .session(session)
           .exec()
         const oldCustomer = customer.toObject()

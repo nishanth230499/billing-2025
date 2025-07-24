@@ -63,7 +63,6 @@ async function getAuditLogs(filters = {}, loggedinUser) {
         $project: {
           collectionName: 1,
           documentId: 1,
-          updatedFields: 1,
           updatedAt: 1,
           type: 1,
           updatedBy: { _id: 1, name: 1 },
@@ -89,8 +88,10 @@ async function getAuditLog(auditLogId, loggedinUser) {
     }
   }
 
-  const auditLog = await AuditLog.findOne({ _id: auditLogId }).lean()
-  auditLog.updatedById = auditLog.updatedById.toString()
+  const auditLog = await AuditLog.findOne(
+    { _id: auditLogId },
+    { _id: 1, updatedFields: 1 }
+  ).lean()
   auditLog._id = auditLog._id.toString()
 
   return { success: true, data: auditLog }

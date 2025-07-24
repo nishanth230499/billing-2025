@@ -1,5 +1,3 @@
-import { CUSTOMER_ID_REGEX } from 'appConfig'
-
 export const nonEmptyRegex = new RegExp(/^(?!\s*$).+$/)
 
 export const multilineNonEmptyRegex = new RegExp(/^(?!\s*$).+$/m)
@@ -11,8 +9,6 @@ export const emailRegex = new RegExp(
 export const passwordRegex = new RegExp(
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,15}$/
 )
-
-export const customerIdRegex = new RegExp(CUSTOMER_ID_REGEX)
 
 export const amountRegex = new RegExp(/^\d+(\.\d{1,2})?$/)
 

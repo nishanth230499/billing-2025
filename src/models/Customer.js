@@ -1,9 +1,8 @@
 import mongoose from 'mongoose'
 
-import { customerIdRegex } from '@/lib/regex'
-
 import {
   AUTO_GENERATE_CUSTOMER_ID,
+  CUSTOMER_ID_REGEX,
   IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
   STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
 } from '../../appConfig'
@@ -35,7 +34,7 @@ const customerSchema = mongoose.Schema(
       ? {}
       : {
           type: String,
-          match: customerIdRegex,
+          match: new RegExp(CUSTOMER_ID_REGEX),
         },
     name: {
       type: String,

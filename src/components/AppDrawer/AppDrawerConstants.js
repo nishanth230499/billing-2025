@@ -94,10 +94,10 @@ export const appDrawerItems = [
     name: 'Company Pages',
     menuItems: [
       {
-        key: 'companys',
-        href: '/',
+        key: 'companies',
+        href: (stockCycle) => `/${stockCycle}/companies`,
         icon: BusinessIcon,
-        name: 'Companys',
+        name: 'Companies',
       },
       {
         key: 'create-purchase-order',
