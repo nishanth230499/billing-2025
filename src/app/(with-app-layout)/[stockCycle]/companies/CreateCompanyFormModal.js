@@ -112,7 +112,7 @@ export default function CreateCompanyFormModal({ refetchCompanies }) {
       emailId: '',
       shippingAddress: '',
       shippingPhoneNumber: '',
-      tags: new Set(),
+      tags: [],
     }),
     []
   )
@@ -135,8 +135,7 @@ export default function CreateCompanyFormModal({ refetchCompanies }) {
           emailId: formFieldValues?.emailId?.trim(),
           shippingAddress: formFieldValues?.shippingAddress?.trim(),
           shippingPhoneNumber: formFieldValues?.shippingPhoneNumber?.trim(),
-          tags:
-            [...(formFieldValues?.tags ?? [])]?.map((tag) => tag?.trim()) ?? [],
+          tags: formFieldValues?.tags?.map((tag) => tag.trim()) ?? [],
         },
         {
           onSuccess: async (data) => {

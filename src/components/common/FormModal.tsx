@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Chip,
@@ -11,11 +12,10 @@ import {
   Switch,
   TextField,
 } from '@mui/material'
-import { GridSize, ResponsiveStyleValue, Stack } from '@mui/system'
+import { GridSize, ResponsiveStyleValue } from '@mui/system'
 import {
   FormEventHandler,
   HTMLInputTypeAttribute,
-  KeyboardEvent,
   ReactNode,
   useCallback,
   useEffect,
@@ -197,51 +197,6 @@ export default function FormModal({
     [formFieldValues]
   )
 
-  const handleTagsKeyDown = useCallback(
-    (event: KeyboardEvent, formFieldName: string) => {
-      if (
-        event.key === 'Enter' &&
-        'value' in event.target &&
-        event.target.value !== ''
-      ) {
-        event.preventDefault()
-        setFormFieldValue(
-          (values: [any]) =>
-            new Set([
-              ...values,
-              'value' in event.target ? event.target.value : '',
-            ]),
-          formFieldName
-        )
-        // TODO: Validator is not working for tags type
-        // setFormFieldError(e.target.value, formFieldName, formFields?.[formFieldName]?.validator)
-        setFormFieldsTouched((fields) => ({
-          ...fields,
-          [formFieldName]: true,
-        }))
-        event.target.value = ''
-      }
-    },
-    [setFormFieldValue]
-  )
-
-  const handleTagDelete = useCallback(
-    (value: string, formFieldName: string) => {
-      setFormFieldValue((values: [any]) => {
-        const newSet = new Set([...values])
-        newSet.delete(value)
-        return newSet
-      }, formFieldName)
-      // TODO: Validator is not working for tags type
-      // setFormFieldError(e.target.value, formFieldName, formFields?.[formFieldName]?.validator)
-      setFormFieldsTouched((fields) => ({
-        ...fields,
-        [formFieldName]: true,
-      }))
-    },
-    [setFormFieldValue]
-  )
-
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (e) => {
       e.preventDefault()
@@ -384,42 +339,43 @@ export default function FormModal({
                     />
                   )}
                   {formField.type === 'tags' && (
-                    <Box sx={{ marginTop: 2, marginBottom: 1 }}>
-                      {formFieldValues?.[formFieldName]?.size ? (
-                        <Stack
-                          direction='row'
-                          flexWrap='wrap'
-                          gap={1}
-                          sx={{ marginBottom: 2 }}>
-                          {[...(formFieldValues?.[formFieldName] ?? [])].map(
-                            (val) => (
-                              <Chip
-                                key={val}
-                                label={val}
-                                variant='outlined'
-                                onDelete={() =>
-                                  handleTagDelete(val, formFieldName)
-                                }
-                              />
-                            )
-                          )}
-                        </Stack>
-                      ) : (
-                        'No Tages Selected'
+                    <Autocomplete
+                      clearIcon={false}
+                      options={[]}
+                      freeSolo
+                      multiple
+                      value={formFieldValues?.[formFieldName] ?? []}
+                      onChange={(_, values) => {
+                        setFormFieldValue(values, formFieldName)
+                        setFormFieldsTouched((fields) => ({
+                          ...fields,
+                          [formFieldName]: true,
+                        }))
+                      }}
+                      renderValue={(values, props) =>
+                        values.map((value, index) => (
+                          <Chip
+                            label={value}
+                            {...props({ index })}
+                            key={value}
+                          />
+                        ))
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          margin='normal'
+                          autoFocus={formField?.autoFocus}
+                          required={formField?.required}
+                          label={formField?.label}
+                          error={
+                            formFieldsTouched?.[formFieldName] &&
+                            formFieldErrors?.[formFieldName]
+                          }
+                          helperText={formField?.helperText}
+                        />
                       )}
-                      <TextField
-                        fullWidth
-                        autoFocus={formField?.autoFocus}
-                        required={formField?.required}
-                        label={formField?.label}
-                        onKeyDown={(e) => handleTagsKeyDown(e, formFieldName)}
-                        error={
-                          formFieldsTouched?.[formFieldName] &&
-                          formFieldErrors?.[formFieldName]
-                        }
-                        helperText={formField?.helperText}
-                      />
-                    </Box>
+                    />
                   )}
                   {formField?.type === 'divider' && (
                     <Divider className='my-4' />

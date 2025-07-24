@@ -109,7 +109,7 @@ export default function EditCompanyFormModal({ refetchCompanies }) {
       emailId: companyResponse?.emailId,
       shippingAddress: companyResponse?.shippingAddress,
       shippingPhoneNumber: companyResponse?.shippingPhoneNumber,
-      tags: new Set(companyResponse?.tags ?? []),
+      tags: companyResponse?.tags ?? [],
     }),
     [
       companyResponse?.address,
@@ -142,9 +142,7 @@ export default function EditCompanyFormModal({ refetchCompanies }) {
             emailId: formFieldValues?.emailId?.trim(),
             shippingAddress: formFieldValues?.shippingAddress?.trim(),
             shippingPhoneNumber: formFieldValues?.shippingPhoneNumber?.trim(),
-            tags:
-              [...(formFieldValues?.tags ?? [])]?.map((tag) => tag?.trim()) ??
-              [],
+            tags: formFieldValues?.tags?.map((tag) => tag.trim()) ?? [],
           },
         ],
         {
