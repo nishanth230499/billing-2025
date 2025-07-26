@@ -283,9 +283,12 @@ export default function FormModal({
                       }
                       helperText={formField?.helperText}
                       slotProps={{
-                        input: {
+                        htmlInput: {
                           sx: {
                             fontFamily: formField?.fontFamily ?? undefined,
+                            whiteSpace: formField?.multiline
+                              ? 'pre'
+                              : undefined,
                           },
                         },
                       }}
