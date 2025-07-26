@@ -20,6 +20,7 @@ import DateSelector from '@/components/common/selectors/DateSelector'
 import UserSelector from '@/components/common/selectors/UserSelector'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import { AuditLogType } from '@/models/AuditLog'
+import { modelConstants } from '@/models/constants'
 
 export default function AuditLogFilters() {
   const { getURL, searchParams } = useHandleSearchParams()
@@ -125,6 +126,7 @@ export default function AuditLogFilters() {
           <Grid container columnSpacing={2} columns={{ xs: 1, sm: 2, md: 3 }}>
             <Grid size={1}>
               <CollectionSelector
+                ignoreCollections={[modelConstants.audit_log.collectionName]}
                 selectedCollectionName={selectedCollectionName}
                 setSelectedCollectionName={setSelectedCollectionName}
               />

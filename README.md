@@ -44,3 +44,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - All the actions are exported withAuth
 - Either model.save or {runValidators: true} should be given
 - AuditLog along with transaction is added for every server action which updates DB
+- When new mongoose model is created, make sure it is also exported from index.ts

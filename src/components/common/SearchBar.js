@@ -4,22 +4,28 @@ import { useMemo, useState } from 'react'
 
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 
-export default function SearchBar({ label, className }) {
+export default function SearchBar({
+  label,
+  className,
+  validator = () => true,
+  searchParamName = 'searchText',
+}) {
   const { getURL, searchParams } = useHandleSearchParams()
 
   const selectedSearchText = useMemo(
-    () => searchParams.get('searchText') || '',
-    [searchParams]
+    () => searchParams.get(searchParamName) || '',
+    [searchParamName, searchParams]
   )
 
   const [searchText, setSearchText] = useState(selectedSearchText)
+  const error = useMemo(() => !validator(searchText), [searchText, validator])
 
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && validator(searchText)) {
       window.history.pushState(
         {},
         '',
-        getURL({ searchText: searchText || undefined })
+        getURL({ [searchParamName]: searchText || undefined })
       )
     }
   }
@@ -56,12 +62,14 @@ export default function SearchBar({ label, className }) {
           marginLeft: 2,
         },
       }}
+      margin='normal'
       className={className}
       label={label}
       fullWidth
       value={searchText}
       onChange={(e) => setSearchText(e.target.value)}
       onKeyDown={handleKeyDown}
+      error={error}
     />
   )
 }

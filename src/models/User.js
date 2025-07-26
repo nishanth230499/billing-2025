@@ -68,6 +68,8 @@ userSchema.searchIndex({
   },
 })
 
+export const dbEditorIgnoreFields = ['hashedPassword']
+
 const model = modelConstants.user
 
 export default mongoose.models?.[model?.modelName] ||

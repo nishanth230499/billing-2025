@@ -1,3 +1,5 @@
+import { SnakeToPascal } from '@/lib/utils/typeUtils'
+
 type ModelConstantsKeyType =
   | 'user'
   | 'stock_cycle'
@@ -8,7 +10,7 @@ type ModelConstantsKeyType =
 
 type ModelConstantsType = {
   [key in ModelConstantsKeyType]: {
-    modelName: string
+    modelName: SnakeToPascal<key>
     collectionName: key
   }
 }

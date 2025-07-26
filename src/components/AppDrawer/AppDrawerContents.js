@@ -19,11 +19,15 @@ import { PiPasswordBold } from 'react-icons/pi'
 
 import { logoutAction } from '@/actions/authActions'
 import handleServerAction from '@/lib/handleServerAction'
-import { UserType } from '@/models/User'
+import { isAdmin, isSuperAdmin } from '@/lib/utils/userUtils'
 
 import Dropdown from '../common/Dropdown'
 import AppDrawerButton from './AppDrawerButton'
-import { adminDrawerItems, appDrawerItems } from './AppDrawerConstants'
+import {
+  adminDrawerItems,
+  appDrawerItems,
+  superAdminDrawerItems,
+} from './AppDrawerConstants'
 
 export default function AppDrawerContents({
   isDrawerExpanded,
@@ -162,10 +166,18 @@ export default function AppDrawerContents({
           {renderDrawerItems(appDrawerItems)}
         </Box>
         <Divider />
-        {userType === UserType.ADMIN && (
+        {isAdmin({ type: userType }) && (
           <>
             <Box className={classNames('py-3 pr-3 flex flex-col items-start')}>
               {renderDrawerItems(adminDrawerItems)}
+            </Box>
+            <Divider />
+          </>
+        )}
+        {isSuperAdmin({ type: userType }) && (
+          <>
+            <Box className={classNames('py-3 pr-3 flex flex-col items-start')}>
+              {renderDrawerItems(superAdminDrawerItems)}
             </Box>
             <Divider />
           </>

@@ -7,6 +7,7 @@ import { modelConstants } from '@/models/constants'
 import AutoComplete from '../AutoComplete'
 
 export default function CollectionSelector({
+  ignoreCollections = [],
   selectedCollectionName,
   setSelectedCollectionName,
 }) {
@@ -24,10 +25,14 @@ export default function CollectionSelector({
       selectedKey={selectedCollectionName}
       selectedLabel={selectedModelName}
       setSelectedKey={setSelectedCollectionName}
-      options={Object.values(modelConstants).map((model) => ({
-        key: model?.collectionName,
-        label: model?.modelName,
-      }))}
+      options={Object.values(modelConstants)
+        .filter(
+          ({ collectionName }) => !ignoreCollections.includes(collectionName)
+        )
+        .map((model) => ({
+          key: model?.collectionName,
+          label: model?.modelName,
+        }))}
       autoFilterOptions
       placeholder='Search for Collections'
       noOptionsText='No Collections Found'

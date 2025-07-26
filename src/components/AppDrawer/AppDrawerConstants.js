@@ -13,6 +13,7 @@ import { FaSchoolFlag } from 'react-icons/fa6'
 import { IoDocumentsOutline } from 'react-icons/io5'
 import { LuPackagePlus } from 'react-icons/lu'
 import { SiBookstack } from 'react-icons/si'
+import { TbDatabaseEdit } from 'react-icons/tb'
 
 export const appDrawerItems = [
   {
@@ -133,5 +134,14 @@ export const adminDrawerItems = [
     icon: HistoryIcon,
     name: 'Audit Logs',
     href: (stockCycle) => `/${stockCycle}/audit-logs`,
+  },
+]
+
+export const superAdminDrawerItems = [
+  {
+    key: 'db-editor',
+    icon: TbDatabaseEdit,
+    name: 'DB Editor',
+    href: (stockCycle) => `/${stockCycle}/db-editor`,
   },
 ]

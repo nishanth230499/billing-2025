@@ -76,7 +76,7 @@ export default function Page() {
         </Box>
       </Box>
       <Box className='mb-4'>
-        <SearchBar label='Search for Customers' />
+        <SearchBar label='Search for Companies' />
       </Box>
       <CreateCompanyFormModal refetchCompanies={refetchCompanies} />
       <EditCompanyFormModal refetchCompanies={refetchCompanies} />
