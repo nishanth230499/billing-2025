@@ -15,7 +15,7 @@ export default function ViewAuditLogUpdates() {
   const searchParams = useSearchParams()
 
   const viewAuditLogId = useMemo(
-    () => searchParams.get('view_audit_log_updates'),
+    () => searchParams.get('viewAuditLog'),
     [searchParams]
   )
 

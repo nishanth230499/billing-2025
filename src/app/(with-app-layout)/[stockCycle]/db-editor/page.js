@@ -17,6 +17,7 @@ import { parseJsonString } from '@/lib/utils/jsonUtils'
 import { modelConstants } from '@/models/constants'
 
 import DocumentsTableActions from './DocumentsTableActions'
+import EditDocumentFormModal from './EditDocumentFormModal'
 
 const documentTableColumns = {
   _id: {
@@ -78,6 +79,7 @@ export default function Page() {
     isLoading: isDocumentsLoading,
     isError: isDocumentsError,
     error: documentsError,
+    refetch: refetchDocuments,
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getDocumentsAction, collectionName, {
@@ -112,10 +114,11 @@ export default function Page() {
           <SearchBar
             label='Filters'
             searchParamName='filter'
-            validator={parseJsonString}
+            validator={(filter) => filter === '' || parseJsonString(filter)}
           />
         </Grid>
       </Grid>
+      <EditDocumentFormModal refetchDocuments={refetchDocuments} />
       {isDocumentsLoading && <TableSkeleton />}
       <ErrorAlert isError={isDocumentsError} error={documentsError}>
         <DataTable

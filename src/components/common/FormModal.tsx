@@ -46,6 +46,7 @@ interface InputFormField extends FormFieldBase {
   // eslint-disable-next-line no-unused-vars
   validator?: (value: any, values: Object) => boolean
   helperText?: string
+  fontFamily?: string
 }
 
 interface SelectFormField extends FormFieldBase {
@@ -175,12 +176,7 @@ export default function FormModal({
           ...formFieldValues,
           [formFieldName]: value,
         })
-        if (typeof validationPassed === 'boolean') {
-          setFormFieldErrors((errors) => ({
-            ...errors,
-            [formFieldName]: !validationPassed,
-          }))
-        }
+
         if (typeof validationPassed === 'object') {
           setFormFieldErrors((errors) => ({
             ...errors,
@@ -190,6 +186,11 @@ export default function FormModal({
                 !passed,
               ])
             ),
+          }))
+        } else {
+          setFormFieldErrors((errors) => ({
+            ...errors,
+            [formFieldName]: !validationPassed,
           }))
         }
       }
@@ -210,13 +211,12 @@ export default function FormModal({
             formFieldValues?.[formFieldName],
             formFieldValues
           )
-          if (typeof validationPassed === 'boolean' && !validationPassed) {
-            newErrors[formFieldName] = true
-          }
           if (typeof validationPassed === 'object') {
             Object.entries(validationPassed).forEach(([name, passed]) => {
               newErrors[name] ||= !passed
             })
+          } else if (!validationPassed) {
+            newErrors[formFieldName] = true
           }
         }
       })
@@ -282,6 +282,13 @@ export default function FormModal({
                         formFieldErrors?.[formFieldName]
                       }
                       helperText={formField?.helperText}
+                      slotProps={{
+                        input: {
+                          sx: {
+                            fontFamily: formField?.fontFamily ?? undefined,
+                          },
+                        },
+                      }}
                     />
                   )}
                   {formField.type === 'select' && (

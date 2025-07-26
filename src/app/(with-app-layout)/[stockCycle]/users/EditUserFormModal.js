@@ -16,7 +16,7 @@ export default function EditUserFormModal({ refetchUsers }) {
   const searchParams = useSearchParams()
 
   const editingUserId = useMemo(
-    () => searchParams.get('edit_user'),
+    () => searchParams.get('editUser'),
     [searchParams]
   )
 

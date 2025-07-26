@@ -11,7 +11,7 @@ export default function DocumentsTableActions({ data }) {
     <IconButton
       color='primary'
       onClick={() =>
-        window.history.pushState({}, '', getURL({ edit_document: data?._id }))
+        window.history.pushState({}, '', getURL({ editDocument: data?._id }))
       }>
       <EditIcon />
     </IconButton>

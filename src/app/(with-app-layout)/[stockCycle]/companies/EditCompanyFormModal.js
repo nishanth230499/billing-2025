@@ -15,7 +15,7 @@ export default function EditCompanyFormModal({ refetchCompanies }) {
   const searchParams = useSearchParams()
 
   const editingCompanyId = useMemo(
-    () => searchParams.get('edit_company'),
+    () => searchParams.get('editCompany'),
     [searchParams]
   )
 

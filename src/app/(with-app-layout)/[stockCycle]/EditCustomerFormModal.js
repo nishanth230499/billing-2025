@@ -27,7 +27,7 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
   const stockCycleId = params.stockCycle
 
   const editingCustomerId = useMemo(
-    () => searchParams.get('edit_customer'),
+    () => searchParams.get('editCustomer'),
     [searchParams]
   )
 

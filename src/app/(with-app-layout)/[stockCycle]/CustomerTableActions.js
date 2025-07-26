@@ -11,7 +11,7 @@ export default function CustomerTableActions({ data }) {
     <IconButton
       color='primary'
       onClick={() =>
-        window.history.pushState({}, '', getURL({ edit_customer: data?._id }))
+        window.history.pushState({}, '', getURL({ editCustomer: data?._id }))
       }>
       <EditIcon />
     </IconButton>

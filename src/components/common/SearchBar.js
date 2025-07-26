@@ -42,7 +42,7 @@ export default function SearchBar({
                   window.history.pushState(
                     {},
                     '',
-                    getURL({ searchText: undefined })
+                    getURL({ [searchParamName]: undefined })
                   )
                   setSearchText('')
                 }}>

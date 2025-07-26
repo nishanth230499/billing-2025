@@ -11,7 +11,7 @@ export default function CompanyTableActions({ data }) {
     <IconButton
       color='primary'
       onClick={() =>
-        window.history.pushState({}, '', getURL({ edit_company: data?._id }))
+        window.history.pushState({}, '', getURL({ editCompany: data?._id }))
       }>
       <EditIcon />
     </IconButton>

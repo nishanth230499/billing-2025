@@ -15,7 +15,7 @@ export default function ResetPasswordFormModal() {
   const searchParams = useSearchParams()
 
   const resettingPasswordUserId = useMemo(
-    () => searchParams.get('reset_password_user'),
+    () => searchParams.get('resetPasswordUser'),
     [searchParams]
   )
 

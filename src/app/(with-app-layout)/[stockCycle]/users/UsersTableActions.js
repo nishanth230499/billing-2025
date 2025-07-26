@@ -13,7 +13,7 @@ export default function UsersTableActions({ data: user }) {
       <IconButton
         color='primary'
         onClick={() =>
-          window.history.pushState({}, '', getURL({ edit_user: user?._id }))
+          window.history.pushState({}, '', getURL({ editUser: user?._id }))
         }>
         <EditIcon />
       </IconButton>
@@ -23,7 +23,7 @@ export default function UsersTableActions({ data: user }) {
           window.history.pushState(
             {},
             '',
-            getURL({ reset_password_user: user?._id })
+            getURL({ resetPasswordUser: user?._id })
           )
         }>
         <LockResetIcon />

@@ -11,11 +11,7 @@ export default function AuditLogTableActions({ data }) {
     <IconButton
       color='primary'
       onClick={() =>
-        window.history.pushState(
-          {},
-          '',
-          getURL({ view_audit_log_updates: data?._id })
-        )
+        window.history.pushState({}, '', getURL({ viewAuditLog: data?._id }))
       }>
       <VisibilityIcon />
     </IconButton>
