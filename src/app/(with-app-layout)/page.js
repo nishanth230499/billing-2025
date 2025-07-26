@@ -11,6 +11,7 @@ export default async function Page() {
     error: defaultStockCycleError,
     data: defaultStockCycle,
   } = await getDefaultStockCycleAction()
+
   if (!success) {
     return <Alert severity='error'>{defaultStockCycleError}</Alert>
   }
