@@ -1,4 +1,4 @@
-'use server'
+'use client'
 
 import {
   Paper,
@@ -11,7 +11,7 @@ import {
   TableRow,
 } from '@mui/material'
 
-export default async function TableSkeleton() {
+export default function TableSkeleton() {
   return (
     <TableContainer component={Paper}>
       <Table>

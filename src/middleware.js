@@ -1,16 +1,18 @@
-import { createSession, verifySession } from '@/lib/session'
 import { NextResponse } from 'next/server'
+
+import createSession from './lib/session/createSession'
+import verifySession from './lib/session/verifySession'
 
 export async function middleware(request) {
   if (request.nextUrl.pathname === '/login') {
     return NextResponse.next()
   }
   try {
-    const { userId, verifyType } = await verifySession()
+    const { userId, verifyType, loggedinAt } = await verifySession()
     const requestHeaders = new Headers(request.headers)
-    // TODO: Check if tokens are issued after the password was changed
-    // TODO: Check if the user is active
-    requestHeaders.set('x-loggedin-user', userId)
+
+    requestHeaders.set('x-loggedin-user-id', userId)
+    requestHeaders.set('x-loggedin-at', loggedinAt)
     requestHeaders.set('x-current-path', request.nextUrl.pathname)
 
     const response = NextResponse.next({
@@ -20,7 +22,7 @@ export async function middleware(request) {
     })
 
     if (verifyType === 'refreshToken') {
-      await createSession(response.cookies, userId)
+      await createSession(response.cookies, userId, loggedinAt)
     }
     return response
   } catch (e) {

@@ -18,9 +18,11 @@ import AppDrawerContents from './AppDrawerContents'
 import { TABLET_MAX_WIDTH } from '@/constants'
 
 export default function AppDrawer({
-  academicYears,
-  selectedAcademicYear,
+  stockCycles,
+  selectedStockCycle,
   userName,
+  userType,
+  firms,
 }) {
   const [isDrawerOpen, setisDrawerOpen] = useState(false)
   const [isMouseInsideDrawer, setIsMouseInsideDrawer] = useState(false)
@@ -46,16 +48,22 @@ export default function AppDrawer({
           onOpen={() => setisDrawerOpen(true)}
           slotProps={{ paper: { className: 'max-h-screen w-3xs' } }}>
           <Box className='flex justify-around p-3'>
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocIRCsd8SrY92ohtV7FAiX2Xm5gydzTo5V4OcsDkiWTtbj8l8t1M=s288-c-no' />
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocL_UzuRNE07fm1oTzTxdWvLlLUOVaewORhWo4jgOIdxOYJj9w=s288-c-no' />
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocJKNw1Ycyf8irfjZSkOUN5oskeE5izE5t2oFynam2t7cb5yOms=s288-c-no' />
+            {firms?.map((firm) => (
+              <Avatar
+                key={firm?._id}
+                sx={{ border: `2px solid ${firm?.color}` }}
+                src={`/logos/${firm?.icon}`}
+                alt={`${firm?.name} Icon`}
+              />
+            ))}
           </Box>
           <Divider />
           <AppDrawerContents
             isDrawerExpanded
-            academicYears={academicYears}
-            selectedAcademicYear={selectedAcademicYear}
+            stockCycles={stockCycles}
+            selectedStockCycle={selectedStockCycle}
             userName={userName}
+            userType={userType}
           />
         </SwipeableDrawer>
         <Paper
@@ -66,7 +74,7 @@ export default function AppDrawer({
               : 'left 195ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
           }}
           className={classNames(
-            'fixed bottom-4 z-[1201] rounded-l-none rounded-r-3xl',
+            'fixed bottom-4 z-[1201] rounded-l-none rounded-r-3xl print:hidden',
             {
               'left-64 shadow-none': isDrawerOpen,
               'left-0': !isDrawerOpen,
@@ -86,10 +94,11 @@ export default function AppDrawer({
   return (
     <Drawer
       variant='permanent'
+      className='print:hidden'
       slotProps={{
         paper: {
           elevation: 1,
-          className: classNames('h-screen max-h-screen relative', {
+          className: classNames('h-screen max-h-screen sticky', {
             'w-3xs': isDrawerExpanded,
             'w-16': !isDrawerExpanded,
           }),
@@ -107,9 +116,14 @@ export default function AppDrawer({
         })}>
         {isDrawerExpanded && (
           <Box className='flex gap-4'>
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocIRCsd8SrY92ohtV7FAiX2Xm5gydzTo5V4OcsDkiWTtbj8l8t1M=s288-c-no' />
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocL_UzuRNE07fm1oTzTxdWvLlLUOVaewORhWo4jgOIdxOYJj9w=s288-c-no' />
-            <Avatar src='https://lh3.googleusercontent.com/a/ACg8ocJKNw1Ycyf8irfjZSkOUN5oskeE5izE5t2oFynam2t7cb5yOms=s288-c-no' />
+            {firms?.map((firm) => (
+              <Avatar
+                key={firm?._id}
+                sx={{ border: `2px solid ${firm?.color}` }}
+                src={`/logos/${firm?.icon}`}
+                alt={`${firm?.name} Icon`}
+              />
+            ))}
           </Box>
         )}
         <IconButton onClick={() => setisDrawerOpen(!isDrawerOpen)}>
@@ -140,9 +154,10 @@ export default function AppDrawer({
       >
         <AppDrawerContents
           isDrawerExpanded={isDrawerExpanded}
-          academicYears={academicYears}
-          selectedAcademicYear={selectedAcademicYear}
+          stockCycles={stockCycles}
+          selectedStockCycle={selectedStockCycle}
           userName={userName}
+          userType={userType}
         />
       </Box>
     </Drawer>

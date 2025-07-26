@@ -2,42 +2,30 @@ import { DEFAULT_PAGE_SIZE } from '@/constants'
 
 export async function getPaginatedData(model, options = {}) {
   const {
-    filter = {},
+    filtersPipeline = [],
     pageNumber = 0,
     pageSize = DEFAULT_PAGE_SIZE,
-    project = {},
-    addFields = {},
+    paginatedResultsPipeline = [],
   } = options
 
   const pipeline = [
+    ...filtersPipeline,
     {
-      $match: filter,
+      $facet: {
+        paginatedResults: [
+          { $skip: pageNumber * pageSize },
+          { $limit: pageSize },
+          ...paginatedResultsPipeline,
+          {
+            $addFields: {
+              _id: { $toString: '$_id' },
+            },
+          },
+        ],
+        totalCount: [{ $count: 'count' }],
+      },
     },
   ]
-
-  if (Object.keys(project).length > 0) {
-    pipeline.push({ $project: project })
-  }
-
-  if (Object.keys(addFields).length > 0) {
-    pipeline.push({ $addFields: addFields })
-  }
-
-  pipeline.push({
-    $addFields: {
-      _id: { $toString: '$_id' },
-    },
-  })
-
-  pipeline.push({
-    $facet: {
-      paginatedResults: [
-        { $skip: pageNumber * pageSize },
-        { $limit: pageSize },
-      ],
-      totalCount: [{ $count: 'count' }],
-    },
-  })
 
   const result = await model.aggregate(pipeline)
 

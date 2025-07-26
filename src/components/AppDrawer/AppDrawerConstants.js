@@ -1,29 +1,31 @@
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
-import BusinessIcon from '@mui/icons-material/Business'
-import MenuBookIcon from '@mui/icons-material/MenuBook'
-import { FaFileInvoice } from 'react-icons/fa'
-import ContentPasteIcon from '@mui/icons-material/ContentPaste'
-import { SiBookstack } from 'react-icons/si'
-import { LuPackagePlus } from 'react-icons/lu'
-import { FaRegListAlt } from 'react-icons/fa'
 import BackspaceIcon from '@mui/icons-material/Backspace'
-import { IoDocumentsOutline } from 'react-icons/io5'
+import BusinessIcon from '@mui/icons-material/Business'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste'
+import GroupIcon from '@mui/icons-material/Group'
+import HistoryIcon from '@mui/icons-material/History'
+import MenuBookIcon from '@mui/icons-material/MenuBook'
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
+import { FaFileInvoice } from 'react-icons/fa'
+import { FaRegListAlt } from 'react-icons/fa'
 import { FaSchoolFlag } from 'react-icons/fa6'
-import GroupIcon from '@mui/icons-material/Group'
+import { IoDocumentsOutline } from 'react-icons/io5'
+import { LuPackagePlus } from 'react-icons/lu'
+import { SiBookstack } from 'react-icons/si'
+import { TbDatabaseEdit } from 'react-icons/tb'
 
 export const appDrawerItems = [
   {
-    key: 'school',
+    key: 'Customer',
     icon: FaSchoolFlag,
-    name: 'School Pages',
+    name: 'Customer Pages',
     menuItems: [
       {
-        key: 'schools',
-        href: (academicYear) => `/${academicYear}`,
+        key: 'customers',
+        href: (stockCycle) => `/${stockCycle}`,
         icon: FaSchoolFlag,
-        name: 'Schools',
+        name: 'Customers',
       },
       {
         key: 'create-sales-order',
@@ -93,10 +95,10 @@ export const appDrawerItems = [
     name: 'Company Pages',
     menuItems: [
       {
-        key: 'companys',
-        href: '/',
+        key: 'companies',
+        href: (stockCycle) => `/${stockCycle}/companies`,
         icon: BusinessIcon,
-        name: 'Companys',
+        name: 'Companies',
       },
       {
         key: 'create-purchase-order',
@@ -125,6 +127,21 @@ export const adminDrawerItems = [
     key: 'users',
     icon: GroupIcon,
     name: 'Users',
-    href: (academicYear) => `/${academicYear}/users`,
+    href: (stockCycle) => `/${stockCycle}/users`,
+  },
+  {
+    key: 'audit-logs',
+    icon: HistoryIcon,
+    name: 'Audit Logs',
+    href: (stockCycle) => `/${stockCycle}/audit-logs`,
+  },
+]
+
+export const superAdminDrawerItems = [
+  {
+    key: 'db-editor',
+    icon: TbDatabaseEdit,
+    name: 'DB Editor',
+    href: (stockCycle) => `/${stockCycle}/db-editor`,
   },
 ]

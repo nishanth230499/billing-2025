@@ -60,6 +60,11 @@ export default function DataRow({
       ref={(ele) => dragPreview(drop(ele))}
       sx={{
         opacity: isDragging ? 0.3 : 1,
+        '& > td:first-child': {
+          borderLeft: data?._metaData?.highlightColor
+            ? `4px solid ${data?._metaData?.highlightColor}`
+            : undefined,
+        },
       }}>
       {canUpdateOrder && (
         <TableCell
@@ -75,17 +80,24 @@ export default function DataRow({
           key={columnKey}
           className={classNames({
             'border-inherit border-t border-b border-dashed': isDragging,
-          })}>
-          {column?.editable ? (
-            <input
-              ref={(ele) => setInputRef(ele, columnKey)}
-              onKeyDown={(e) => handleInputKeyDown(e, columnKey)}
-              value={data?.[columnKey]}
-              onChange={(e) => handleInputChange(e, columnKey)}
-            />
-          ) : (
-            data?.[columnKey]
-          )}
+          })}
+          {...(column?.slotProps?.tableBodyCell || {})}>
+          {(() => {
+            if (column?.component) {
+              return column?.component({ data })
+            }
+            if (column?.editable) {
+              return (
+                <input
+                  ref={(ele) => setInputRef(ele, columnKey)}
+                  onKeyDown={(e) => handleInputKeyDown(e, columnKey)}
+                  value={data?.[columnKey]}
+                  onChange={(e) => handleInputChange(e, columnKey)}
+                />
+              )
+            }
+            return data?.[columnKey]
+          })()}
         </TableCell>
       ))}
     </TableRow>

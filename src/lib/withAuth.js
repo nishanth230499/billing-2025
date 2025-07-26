@@ -1,10 +1,15 @@
-import { headers } from 'next/headers'
-import { verifySession } from './session'
+import isSessionActive from './session/isSessionActive'
+import verifySession from './session/verifySession'
 
 export function withAuth(action) {
   return async function (...args) {
-    await verifySession()
-    const loggedinUser = (await headers()).get('x-loggedin-user') || {}
-    return await action(loggedinUser, ...args)
+    let loggedinUser
+    try {
+      await verifySession()
+      loggedinUser = await isSessionActive()
+    } catch (e) {
+      return { success: false, error: e.message }
+    }
+    return await action(...args, loggedinUser)
   }
 }
