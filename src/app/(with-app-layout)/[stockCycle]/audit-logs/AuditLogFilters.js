@@ -1,15 +1,15 @@
 import ClearIcon from '@mui/icons-material/Clear'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
-  Collapse,
   Grid,
   IconButton,
   InputAdornment,
   MenuItem,
-  Paper,
   TextField,
   Typography,
 } from '@mui/material'
@@ -52,12 +52,23 @@ export default function AuditLogFilters() {
 
   const appliedFiltersCount = useMemo(
     () =>
-      [collectionName, updatedById, startDateTime, endDateTime].filter(Boolean)
-        .length,
-    [collectionName, endDateTime, startDateTime, updatedById]
+      [
+        collectionName,
+        documentId,
+        updateType,
+        updatedById,
+        startDateTime,
+        endDateTime,
+      ].filter(Boolean).length,
+    [
+      collectionName,
+      documentId,
+      endDateTime,
+      startDateTime,
+      updateType,
+      updatedById,
+    ]
   )
-
-  const [filtersExpanded, setFiltersExpanded] = useState(false)
 
   const [selectedCollectionName, setSelectedCollectionName] =
     useState(collectionName)
@@ -112,17 +123,17 @@ export default function AuditLogFilters() {
   }, [getURL])
 
   return (
-    <>
-      <Paper className='px-4 py-2 mb-4'>
-        <Box className='flex items-center justify-between'>
-          <Typography variant='h6'>{`Filters${
+    <Box className='mb-4'>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls='audit-log-filters-content'
+          id='audit-log-filters-header'>
+          <Typography variant='h6' component='span'>{`Filters${
             appliedFiltersCount ? ` (${appliedFiltersCount} applied)` : ''
           }`}</Typography>
-          <IconButton onClick={() => setFiltersExpanded(!filtersExpanded)}>
-            {filtersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </IconButton>
-        </Box>
-        <Collapse in={filtersExpanded} timeout='auto' unmountOnExit>
+        </AccordionSummary>
+        <AccordionDetails>
           <Grid container columnSpacing={2} columns={{ xs: 1, sm: 2, md: 3 }}>
             <Grid size={1}>
               <CollectionSelector
@@ -205,8 +216,8 @@ export default function AuditLogFilters() {
               </Button>
             </Grid>
           </Grid>
-        </Collapse>
-      </Paper>
-    </>
+        </AccordionDetails>
+      </Accordion>
+    </Box>
   )
 }
