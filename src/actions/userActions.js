@@ -28,12 +28,8 @@ async function getUsers(
     filtersPipeline: searchKey
       ? [
           {
-            $search: {
-              index: 'name_search_index', // optional, defaults to "default"
-              autocomplete: {
-                query: searchKey,
-                path: 'name',
-              },
+            $match: {
+              name: { $regex: searchKey, $options: 'i' },
             },
           },
         ]

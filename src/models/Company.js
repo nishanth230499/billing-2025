@@ -18,6 +18,7 @@ const companySchema = mongoose.Schema(
     shortName: {
       type: String,
     },
+    tags: [{ type: String, required: true }],
     address: {
       type: String,
     },
@@ -41,7 +42,6 @@ const companySchema = mongoose.Schema(
     shippingPhoneNumber: {
       type: String,
     },
-    tags: [{ type: String, required: true }],
   },
   { autoSearchIndex: true }
 )
