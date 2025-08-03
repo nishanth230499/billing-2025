@@ -41,9 +41,8 @@ const customerSchema = mongoose.Schema(
     name: {
       type: String,
       required: true,
-      index: 1,
     },
-    place: { type: String, required: true, index: 1 },
+    place: { type: String, required: true },
     firmId: {
       type: String,
       required: true,

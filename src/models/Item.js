@@ -52,6 +52,7 @@ const itemSchema = mongoose.Schema(
       type: AUTO_GENERATE_COMPANY_ID ? mongoose.Schema.Types.ObjectId : String,
       required: true,
       ref: modelConstants?.company?.modelName,
+      index: 1,
     },
     company: {
       name: {

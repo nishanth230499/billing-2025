@@ -15,23 +15,21 @@ import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
 
 import CreateItemFormModal from './CreateItemFormModal'
-
-// import CompanyTableActions from './CompanyTableActions'
-// import CreateCompanyFormModal from './CreateCompanyFormModal'
-// import EditCompanyFormModal from './EditCompanyFormModal'
+import EditItemFormModal from './EditItemFormModal'
+import ItemTableActions from './ItemTableActions'
 
 const itemTableColumns = {
   _id: { label: 'ID' },
-  companyShortName: { label: 'Company' },
+  companyShortName: { label: 'Company Short Name' },
   name: { label: 'Name' },
   group: { label: 'Group' },
   price: { label: 'Price' },
   hsnId: { label: 'HSN' },
-  // actions: {
-  //   label: 'Actions',
-  //   // component: CompanyTableActions,
-  //   slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
-  // },
+  actions: {
+    label: 'Actions',
+    component: ItemTableActions,
+    slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
+  },
 }
 
 export default function Page() {
@@ -107,7 +105,7 @@ export default function Page() {
       </Grid>
       <Box className='mb-4'></Box>
       <CreateItemFormModal refetchItems={refetchItems} />
-      {/* <EditCompanyFormModal refetchCompanies={refetchCompanies} /> */}
+      <EditItemFormModal refetchItems={refetchItems} />
       {isItemsLoading && <TableSkeleton />}
       <ErrorAlert isError={isItemsError} error={itemsError}>
         <DataTable
@@ -115,7 +113,11 @@ export default function Page() {
           data={Object.fromEntries(
             itemsResponse?.paginatedResults?.map((item) => [
               item?._id,
-              { ...item, companyShortName: item?.company?.shortName },
+              {
+                ...item,
+                companyShortName: item?.company?.shortName,
+                price: item?.price?.toFixed(2),
+              },
             ]) || []
           )}
           dataOrder={itemsResponse?.paginatedResults?.map((user) => user?._id)}

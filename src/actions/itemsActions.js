@@ -5,7 +5,7 @@ import mongoose from 'mongoose'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
-import { trackCreation } from '@/lib/utils/auditLogUtils'
+import { trackCreation, trackUpdates } from '@/lib/utils/auditLogUtils'
 import { withAuth } from '@/lib/withAuth'
 import withTransaction from '@/lib/withTransaction'
 import Item from '@/models/Item'
@@ -59,6 +59,24 @@ async function getItems({
                             },
                           },
                           { autocomplete: { query: searchText, path: 'tags' } },
+                          {
+                            autocomplete: {
+                              query: searchText,
+                              path: 'company.name',
+                            },
+                          },
+                          {
+                            autocomplete: {
+                              query: searchText,
+                              path: 'company.shortName',
+                            },
+                          },
+                          {
+                            autocomplete: {
+                              query: searchText,
+                              path: 'company.tags',
+                            },
+                          },
                         ]
                       : []),
                     ...(companySearchText
@@ -133,11 +151,10 @@ async function getItem(itemId) {
       'company.shortName': 1,
       hsnId: 1,
     }
-  )
+  ).lean()
 
   if (item) {
     item._id = item._id.toString()
-    item.companyId = item.companyId.toString()
     return { success: true, data: item }
   }
   return { success: false, error: 'Item not found!' }
@@ -232,55 +249,50 @@ async function createItem(itemReq) {
   }
 }
 
-// async function editCompany(companyId, companyReq) {
-//   await connectDB()
+async function editItem(itemId, itemReq) {
+  await connectDB()
 
-//   try {
-//     const companyUpdateFields = {
-//       name: companyReq?.name,
-//       shortName: companyReq?.shortName,
-//       address: companyReq?.address,
-//       gstin: companyReq?.gstin,
-//       phoneNumber: companyReq?.phoneNumber,
-//       emailId: companyReq?.emailId,
-//       shippingAddress: companyReq?.shippingAddress,
-//       shippingPhoneNumber: companyReq?.shippingPhoneNumber,
-//       tags: companyReq?.tags,
-//     }
+  try {
+    // If companyId is also changed, make sure to update company field by calling normalizer
+    const itemUpdateFields = {
+      name: itemReq?.name,
+      group: itemReq?.group,
+      price: itemReq?.price,
+      tags: itemReq?.tags,
+      hsnId: itemReq?.hsnId,
+    }
 
-//     const oldCompany = await Company.findOneAndUpdate(
-//       {
-//         _id: AUTO_GENERATE_COMPANY_ID
-//           ? mongoose.Types.ObjectId(companyId)
-//           : companyId,
-//       },
-//       companyUpdateFields,
-//       {
-//         runValidators: true,
-//       }
-//     ).lean()
+    const oldItem = await Item.findOneAndUpdate(
+      {
+        _id: AUTO_GENERATE_ITEM_ID ? mongoose.Types.ObjectId(itemId) : itemId,
+      },
+      itemUpdateFields,
+      {
+        runValidators: true,
+      }
+    ).lean()
 
-//     trackUpdates({
-//       model: Company,
-//       documentId: oldCompany._id,
-//       oldDocument: oldCompany,
-//       newDocument: companyUpdateFields,
-//     })
+    trackUpdates({
+      model: Item,
+      documentId: oldItem._id,
+      oldDocument: oldItem,
+      newDocument: itemUpdateFields,
+    })
 
-//     return {
-//       success: true,
-//       data: 'Company saved successfully!',
-//     }
-//   } catch (e) {
-//     console.error(e)
-//     return {
-//       success: false,
-//       error: e.message,
-//     }
-//   }
-// }
+    return {
+      success: true,
+      data: 'Item saved successfully!',
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      success: false,
+      error: e.message,
+    }
+  }
+}
 
 export const getItemsAction = withAuth(getItems)
 export const getItemAction = withAuth(getItem)
 export const createItemAction = withAuth(createItem)
-// export const editCompanyAction = withAuth(editCompany)
+export const editItemAction = withAuth(editItem)

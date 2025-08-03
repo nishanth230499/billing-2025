@@ -47,6 +47,7 @@ export default function CreateItemFormModal({ refetchItems }) {
             error={error}
           />
         ),
+        required: true,
         validator: (val) => nonEmptyRegex.test(val),
       },
       ...(AUTO_GENERATE_COMPANY_ID
@@ -112,6 +113,7 @@ export default function CreateItemFormModal({ refetchItems }) {
             error={error}
           />
         ),
+        required: true,
         validator: (val) => nonEmptyRegex.test(val),
       },
     }),
