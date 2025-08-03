@@ -12,7 +12,7 @@ import { withAuth } from '@/lib/withAuth'
 import User from '@/models/User'
 
 async function getUsers(
-  { pageNumber = 0, pageSize = DEFAULT_PAGE_SIZE, searchKey = '' },
+  { pageNumber = 0, pageSize = DEFAULT_PAGE_SIZE, searchText = '' },
   loggedinUser
 ) {
   await connectDB()
@@ -25,11 +25,11 @@ async function getUsers(
   }
 
   const users = await getPaginatedData(User, {
-    filtersPipeline: searchKey
+    filtersPipeline: searchText
       ? [
           {
             $match: {
-              name: { $regex: searchKey, $options: 'i' },
+              name: { $regex: searchText, $options: 'i' },
             },
           },
         ]

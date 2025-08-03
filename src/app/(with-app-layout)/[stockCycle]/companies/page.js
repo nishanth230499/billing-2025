@@ -97,7 +97,7 @@ export default function Page() {
             (user) => user?._id
           )}
           columns={companiesTableColumns}
-          totalCount={companiesTableColumns?.totalCount}
+          totalCount={companiesResponse?.totalCount}
         />
       </ErrorAlert>
     </>

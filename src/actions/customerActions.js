@@ -111,7 +111,11 @@ async function getCustomer(customerId, stockCycleId = '') {
   await connectDB()
   const customer = await Customer.aggregate([
     {
-      $match: { _id: customerId },
+      $match: {
+        _id: AUTO_GENERATE_CUSTOMER_ID
+          ? new mongoose.Types.ObjectId(customerId)
+          : customerId,
+      },
     },
     {
       $lookup: {
@@ -267,7 +271,7 @@ async function editCustomer(customerId, customerReq) {
       async ({ session }) => {
         const customer = await Customer.findById(
           AUTO_GENERATE_CUSTOMER_ID
-            ? mongoose.Types.ObjectId(customerId)
+            ? new mongoose.Types.ObjectId(customerId)
             : customerId
         )
           .session(session)

@@ -30,12 +30,14 @@ export const additionalCustomerFields = {
 
 const customerSchema = mongoose.Schema(
   {
-    _id: AUTO_GENERATE_CUSTOMER_ID
+    ...(AUTO_GENERATE_CUSTOMER_ID
       ? {}
       : {
-          type: String,
-          match: new RegExp(CUSTOMER_ID_REGEX),
-        },
+          _id: {
+            type: String,
+            match: new RegExp(CUSTOMER_ID_REGEX),
+          },
+        }),
     name: {
       type: String,
       required: true,

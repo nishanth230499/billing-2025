@@ -5,12 +5,14 @@ import { modelConstants } from './constants'
 
 const companySchema = mongoose.Schema(
   {
-    _id: AUTO_GENERATE_COMPANY_ID
+    ...(AUTO_GENERATE_COMPANY_ID
       ? {}
       : {
-          type: String,
-          match: new RegExp(COMPANY_ID_REGEX),
-        },
+          _id: {
+            type: String,
+            match: new RegExp(COMPANY_ID_REGEX),
+          },
+        }),
     name: {
       type: String,
       required: true,

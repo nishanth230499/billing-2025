@@ -61,7 +61,7 @@ export default function EditUserFormModal({ refetchUsers }) {
           label: type,
         })),
         required: true,
-        // TODO: Change validator to accept only 2 values
+        // TODO: Change validator to accept only 3 values
         validator: (val) => nonEmptyRegex.test(val),
         size: 6,
       },

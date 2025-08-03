@@ -7,10 +7,10 @@ import AuditLog, { AuditLogType } from '@/models/AuditLog'
 
 import getLoggedinUserId from '../getLoggedinUserId'
 
-const ignoredFields = ['_id', '__v', 'hashedPassword']
+const ignoredFields = ['_id', '__v']
 
 interface ITrackParams {
-  model: Model<any>
+  model: Model<any> & { dbEditorIgnoreFields?: string[] }
   documentId: Schema.Types.ObjectId | string
 }
 
@@ -28,8 +28,10 @@ export async function trackUpdates({
   const newFields: { [key: string]: any } = {}
   const oldFields: { [key: string]: any } = {}
 
+  const dbEditorIgnoreFields = model.dbEditorIgnoreFields ?? []
+
   for (const key in newDocument) {
-    if (!ignoredFields.includes(key)) {
+    if (!(ignoredFields.includes(key) || dbEditorIgnoreFields.includes(key))) {
       newFields[key] = newDocument[key]
       oldFields[key] = oldDocument[key]
     }
@@ -59,8 +61,11 @@ export async function trackCreation({
   newDocument,
 }: ITrackCreationParams): Promise<undefined> {
   const updatedFields: { [key: string]: any } = {}
+
+  const dbEditorIgnoreFields = model.dbEditorIgnoreFields ?? []
+
   for (const key in newDocument) {
-    if (!ignoredFields.includes(key)) {
+    if (!(ignoredFields.includes(key) || dbEditorIgnoreFields.includes(key))) {
       updatedFields[key] = newDocument[key]
     }
   }
@@ -86,8 +91,11 @@ export async function trackDeletion({
   oldDocument,
 }: ITrackDeletionParams) {
   const deletedFields: { [key: string]: any } = {}
+
+  const dbEditorIgnoreFields = model.dbEditorIgnoreFields ?? []
+
   for (const key in oldDocument) {
-    if (!ignoredFields.includes(key)) {
+    if (!(ignoredFields.includes(key) || dbEditorIgnoreFields.includes(key))) {
       deletedFields[key] = oldDocument[key]
     }
   }

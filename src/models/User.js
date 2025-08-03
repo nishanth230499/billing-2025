@@ -30,7 +30,7 @@ const userSchema = mongoose.Schema({
   active: { type: Boolean, default: true },
 })
 
-export const dbEditorIgnoreFields = ['hashedPassword']
+userSchema.statics.dbEditorIgnoreFields = ['hashedPassword']
 
 const model = modelConstants.user
 
