@@ -2,31 +2,19 @@ import ClearIcon from '@mui/icons-material/Clear'
 import { IconButton, InputAdornment, TextField } from '@mui/material'
 import { useMemo, useState } from 'react'
 
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
-
 export default function SearchBar({
   label,
   className,
   validator = () => true,
-  searchParamName = 'searchText',
+  searchText: selectedSearchText,
+  setSearchText: setSelectedSearchText,
 }) {
-  const { getURL, searchParams } = useHandleSearchParams()
-
-  const selectedSearchText = useMemo(
-    () => searchParams.get(searchParamName) || '',
-    [searchParamName, searchParams]
-  )
-
   const [searchText, setSearchText] = useState(selectedSearchText)
   const error = useMemo(() => !validator(searchText), [searchText, validator])
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && validator(searchText)) {
-      window.history.replaceState(
-        {},
-        '',
-        getURL({ [searchParamName]: searchText || undefined })
-      )
+      setSelectedSearchText(searchText || '')
     }
   }
 
@@ -39,11 +27,7 @@ export default function SearchBar({
             <InputAdornment position='end'>
               <IconButton
                 onClick={() => {
-                  window.history.replaceState(
-                    {},
-                    '',
-                    getURL({ [searchParamName]: undefined })
-                  )
+                  setSelectedSearchText('')
                   setSearchText('')
                 }}>
                 <ClearIcon />

@@ -34,7 +34,7 @@ const itemTableColumns = {
 }
 
 export default function Page() {
-  const { getURL, searchParams } = useHandleSearchParams()
+  const { searchParams, replaceURL } = useHandleSearchParams()
 
   const companyId = useMemo(
     () => searchParams.get('companyId') || '',
@@ -90,17 +90,17 @@ export default function Page() {
         <Grid size={{ xs: 3, sm: 1 }}>
           <CompanySelector
             selectedCompanyId={companyId}
-            setSelectedCompanyId={(id) =>
-              window.history.replaceState(
-                {},
-                '',
-                getURL({ companyId: id || null })
-              )
-            }
+            setSelectedCompanyId={(id) => replaceURL({ companyId: id || null })}
           />
         </Grid>
         <Grid size={{ xs: 3, sm: 2 }}>
-          <SearchBar label='Search for Items' />
+          <SearchBar
+            label='Search for Items'
+            searchText={searchText}
+            setSearchText={(text) =>
+              replaceURL({ searchText: text || undefined })
+            }
+          />
         </Grid>
       </Grid>
       <Box className='mb-4'></Box>

@@ -22,5 +22,11 @@ export default function useHandleSearchParams() {
     [pathname, searchParams]
   )
 
-  return { searchParams, getURL: generateURL }
+  const replaceURL = useCallback(
+    (newParams: { [s: string]: string | null | undefined }) =>
+      window.history.replaceState({}, '', generateURL(newParams)),
+    [generateURL]
+  )
+
+  return { searchParams, getURL: generateURL, replaceURL }
 }

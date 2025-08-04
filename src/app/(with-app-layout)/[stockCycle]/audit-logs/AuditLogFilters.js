@@ -23,7 +23,7 @@ import { AuditLogType } from '@/models/AuditLog'
 import { modelConstants } from '@/models/constants'
 
 export default function AuditLogFilters() {
-  const { getURL, searchParams } = useHandleSearchParams()
+  const { replaceURL, searchParams } = useHandleSearchParams()
 
   const collectionName = useMemo(
     () => searchParams.get('collectionName') ?? '',
@@ -80,20 +80,16 @@ export default function AuditLogFilters() {
   const [selectedEndDateTime, setSelectedEndDateTime] = useState(endDateTime)
 
   const handleApplyFilters = useCallback(() => {
-    window.history.replaceState(
-      {},
-      '',
-      getURL({
-        collectionName: selectedCollectionName || null,
-        documentId: selectedDocumentId || null,
-        updateType: selectedUpdateType || null,
-        updatedById: selectedUserId || null,
-        startDateTime: selectedStartDateTime || null,
-        endDateTime: selectedEndDateTime || null,
-      })
-    )
+    replaceURL({
+      collectionName: selectedCollectionName || null,
+      documentId: selectedDocumentId || null,
+      updateType: selectedUpdateType || null,
+      updatedById: selectedUserId || null,
+      startDateTime: selectedStartDateTime || null,
+      endDateTime: selectedEndDateTime || null,
+    })
   }, [
-    getURL,
+    replaceURL,
     selectedCollectionName,
     selectedDocumentId,
     selectedEndDateTime,
@@ -109,18 +105,15 @@ export default function AuditLogFilters() {
     setSelectedUserId('')
     setSelectedStartDateTime(0)
     setSelectedEndDateTime(0)
-    window.history.replaceState(
-      {},
-      '',
-      getURL({
-        collectionName: null,
-        documentId: null,
-        updatedById: null,
-        startDateTime: null,
-        endDateTime: null,
-      })
-    )
-  }, [getURL])
+
+    replaceURL({
+      collectionName: null,
+      documentId: null,
+      updatedById: null,
+      startDateTime: null,
+      endDateTime: null,
+    })
+  }, [replaceURL])
 
   return (
     <Box className='mb-4'>

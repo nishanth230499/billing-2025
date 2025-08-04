@@ -40,7 +40,7 @@ const documentTableColumns = {
 }
 
 export default function Page() {
-  const { getURL, searchParams } = useHandleSearchParams()
+  const { searchParams, replaceURL } = useHandleSearchParams()
 
   const collectionName = useMemo(
     () => searchParams.get('collectionName') ?? '',
@@ -56,15 +56,11 @@ export default function Page() {
 
   const handleCollectionNameChange = useCallback(
     (val) => {
-      window.history.replaceState(
-        {},
-        '',
-        getURL({
-          collectionName: val || null,
-        })
-      )
+      replaceURL({
+        collectionName: val || null,
+      })
     },
-    [getURL]
+    [replaceURL]
   )
 
   const {
@@ -106,8 +102,9 @@ export default function Page() {
         <Grid size={{ xs: 3, sm: 2 }}>
           <SearchBar
             label='Filters'
-            searchParamName='filter'
             validator={(filter) => filter === '' || parseJsonString(filter)}
+            searchText={filter}
+            setSearchText={(text) => replaceURL({ filter: text || undefined })}
           />
         </Grid>
       </Grid>

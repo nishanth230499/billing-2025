@@ -29,7 +29,7 @@ export const appDrawerItems = [
       },
       {
         key: 'create-sales-order',
-        href: '/',
+        href: (stockCycle) => `/${stockCycle}/sales-order/create`,
         icon: PlaylistAddIcon,
         name: 'Create Sales Order',
       },

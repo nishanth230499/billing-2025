@@ -10,7 +10,7 @@ export default function usePaginationControl(
   pageNumberSearchParamName: string = 'pageNumber',
   pageSizeSearchParamName: string = 'pageSize'
 ) {
-  const { getURL, searchParams } = useHandleSearchParams()
+  const { replaceURL, searchParams } = useHandleSearchParams()
 
   const pageNumber = useMemo(
     () => Number(searchParams.get(pageNumberSearchParamName)) || 0,
@@ -24,27 +24,19 @@ export default function usePaginationControl(
 
   const setPageNumber = useCallback(
     (page: number) => {
-      window.history.replaceState(
-        {},
-        '',
-        getURL({ [pageNumberSearchParamName]: page.toString() })
-      )
+      replaceURL({ [pageNumberSearchParamName]: page.toString() })
     },
-    [getURL, pageNumberSearchParamName]
+    [replaceURL, pageNumberSearchParamName]
   )
 
   const setPageSize = useCallback(
     (size: number) => {
-      window.history.replaceState(
-        {},
-        '',
-        getURL({
-          [pageSizeSearchParamName]: size.toString(),
-          [pageNumberSearchParamName]: '0',
-        })
-      )
+      replaceURL({
+        [pageSizeSearchParamName]: size.toString(),
+        [pageNumberSearchParamName]: '0',
+      })
     },
-    [getURL, pageNumberSearchParamName, pageSizeSearchParamName]
+    [replaceURL, pageNumberSearchParamName, pageSizeSearchParamName]
   )
 
   return { pageNumber, setPageNumber, pageSize, setPageSize }

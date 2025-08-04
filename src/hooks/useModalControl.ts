@@ -8,17 +8,13 @@ export default function useModalControl(
   searchParamName: string,
   additionalSearchParamNames: string[] = []
 ) {
-  const { getURL, searchParams } = useHandleSearchParams()
+  const { replaceURL, searchParams } = useHandleSearchParams()
 
   const setModalValue = useCallback(
     (searchParamValue: string) => {
-      window.history.replaceState(
-        {},
-        '',
-        getURL({ [searchParamName]: searchParamValue })
-      )
+      replaceURL({ [searchParamName]: searchParamValue })
     },
-    [getURL, searchParamName]
+    [replaceURL, searchParamName]
   )
 
   const additionalModalValues = useMemo(() => {
@@ -35,17 +31,13 @@ export default function useModalControl(
   )
 
   const handleCloseModal = useCallback(() => {
-    window.history.replaceState(
-      {},
-      '',
-      getURL({
-        [searchParamName]: null,
-        ...Object.fromEntries(
-          additionalSearchParamNames.map((name) => [name, null])
-        ),
-      })
-    )
-  }, [additionalSearchParamNames, getURL, searchParamName])
+    replaceURL({
+      [searchParamName]: null,
+      ...Object.fromEntries(
+        additionalSearchParamNames.map((name) => [name, null])
+      ),
+    })
+  }, [additionalSearchParamNames, replaceURL, searchParamName])
 
   return { setModalValue, modalValue, additionalModalValues, handleCloseModal }
 }

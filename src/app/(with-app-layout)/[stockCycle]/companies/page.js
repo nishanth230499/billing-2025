@@ -29,7 +29,7 @@ const companiesTableColumns = {
 }
 
 export default function Page() {
-  const { searchParams } = useHandleSearchParams()
+  const { searchParams, replaceURL } = useHandleSearchParams()
   const searchText = useMemo(
     () => searchParams.get('searchText') || '',
     [searchParams]
@@ -75,7 +75,13 @@ export default function Page() {
         </Box>
       </Box>
       <Box className='mb-4'>
-        <SearchBar label='Search for Companies' />
+        <SearchBar
+          label='Search for Companies'
+          searchText={searchText}
+          setSearchText={(text) =>
+            replaceURL({ searchText: text || undefined })
+          }
+        />
       </Box>
       <CreateCompanyFormModal refetchCompanies={refetchCompanies} />
       <EditCompanyFormModal refetchCompanies={refetchCompanies} />

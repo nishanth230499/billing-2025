@@ -34,7 +34,7 @@ const customersTableColumns = {
 }
 
 export default function Page() {
-  const { searchParams } = useHandleSearchParams()
+  const { searchParams, replaceURL } = useHandleSearchParams()
   const params = useParams()
 
   const stockCycleId = params.stockCycle
@@ -107,7 +107,13 @@ export default function Page() {
         </Box>
       )}
       <Box className='mb-4'>
-        <SearchBar label='Search for Customers' />
+        <SearchBar
+          label='Search for Customers'
+          searchText={searchText}
+          setSearchText={(text) =>
+            replaceURL({ searchText: text || undefined })
+          }
+        />
       </Box>
       <CreateCustomerFormModal refetchCustomers={refetchCustomers} />
       <AddExistingCustomerFormModal refetchCustomers={refetchCustomers} />
