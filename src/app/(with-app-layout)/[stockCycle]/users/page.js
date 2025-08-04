@@ -2,15 +2,14 @@
 
 import { Box, Button, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import React, { useMemo } from 'react'
+import React from 'react'
 
 import { getUsersAction } from '@/actions/userActions'
 import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import TableSkeleton from '@/components/TableSkeleton'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import useModalControl from '@/hooks/useModalControl'
+import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import CreateUserFormModal from './CreateUserFormModal'
@@ -34,17 +33,7 @@ const usersTableColumns = {
 }
 
 export default function Page() {
-  const { searchParams } = useHandleSearchParams()
-
-  const pageNumber = useMemo(
-    () => Number(searchParams.get('pageNumber')) || 0,
-    [searchParams]
-  )
-  const pageSize = useMemo(
-    () => Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE,
-    [searchParams]
-  )
-
+  const paginationProps = usePaginationControl()
   const { setModalValue: setCreateUserModalValue } = useModalControl('create')
 
   const {
@@ -55,8 +44,15 @@ export default function Page() {
     refetch: refetchUsers,
   } = useQuery({
     queryFn: async () =>
-      await handleServerAction(getUsersAction, { pageNumber, pageSize }),
-    queryKey: ['getUsersAction', pageNumber, pageSize],
+      await handleServerAction(getUsersAction, {
+        pageNumber: paginationProps?.pageNumber,
+        pageSize: paginationProps?.pageSize,
+      }),
+    queryKey: [
+      'getUsersAction',
+      paginationProps?.pageNumber,
+      paginationProps?.pageSize,
+    ],
   })
   return (
     <>
@@ -83,7 +79,10 @@ export default function Page() {
           )}
           dataOrder={usersResponse?.paginatedResults?.map((user) => user?._id)}
           columns={usersTableColumns}
-          totalCount={usersResponse?.totalCount}
+          paginationProps={{
+            ...paginationProps,
+            totalCount: usersResponse?.totalCount,
+          }}
         />
       </ErrorAlert>
     </>

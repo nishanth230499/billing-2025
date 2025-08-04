@@ -2,15 +2,14 @@
 
 import { Button, DialogContent } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
 
 import { getCustomerShippingAddressesAction } from '@/actions/customerShippingAddressActions'
 import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useModalControl from '@/hooks/useModalControl'
+import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import CreateShippingAddressFormModal from './CreateShippingAddressFormModal'
@@ -28,27 +27,14 @@ const shippingAddressTableColumns = {
 }
 
 export default function ViewShippingAddressModal() {
-  const {
-    modalValue: customerId,
-    handleCloseModal,
-    additionalModalValues: {
-      shippingAddressPageNumber,
-      shippingAddressPageSize,
-    },
-  } = useModalControl('viewShippingAddress', [
+  const paginationProps = usePaginationControl(
     'shippingAddressPageNumber',
-    'shippingAddressPageSize',
-  ])
-
-  const pageNumber = useMemo(
-    () => Number(shippingAddressPageNumber) || 0,
-    [shippingAddressPageNumber]
+    'shippingAddressPageSize'
   )
-  const pageSize = useMemo(
-    () => Number(shippingAddressPageSize) || DEFAULT_PAGE_SIZE,
-    [shippingAddressPageSize]
+  const { modalValue: customerId, handleCloseModal } = useModalControl(
+    'viewShippingAddress',
+    ['shippingAddressPageNumber', 'shippingAddressPageSize']
   )
-
   const { setModalValue: setCreateShippingAddressModalValue } = useModalControl(
     'createShippingAddress'
   )
@@ -62,14 +48,14 @@ export default function ViewShippingAddressModal() {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getCustomerShippingAddressesAction, {
-        pageNumber,
-        pageSize,
+        pageNumber: paginationProps?.pageNumber,
+        pageSize: paginationProps?.pageSize,
         customerId,
       }),
     queryKey: [
       'getCustomerShippingAddressesAction',
-      pageNumber,
-      pageSize,
+      paginationProps?.pageNumber,
+      paginationProps?.pageSize,
       customerId,
     ],
     enabled: Boolean(customerId),
@@ -108,9 +94,10 @@ export default function ViewShippingAddressModal() {
               (user) => user?._id
             )}
             columns={shippingAddressTableColumns}
-            totalCount={shippingAddressResponse?.totalCount}
-            pageNumberSearchParamName='shippingAddressPageNumber'
-            pageSizeSearchParamName='shippingAddressPageSize'
+            paginationProps={{
+              ...paginationProps,
+              totalCount: shippingAddressResponse?.totalCount,
+            }}
           />
         </ErrorAlert>
       </DialogContent>

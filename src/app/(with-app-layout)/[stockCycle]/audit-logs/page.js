@@ -8,8 +8,8 @@ import { getAuditLogsAction } from '@/actions/auditLogActions'
 import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import TableSkeleton from '@/components/TableSkeleton'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import { modelConstants } from '../../../../models/constants'
@@ -58,14 +58,7 @@ export default function Page() {
     () => searchParams.get('updatedById') ?? '',
     [searchParams]
   )
-  const pageNumber = useMemo(
-    () => Number(searchParams.get('pageNumber')) || 0,
-    [searchParams]
-  )
-  const pageSize = useMemo(
-    () => Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE,
-    [searchParams]
-  )
+
   const startDateTime = useMemo(
     () => Number(searchParams.get('startDateTime')),
     [searchParams]
@@ -75,6 +68,8 @@ export default function Page() {
     [searchParams]
   )
 
+  const paginationProps = usePaginationControl()
+
   const {
     data: auditLogResponse,
     isLoading: isAuditLogLoading,
@@ -83,8 +78,8 @@ export default function Page() {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getAuditLogsAction, {
-        pageNumber,
-        pageSize,
+        pageNumber: paginationProps?.pageNumber,
+        pageSize: paginationProps?.pageSize,
         collectionName,
         documentId,
         updateType,
@@ -94,8 +89,8 @@ export default function Page() {
       }),
     queryKey: [
       'getAuditLogsAction',
-      pageNumber,
-      pageSize,
+      paginationProps?.pageNumber,
+      paginationProps?.pageSize,
       collectionName,
       documentId,
       updateType,
@@ -126,7 +121,10 @@ export default function Page() {
             (user) => user?._id
           )}
           columns={auditLogColumns}
-          totalCount={auditLogResponse?.totalCount}
+          paginationProps={{
+            ...paginationProps,
+            totalCount: auditLogResponse?.totalCount,
+          }}
         />
       </ErrorAlert>
     </>

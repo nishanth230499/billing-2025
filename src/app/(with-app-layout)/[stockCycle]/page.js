@@ -11,9 +11,9 @@ import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import SearchBar from '@/components/common/SearchBar'
 import TableSkeleton from '@/components/TableSkeleton'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import useModalControl from '@/hooks/useModalControl'
+import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import AddExistingCustomerFormModal from './AddExistingCustomerFormModal'
@@ -39,14 +39,6 @@ export default function Page() {
 
   const stockCycleId = params.stockCycle
 
-  const pageNumber = useMemo(
-    () => Number(searchParams.get('pageNumber')) || 0,
-    [searchParams]
-  )
-  const pageSize = useMemo(
-    () => Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE,
-    [searchParams]
-  )
   const searchText = useMemo(
     () => searchParams.get('searchText') || '',
     [searchParams]
@@ -54,6 +46,7 @@ export default function Page() {
   const { appConfig } = useContext(AppContext)
   const { IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE } = appConfig
 
+  const paginationProps = usePaginationControl()
   const { setModalValue: setCreateUserModalValue } = useModalControl('create')
   const { setModalValue: setAddUserModalValue } = useModalControl('add')
 
@@ -66,15 +59,20 @@ export default function Page() {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getCustomersAction, {
-        pageNumber,
-        pageSize,
+        pageNumber: paginationProps?.pageNumber,
+        pageSize: paginationProps?.pageSize,
         searchText,
         filter: IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
           ? { stockCycle: { id: stockCycleId } }
           : {},
         sortFields: searchText ? {} : { _id: 1 },
       }),
-    queryKey: ['getCustomersAction', pageNumber, pageSize, searchText],
+    queryKey: [
+      'getCustomersAction',
+      paginationProps?.pageNumber,
+      paginationProps?.pageSize,
+      searchText,
+    ],
   })
 
   return (
@@ -129,7 +127,10 @@ export default function Page() {
             (user) => user?._id
           )}
           columns={customersTableColumns}
-          totalCount={customersResponse?.totalCount}
+          paginationProps={{
+            ...paginationProps,
+            totalCount: customersResponse?.totalCount,
+          }}
         />
       </ErrorAlert>
     </>

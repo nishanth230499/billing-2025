@@ -9,9 +9,9 @@ import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import SearchBar from '@/components/common/SearchBar'
 import TableSkeleton from '@/components/TableSkeleton'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import useModalControl from '@/hooks/useModalControl'
+import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import CompanyTableActions from './CompanyTableActions'
@@ -30,20 +30,12 @@ const companiesTableColumns = {
 
 export default function Page() {
   const { searchParams } = useHandleSearchParams()
-
-  const pageNumber = useMemo(
-    () => Number(searchParams.get('pageNumber')) || 0,
-    [searchParams]
-  )
-  const pageSize = useMemo(
-    () => Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE,
-    [searchParams]
-  )
   const searchText = useMemo(
     () => searchParams.get('searchText') || '',
     [searchParams]
   )
 
+  const paginationProps = usePaginationControl()
   const { setModalValue: setCreateCompanyModalValue } =
     useModalControl('create')
 
@@ -56,12 +48,17 @@ export default function Page() {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getCompaniesAction, {
-        pageNumber,
-        pageSize,
+        pageNumber: paginationProps?.pageNumber,
+        pageSize: paginationProps?.pageSize,
         searchText,
         sortFields: searchText ? {} : { _id: 1 },
       }),
-    queryKey: ['getCompaniesAction', pageNumber, pageSize, searchText],
+    queryKey: [
+      'getCompaniesAction',
+      paginationProps?.pageNumber,
+      paginationProps?.pageSize,
+      searchText,
+    ],
   })
 
   return (
@@ -99,7 +96,10 @@ export default function Page() {
             (user) => user?._id
           )}
           columns={companiesTableColumns}
-          totalCount={companiesResponse?.totalCount}
+          paginationProps={{
+            ...paginationProps,
+            totalCount: companiesResponse?.totalCount,
+          }}
         />
       </ErrorAlert>
     </>

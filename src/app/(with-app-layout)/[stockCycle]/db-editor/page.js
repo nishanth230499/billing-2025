@@ -10,8 +10,8 @@ import ErrorAlert from '@/components/common/ErrorAlert'
 import SearchBar from '@/components/common/SearchBar'
 import CollectionSelector from '@/components/common/selectors/CollectionSelector'
 import TableSkeleton from '@/components/TableSkeleton'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { parseJsonString } from '@/lib/utils/jsonUtils'
 import { modelConstants } from '@/models/constants'
@@ -47,19 +47,12 @@ export default function Page() {
     [searchParams]
   )
 
-  const pageNumber = useMemo(
-    () => Number(searchParams.get('pageNumber')) || 0,
-    [searchParams]
-  )
-  const pageSize = useMemo(
-    () => Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE,
-    [searchParams]
-  )
-
   const filter = useMemo(
     () => parseJsonString(searchParams.get('filter')) ?? {},
     [searchParams]
   )
+
+  const paginationProps = usePaginationControl()
 
   const handleCollectionNameChange = useCallback(
     (val) => {
@@ -83,15 +76,15 @@ export default function Page() {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getDocumentsAction, collectionName, {
-        pageNumber,
-        pageSize,
+        pageNumber: paginationProps?.pageNumber,
+        pageSize: paginationProps?.pageSize,
         filter,
       }),
     queryKey: [
       'getDocumentsAction',
       collectionName,
-      pageNumber,
-      pageSize,
+      paginationProps?.pageNumber,
+      paginationProps?.pageSize,
       filter,
     ],
     enabled: Boolean(collectionName),
@@ -133,7 +126,10 @@ export default function Page() {
             (document) => document?._id
           )}
           columns={documentTableColumns}
-          totalCount={documentsResponse?.totalCount}
+          paginationProps={{
+            ...paginationProps,
+            totalCount: documentsResponse?.totalCount,
+          }}
         />
       </ErrorAlert>
     </>

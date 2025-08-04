@@ -10,9 +10,9 @@ import ErrorAlert from '@/components/common/ErrorAlert'
 import SearchBar from '@/components/common/SearchBar'
 import CompanySelector from '@/components/common/selectors/CompanySelector'
 import TableSkeleton from '@/components/TableSkeleton'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import useModalControl from '@/hooks/useModalControl'
+import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import CreateItemFormModal from './CreateItemFormModal'
@@ -41,19 +41,12 @@ export default function Page() {
     [searchParams]
   )
 
-  const pageNumber = useMemo(
-    () => Number(searchParams.get('pageNumber')) || 0,
-    [searchParams]
-  )
-  const pageSize = useMemo(
-    () => Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE,
-    [searchParams]
-  )
   const searchText = useMemo(
     () => searchParams.get('searchText') || '',
     [searchParams]
   )
 
+  const paginationProps = usePaginationControl()
   const { setModalValue: setCreateItemModalValue } = useModalControl('create')
 
   const {
@@ -65,13 +58,19 @@ export default function Page() {
   } = useQuery({
     queryFn: async () =>
       await handleServerAction(getItemsAction, {
-        pageNumber,
-        pageSize,
+        pageNumber: paginationProps?.pageNumber,
+        pageSize: paginationProps?.pageSize,
         companyId,
         searchText,
         sortFields: searchText ? {} : { _id: 1 },
       }),
-    queryKey: ['getItemsAction', pageNumber, pageSize, companyId, searchText],
+    queryKey: [
+      'getItemsAction',
+      paginationProps?.pageNumber,
+      paginationProps?.pageSize,
+      companyId,
+      searchText,
+    ],
   })
 
   return (
@@ -123,7 +122,10 @@ export default function Page() {
           )}
           dataOrder={itemsResponse?.paginatedResults?.map((user) => user?._id)}
           columns={itemTableColumns}
-          totalCount={itemsResponse?.totalCount}
+          paginationProps={{
+            ...paginationProps,
+            totalCount: itemsResponse?.totalCount,
+          }}
         />
       </ErrorAlert>
     </>
