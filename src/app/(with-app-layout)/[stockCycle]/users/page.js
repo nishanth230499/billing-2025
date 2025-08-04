@@ -10,6 +10,7 @@ import ErrorAlert from '@/components/common/ErrorAlert'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import CreateUserFormModal from './CreateUserFormModal'
@@ -33,7 +34,7 @@ const usersTableColumns = {
 }
 
 export default function Page() {
-  const { getURL, searchParams } = useHandleSearchParams()
+  const { searchParams } = useHandleSearchParams()
 
   const pageNumber = useMemo(
     () => Number(searchParams.get('pageNumber')) || 0,
@@ -43,6 +44,8 @@ export default function Page() {
     () => Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE,
     [searchParams]
   )
+
+  const { setModalValue: setCreateUserModalValue } = useModalControl('create')
 
   const {
     data: usersResponse,
@@ -62,9 +65,7 @@ export default function Page() {
         <Button
           className='rounded-3xl'
           variant='outlined'
-          onClick={() =>
-            window.history.pushState({}, '', getURL({ create: true }))
-          }>
+          onClick={() => setCreateUserModalValue(true)}>
           Create User
         </Button>
         <CreateUserFormModal refetchUsers={refetchUsers} />

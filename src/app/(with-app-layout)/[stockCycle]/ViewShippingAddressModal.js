@@ -2,8 +2,7 @@
 
 import { Button, DialogContent } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { getCustomerShippingAddressesAction } from '@/actions/customerShippingAddressActions'
 import DataTable from '@/components/common/DataTable'
@@ -11,7 +10,7 @@ import ErrorAlert from '@/components/common/ErrorAlert'
 import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import CreateShippingAddressFormModal from './CreateShippingAddressFormModal'
@@ -29,23 +28,29 @@ const shippingAddressTableColumns = {
 }
 
 export default function ViewShippingAddressModal() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { getURL } = useHandleSearchParams()
-
-  const customerId = useMemo(
-    () => searchParams.get('viewShippingAddress') ?? '',
-    [searchParams]
-  )
+  const {
+    modalValue: customerId,
+    handleCloseModal,
+    additionalModalValues: {
+      shippingAddressPageNumber,
+      shippingAddressPageSize,
+    },
+  } = useModalControl('viewShippingAddress', [
+    'shippingAddressPageNumber',
+    'shippingAddressPageSize',
+  ])
 
   const pageNumber = useMemo(
-    () => Number(searchParams.get('shippingAddressPageNumber')) || 0,
-    [searchParams]
+    () => Number(shippingAddressPageNumber) || 0,
+    [shippingAddressPageNumber]
   )
   const pageSize = useMemo(
-    () =>
-      Number(searchParams.get('shippingAddressPageSize')) || DEFAULT_PAGE_SIZE,
-    [searchParams]
+    () => Number(shippingAddressPageSize) || DEFAULT_PAGE_SIZE,
+    [shippingAddressPageSize]
+  )
+
+  const { setModalValue: setCreateShippingAddressModalValue } = useModalControl(
+    'createShippingAddress'
   )
 
   const {
@@ -70,26 +75,16 @@ export default function ViewShippingAddressModal() {
     enabled: Boolean(customerId),
   })
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   return (
     <Modal
       open={Boolean(customerId)}
       title={'Shipping Addresses'}
-      onClose={handleClose}>
+      onClose={handleCloseModal}>
       <DialogContent>
         <Button
           className='rounded-3xl mb-4'
           variant='outlined'
-          onClick={() =>
-            window.history.pushState(
-              {},
-              '',
-              getURL({ createShippingAddress: true })
-            )
-          }>
+          onClick={() => setCreateShippingAddressModalValue(true)}>
           Create Shipping Address
         </Button>
         <CreateShippingAddressFormModal

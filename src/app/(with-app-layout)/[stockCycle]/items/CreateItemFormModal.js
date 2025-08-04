@@ -2,7 +2,6 @@
 
 import { InputAdornment } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useContext, useMemo } from 'react'
 
@@ -11,18 +10,14 @@ import { AppContext } from '@/app/ClientProviders'
 import FormModal from '@/components/common/FormModal'
 import CompanySelector from '@/components/common/selectors/CompanySelector'
 import HsnSelector from '@/components/common/selectors/HsnSelector'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { amountRegex, nonEmptyRegex } from '@/lib/regex'
 
 export default function CreateItemFormModal({ refetchItems }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const { appConfig } = useContext(AppContext)
 
-  const isModalOpen = useMemo(
-    () => Boolean(searchParams.get('create')),
-    [searchParams]
-  )
+  const { modalValue, handleCloseModal } = useModalControl('create')
 
   const {
     AUTO_GENERATE_COMPANY_ID,
@@ -138,10 +133,6 @@ export default function CreateItemFormModal({ refetchItems }) {
     []
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       createItem(
@@ -162,19 +153,19 @@ export default function CreateItemFormModal({ refetchItems }) {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchItems()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
         }
       )
     },
-    [createItem, refetchItems, router]
+    [createItem, handleCloseModal, refetchItems]
   )
 
   return (
     <FormModal
-      open={isModalOpen}
+      open={Boolean(modalValue)}
       title='Create Item'
       formId='createItem'
       submitButtonLabel='Create'
@@ -182,7 +173,7 @@ export default function CreateItemFormModal({ refetchItems }) {
       initialFormFieldValues={initialFormFieldValues}
       isSubmitLoading={isCreateItemLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

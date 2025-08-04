@@ -8,7 +8,7 @@ export default function useHandleSearchParams() {
   const searchParams = useSearchParams()
 
   const generateURL = useCallback(
-    (newParams) => {
+    (newParams: { [s: string]: string | null | undefined }) => {
       const params = new URLSearchParams(searchParams)
       Object.entries(newParams).forEach(([key, value]) => {
         if (value === null || value === undefined) {
@@ -17,7 +17,7 @@ export default function useHandleSearchParams() {
           params.set(key, value)
         }
       })
-      return `${pathname}?${params.toString()}`
+      return `${pathname}${params.toString() ? `?${params.toString()}` : ''}`
     },
     [pathname, searchParams]
   )

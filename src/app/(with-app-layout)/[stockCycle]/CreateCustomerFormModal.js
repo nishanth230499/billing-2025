@@ -1,7 +1,7 @@
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useContext, useMemo } from 'react'
 
@@ -9,6 +9,7 @@ import { createCustomerAction } from '@/actions/customerActions'
 import { AppContext } from '@/app/ClientProviders'
 import FormModal from '@/components/common/FormModal'
 import FirmSelector from '@/components/common/selectors/FirmSelector'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import {
   multilineNonEmptyRegex,
@@ -17,17 +18,13 @@ import {
 } from '@/lib/regex'
 
 export default function CreateCustomerFormModal({ refetchCustomers }) {
-  const router = useRouter()
   const params = useParams()
-  const searchParams = useSearchParams()
+
   const { appConfig } = useContext(AppContext)
 
   const stockCycleId = params.stockCycle
 
-  const isModalOpen = useMemo(
-    () => Boolean(searchParams.get('create')),
-    [searchParams]
-  )
+  const { modalValue, handleCloseModal } = useModalControl('create')
 
   const {
     AUTO_GENERATE_CUSTOMER_ID,
@@ -167,10 +164,6 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
     []
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       createCustomer(
@@ -193,7 +186,7 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchCustomers()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
@@ -205,13 +198,13 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
       IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
       stockCycleId,
       refetchCustomers,
-      router,
+      handleCloseModal,
     ]
   )
 
   return (
     <FormModal
-      open={isModalOpen}
+      open={Boolean(modalValue)}
       title='Create Customer'
       formId='createCustomer'
       submitButtonLabel='Create'
@@ -219,7 +212,7 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
       initialFormFieldValues={initialFormFieldValues}
       isSubmitLoading={isCreateCustomerLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

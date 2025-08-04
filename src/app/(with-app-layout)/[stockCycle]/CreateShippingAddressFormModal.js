@@ -1,19 +1,19 @@
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useMemo } from 'react'
 
 import { createCustomerShippingAddressAction } from '@/actions/customerShippingAddressActions'
 import FormModal from '@/components/common/FormModal'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { multilineNonEmptyRegex, nonEmptyRegex } from '@/lib/regex'
 
 export default function CreateShippingAddressFormModal({
   refetchShippingAddress,
 }) {
-  const router = useRouter()
   const searchParams = useSearchParams()
 
   const customerId = useMemo(
@@ -21,9 +21,8 @@ export default function CreateShippingAddressFormModal({
     [searchParams]
   )
 
-  const isModalOpen = useMemo(
-    () => Boolean(searchParams.get('createShippingAddress')),
-    [searchParams]
+  const { modalValue, handleCloseModal } = useModalControl(
+    'createShippingAddress'
   )
 
   const {
@@ -76,10 +75,6 @@ export default function CreateShippingAddressFormModal({
     []
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       createCustomerShippingAddress(
@@ -95,19 +90,24 @@ export default function CreateShippingAddressFormModal({
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchShippingAddress()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
         }
       )
     },
-    [createCustomerShippingAddress, customerId, refetchShippingAddress, router]
+    [
+      createCustomerShippingAddress,
+      customerId,
+      handleCloseModal,
+      refetchShippingAddress,
+    ]
   )
 
   return (
     <FormModal
-      open={isModalOpen}
+      open={Boolean(modalValue)}
       title='Create Customer Shipping Address'
       formId='createCustomerShippingAddress'
       submitButtonLabel='Create'
@@ -115,7 +115,7 @@ export default function CreateShippingAddressFormModal({
       initialFormFieldValues={initialFormFieldValues}
       isSubmitLoading={isCreateCustomerShippingAddressLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

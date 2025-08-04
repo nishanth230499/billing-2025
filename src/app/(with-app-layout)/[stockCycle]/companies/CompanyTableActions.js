@@ -3,17 +3,16 @@
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Tooltip } from '@mui/material'
 
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 
 export default function CompanyTableActions({ data }) {
-  const { getURL } = useHandleSearchParams()
+  const { setModalValue: setEditCompanyModalValue } =
+    useModalControl('editCompany')
   return (
     <Tooltip title='Edit Company'>
       <IconButton
         color='primary'
-        onClick={() =>
-          window.history.pushState({}, '', getURL({ editCompany: data?._id }))
-        }>
+        onClick={() => setEditCompanyModalValue(data?._id)}>
         <EditIcon />
       </IconButton>
     </Tooltip>

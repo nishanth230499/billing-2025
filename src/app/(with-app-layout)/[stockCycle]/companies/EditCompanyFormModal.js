@@ -1,23 +1,18 @@
 'use client'
 
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useMemo } from 'react'
 
 import { editCompanyAction, getCompanyAction } from '@/actions/companyActions'
 import FormModal from '@/components/common/FormModal'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { multilineNonEmptyRegex, nonEmptyRegex } from '@/lib/regex'
 
 export default function EditCompanyFormModal({ refetchCompanies }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const editingCompanyId = useMemo(
-    () => searchParams.get('editCompany'),
-    [searchParams]
-  )
+  const { modalValue: editingCompanyId, handleCloseModal } =
+    useModalControl('editCompany')
 
   const {
     data: companyResponse,
@@ -124,10 +119,6 @@ export default function EditCompanyFormModal({ refetchCompanies }) {
     ]
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       editCompany(
@@ -149,14 +140,14 @@ export default function EditCompanyFormModal({ refetchCompanies }) {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchCompanies()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
         }
       )
     },
-    [editCompany, editingCompanyId, refetchCompanies, router]
+    [editCompany, editingCompanyId, handleCloseModal, refetchCompanies]
   )
 
   return (
@@ -172,7 +163,7 @@ export default function EditCompanyFormModal({ refetchCompanies }) {
       isFormLoading={isCompanyLoading}
       isSubmitLoading={isEditCompanyLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

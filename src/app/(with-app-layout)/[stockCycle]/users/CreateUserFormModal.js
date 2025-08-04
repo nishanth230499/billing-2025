@@ -1,24 +1,18 @@
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useMemo } from 'react'
 
 import { createUserAction } from '@/actions/userActions'
 import FormModal from '@/components/common/FormModal'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { emailRegex, nonEmptyRegex, passwordRegex } from '@/lib/regex'
 import { UserType } from '@/models/User'
 
 export default function CreateOrEditUserForm({ refetchUsers }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const isModalOpen = useMemo(
-    () => Boolean(searchParams.get('create')),
-    [searchParams]
-  )
+  const { modalValue, handleCloseModal } = useModalControl('create')
 
   const { mutate: createUser, isPending: isCreateUserLoading } = useMutation({
     mutationFn: (data) => handleServerAction(createUserAction, data),
@@ -93,10 +87,6 @@ export default function CreateOrEditUserForm({ refetchUsers }) {
     []
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       createUser(
@@ -111,19 +101,19 @@ export default function CreateOrEditUserForm({ refetchUsers }) {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchUsers()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
         }
       )
     },
-    [createUser, refetchUsers, router]
+    [createUser, handleCloseModal, refetchUsers]
   )
 
   return (
     <FormModal
-      open={isModalOpen}
+      open={Boolean(modalValue)}
       title='Create User'
       formId='createUser'
       submitButtonLabel='Create'
@@ -131,7 +121,7 @@ export default function CreateOrEditUserForm({ refetchUsers }) {
       initialFormFieldValues={initialFormFieldValues}
       isSubmitLoading={isCreateUserLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

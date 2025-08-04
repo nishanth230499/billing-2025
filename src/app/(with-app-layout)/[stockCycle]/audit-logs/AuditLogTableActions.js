@@ -3,17 +3,16 @@
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { IconButton, Tooltip } from '@mui/material'
 
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 
 export default function AuditLogTableActions({ data }) {
-  const { getURL } = useHandleSearchParams()
+  const { setModalValue: setViewAuditLogModalValue } =
+    useModalControl('viewAuditLog')
   return (
     <Tooltip title='View Audit Log'>
       <IconButton
         color='primary'
-        onClick={() =>
-          window.history.pushState({}, '', getURL({ viewAuditLog: data?._id }))
-        }>
+        onClick={() => setViewAuditLogModalValue(data?._id)}>
         <VisibilityIcon />
       </IconButton>
     </Tooltip>

@@ -22,7 +22,7 @@ export default function SearchBar({
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && validator(searchText)) {
-      window.history.pushState(
+      window.history.replaceState(
         {},
         '',
         getURL({ [searchParamName]: searchText || undefined })
@@ -39,7 +39,7 @@ export default function SearchBar({
             <InputAdornment position='end'>
               <IconButton
                 onClick={() => {
-                  window.history.pushState(
+                  window.history.replaceState(
                     {},
                     '',
                     getURL({ [searchParamName]: undefined })

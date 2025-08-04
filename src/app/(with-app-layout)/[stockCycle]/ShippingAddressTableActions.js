@@ -3,21 +3,17 @@
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Tooltip } from '@mui/material'
 
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 
 export default function ShippingAddressTableActions({ data }) {
-  const { getURL } = useHandleSearchParams()
+  const { setModalValue: setEditShippingAddressModalValue } = useModalControl(
+    'editShippingAddress'
+  )
   return (
     <Tooltip title='Edit Shipping Address'>
       <IconButton
         color='primary'
-        onClick={() =>
-          window.history.pushState(
-            {},
-            '',
-            getURL({ editShippingAddress: data?._id })
-          )
-        }>
+        onClick={() => setEditShippingAddressModalValue(data?._id)}>
         <EditIcon />
       </IconButton>
     </Tooltip>

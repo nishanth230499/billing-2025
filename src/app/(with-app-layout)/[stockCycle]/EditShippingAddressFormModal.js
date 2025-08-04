@@ -1,7 +1,6 @@
 'use client'
 
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useMemo } from 'react'
 
@@ -10,19 +9,15 @@ import {
   getCustomerShippingAddressAction,
 } from '@/actions/customerShippingAddressActions'
 import FormModal from '@/components/common/FormModal'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { multilineNonEmptyRegex, nonEmptyRegex } from '@/lib/regex'
 
 export default function EditCustomerShippingAddressFormModal({
   refetchShippingAddress,
 }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const editingShippingAddressId = useMemo(
-    () => searchParams.get('editShippingAddress'),
-    [searchParams]
-  )
+  const { modalValue: editingShippingAddressId, handleCloseModal } =
+    useModalControl('editShippingAddress')
 
   const {
     data: customerShippingAddressResponse,
@@ -103,10 +98,6 @@ export default function EditCustomerShippingAddressFormModal({
     ]
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       editCustomerShippingAddress(
@@ -124,7 +115,7 @@ export default function EditCustomerShippingAddressFormModal({
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchShippingAddress()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
@@ -134,8 +125,8 @@ export default function EditCustomerShippingAddressFormModal({
     [
       editCustomerShippingAddress,
       editingShippingAddressId,
+      handleCloseModal,
       refetchShippingAddress,
-      router,
     ]
   )
 
@@ -152,7 +143,7 @@ export default function EditCustomerShippingAddressFormModal({
       isFormLoading={isCustomerShippingAddressLoading}
       isSubmitLoading={isEditCustomerShippingAddressLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

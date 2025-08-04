@@ -12,6 +12,7 @@ import CompanySelector from '@/components/common/selectors/CompanySelector'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import CreateItemFormModal from './CreateItemFormModal'
@@ -53,6 +54,8 @@ export default function Page() {
     [searchParams]
   )
 
+  const { setModalValue: setCreateItemModalValue } = useModalControl('create')
+
   const {
     data: itemsResponse,
     isLoading: isItemsLoading,
@@ -79,9 +82,7 @@ export default function Page() {
           <Button
             className='rounded-3xl'
             variant='outlined'
-            onClick={() =>
-              window.history.pushState({}, '', getURL({ create: true }))
-            }>
+            onClick={() => setCreateItemModalValue(true)}>
             Create New Item
           </Button>
         </Box>
@@ -91,7 +92,7 @@ export default function Page() {
           <CompanySelector
             selectedCompanyId={companyId}
             setSelectedCompanyId={(id) =>
-              window.history.pushState(
+              window.history.replaceState(
                 {},
                 '',
                 getURL({ companyId: id || null })

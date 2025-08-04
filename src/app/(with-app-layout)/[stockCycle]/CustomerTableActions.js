@@ -4,35 +4,28 @@ import EditIcon from '@mui/icons-material/Edit'
 import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import { Box, IconButton, Tooltip } from '@mui/material'
 
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 
 export default function CustomerTableActions({ data }) {
-  const { getURL } = useHandleSearchParams()
+  const { setModalValue: setEditCustomerModalValue } =
+    useModalControl('editCustomer')
+
+  const { setModalValue: setViewShippingAddressModalValue } = useModalControl(
+    'viewShippingAddress'
+  )
   return (
     <Box className='flex'>
       <Tooltip title='Edit Customer'>
         <IconButton
           color='primary'
-          onClick={() =>
-            window.history.pushState(
-              {},
-              '',
-              getURL({ editCustomer: data?._id })
-            )
-          }>
+          onClick={() => setEditCustomerModalValue(data?._id)}>
           <EditIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='View Shipping Addresses'>
         <IconButton
           color='primary'
-          onClick={() =>
-            window.history.pushState(
-              {},
-              '',
-              getURL({ viewShippingAddress: data?._id })
-            )
-          }>
+          onClick={() => setViewShippingAddressModalValue(data?._id)}>
           <LocalShippingIcon />
         </IconButton>
       </Tooltip>

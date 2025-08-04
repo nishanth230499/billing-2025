@@ -1,7 +1,7 @@
 'use client'
 
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
@@ -9,26 +9,25 @@ import { addCustomerAction, getCustomerAction } from '@/actions/customerActions'
 import { AppContext } from '@/app/ClientProviders'
 import FormModal from '@/components/common/FormModal'
 import CustomerSelector from '@/components/common/selectors/CustomerSelector'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { multilineNonEmptyRegex, nonEmptyRegex } from '@/lib/regex'
 
 export default function AddExistingCustomerFormModal({ refetchCustomers }) {
-  const router = useRouter()
   const params = useParams()
-  const searchParams = useSearchParams()
   const { appConfig } = useContext(AppContext)
 
   const stockCycleId = params.stockCycle
 
-  const isModalOpen = useMemo(() => searchParams.get('add'), [searchParams])
+  const { modalValue, handleCloseModal } = useModalControl('add')
 
   const { CUSTOMER_ID_REGEX, STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS } = appConfig
 
   const [selectedCustomerId, setSelectedCustomerId] = useState('')
 
   useEffect(() => {
-    if (!isModalOpen) setSelectedCustomerId('')
-  }, [isModalOpen])
+    if (!modalValue) setSelectedCustomerId('')
+  }, [modalValue])
 
   const {
     data: customerResponse,
@@ -143,10 +142,6 @@ export default function AddExistingCustomerFormModal({ refetchCustomers }) {
     ]
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       addCustomer(
@@ -165,19 +160,19 @@ export default function AddExistingCustomerFormModal({ refetchCustomers }) {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchCustomers()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
         }
       )
     },
-    [addCustomer, stockCycleId, refetchCustomers, router]
+    [addCustomer, stockCycleId, refetchCustomers, handleCloseModal]
   )
 
   return (
     <FormModal
-      open={isModalOpen}
+      open={Boolean(modalValue)}
       title='Add Existing Customer'
       formId='addExistingCustomer'
       submitButtonLabel='Add'
@@ -188,7 +183,7 @@ export default function AddExistingCustomerFormModal({ refetchCustomers }) {
       isFormLoading={isCustomerLoading}
       isSubmitLoading={isAddCustomerLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useContext, useMemo } from 'react'
 
@@ -9,18 +8,14 @@ import { createCompanyAction } from '@/actions/companyActions'
 import { AppContext } from '@/app/ClientProviders'
 import FormModal from '@/components/common/FormModal'
 import FirmSelector from '@/components/common/selectors/FirmSelector'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { multilineNonEmptyRegex, nonEmptyRegex } from '@/lib/regex'
 
 export default function CreateCompanyFormModal({ refetchCompanies }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const { appConfig } = useContext(AppContext)
 
-  const isModalOpen = useMemo(
-    () => Boolean(searchParams.get('create')),
-    [searchParams]
-  )
+  const { modalValue, handleCloseModal } = useModalControl('create')
 
   const { AUTO_GENERATE_COMPANY_ID, COMPANY_ID_REGEX } = appConfig
 
@@ -117,10 +112,6 @@ export default function CreateCompanyFormModal({ refetchCompanies }) {
     []
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       createCompany(
@@ -141,19 +132,19 @@ export default function CreateCompanyFormModal({ refetchCompanies }) {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchCompanies()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
         }
       )
     },
-    [createCompany, refetchCompanies, router]
+    [createCompany, handleCloseModal, refetchCompanies]
   )
 
   return (
     <FormModal
-      open={isModalOpen}
+      open={Boolean(modalValue)}
       title='Create Company'
       formId='createCompany'
       submitButtonLabel='Create'
@@ -161,7 +152,7 @@ export default function CreateCompanyFormModal({ refetchCompanies }) {
       initialFormFieldValues={initialFormFieldValues}
       isSubmitLoading={isCreateCompanyLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }
