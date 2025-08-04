@@ -108,7 +108,7 @@ export default function DataTable({
   )
 
   return (
-    <TableContainer component={Paper} hidden={hidden}>
+    <TableContainer component={Paper} hidden={hidden} className='min-h-60'>
       <Table stickyHeader size={isMobileWidth ? 'small' : 'medium'}>
         <TableHead>
           <TableRow>

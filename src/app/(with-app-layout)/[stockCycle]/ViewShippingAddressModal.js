@@ -80,7 +80,7 @@ export default function ViewShippingAddressModal() {
       open={Boolean(customerId)}
       title={'Shipping Addresses'}
       onClose={handleCloseModal}>
-      <DialogContent>
+      <DialogContent className='flex flex-col items-start'>
         <Button
           className='rounded-3xl mb-4'
           variant='outlined'
