@@ -5,14 +5,13 @@ import { IconButton, Tooltip } from '@mui/material'
 
 import useModalControl from '@/hooks/useModalControl'
 
-export default function CompanyTableActions({ data }) {
-  const { setModalValue: setEditCompanyModalValue } =
-    useModalControl('editCompany')
+export default function ItemTableActions({ data }) {
+  const { setModalValue: setEditItemModalValue } = useModalControl('editItem')
   return (
-    <Tooltip title='Edit Company'>
+    <Tooltip title='Edit Item'>
       <IconButton
         color='primary'
-        onClick={() => setEditCompanyModalValue(data?._id)}>
+        onClick={() => setEditItemModalValue(data?._id)}>
         <EditIcon />
       </IconButton>
     </Tooltip>

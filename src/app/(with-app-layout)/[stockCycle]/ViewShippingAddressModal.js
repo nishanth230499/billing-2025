@@ -1,0 +1,119 @@
+'use client'
+
+import { Button, DialogContent } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+
+import { getCustomerShippingAddressesAction } from '@/actions/customerShippingAddressActions'
+import DataTable from '@/components/common/DataTable'
+import ErrorAlert from '@/components/common/ErrorAlert'
+import Modal from '@/components/common/Modal'
+import TableSkeleton from '@/components/TableSkeleton'
+import { DEFAULT_PAGE_SIZE } from '@/constants'
+import useModalControl from '@/hooks/useModalControl'
+import handleServerAction from '@/lib/handleServerAction'
+
+import CreateShippingAddressFormModal from './CreateShippingAddressFormModal'
+import EditCustomerShippingAddressFormModal from './EditShippingAddressFormModal'
+import ShippingAddressTableActions from './ShippingAddressTableActions'
+
+const shippingAddressTableColumns = {
+  _id: { label: 'ID' },
+  name: { label: 'Name' },
+  actions: {
+    label: 'Actions',
+    component: ShippingAddressTableActions,
+    slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
+  },
+}
+
+export default function ViewShippingAddressModal() {
+  const {
+    modalValue: customerId,
+    handleCloseModal,
+    additionalModalValues: {
+      shippingAddressPageNumber,
+      shippingAddressPageSize,
+    },
+  } = useModalControl('viewShippingAddress', [
+    'shippingAddressPageNumber',
+    'shippingAddressPageSize',
+  ])
+
+  const pageNumber = useMemo(
+    () => Number(shippingAddressPageNumber) || 0,
+    [shippingAddressPageNumber]
+  )
+  const pageSize = useMemo(
+    () => Number(shippingAddressPageSize) || DEFAULT_PAGE_SIZE,
+    [shippingAddressPageSize]
+  )
+
+  const { setModalValue: setCreateShippingAddressModalValue } = useModalControl(
+    'createShippingAddress'
+  )
+
+  const {
+    data: shippingAddressResponse,
+    isLoading: isShippingAddressLoading,
+    isError: isShippingAddressError,
+    error: shippingAddressError,
+    refetch: refetchShippingAddress,
+  } = useQuery({
+    queryFn: async () =>
+      await handleServerAction(getCustomerShippingAddressesAction, {
+        pageNumber,
+        pageSize,
+        customerId,
+      }),
+    queryKey: [
+      'getCustomerShippingAddressesAction',
+      pageNumber,
+      pageSize,
+      customerId,
+    ],
+    enabled: Boolean(customerId),
+  })
+
+  return (
+    <Modal
+      open={Boolean(customerId)}
+      title={'Shipping Addresses'}
+      onClose={handleCloseModal}>
+      <DialogContent>
+        <Button
+          className='rounded-3xl mb-4'
+          variant='outlined'
+          onClick={() => setCreateShippingAddressModalValue(true)}>
+          Create Shipping Address
+        </Button>
+        <CreateShippingAddressFormModal
+          refetchShippingAddress={refetchShippingAddress}
+        />
+        <EditCustomerShippingAddressFormModal
+          refetchShippingAddress={refetchShippingAddress}
+        />
+        {isShippingAddressLoading && <TableSkeleton />}
+        <ErrorAlert
+          isError={isShippingAddressError}
+          error={shippingAddressError}>
+          <DataTable
+            hidden={isShippingAddressLoading}
+            data={Object.fromEntries(
+              shippingAddressResponse?.paginatedResults?.map(
+                (shippingAddress) => [shippingAddress?._id, shippingAddress]
+              ) || []
+            )}
+            dataOrder={shippingAddressResponse?.paginatedResults?.map(
+              (user) => user?._id
+            )}
+            columns={shippingAddressTableColumns}
+            totalCount={shippingAddressResponse?.totalCount}
+            pageNumberSearchParamName='shippingAddressPageNumber'
+            pageSizeSearchParamName='shippingAddressPageSize'
+          />
+        </ErrorAlert>
+      </DialogContent>
+    </Modal>
+  )
+}

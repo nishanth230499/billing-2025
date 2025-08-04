@@ -24,7 +24,7 @@ export default function Dropdown({ button, menuItems = [], slotProps = {} }) {
               })}
               key={key}
               href={href}
-              component={href ? 'a' : null}
+              component={href ? 'a' : undefined}
               selected={selected}
               onClick={onClick}
               disabled={loading}

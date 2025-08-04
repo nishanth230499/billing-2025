@@ -25,6 +25,8 @@ export default function DataTable({
   totalCount,
   onDataChange,
   onDataOrderChange,
+  pageNumberSearchParamName,
+  pageSizeSearchParamName,
 }) {
   const inputsRef = useRef({})
 
@@ -145,6 +147,8 @@ export default function DataTable({
         <Pagination
           totalCount={totalCount}
           className='sticky bottom-0 bg-inherit'
+          pageNumberSearchParamName={pageNumberSearchParamName}
+          pageSizeSearchParamName={pageSizeSearchParamName}
         />
       ) : null}
     </TableContainer>

@@ -1,24 +1,19 @@
 'use client'
 
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useMemo } from 'react'
 
 import { editUserAction, getUserAction } from '@/actions/userActions'
 import FormModal from '@/components/common/FormModal'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { nonEmptyRegex } from '@/lib/regex'
 import { UserType } from '@/models/User'
 
 export default function EditUserFormModal({ refetchUsers }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const editingUserId = useMemo(
-    () => searchParams.get('editUser'),
-    [searchParams]
-  )
+  const { modalValue: editingUserId, handleCloseModal } =
+    useModalControl('editUser')
 
   const {
     data: userResponse,
@@ -61,7 +56,7 @@ export default function EditUserFormModal({ refetchUsers }) {
           label: type,
         })),
         required: true,
-        // TODO: Change validator to accept only 2 values
+        // TODO: Change validator to accept only 3 values
         validator: (val) => nonEmptyRegex.test(val),
         size: 6,
       },
@@ -83,10 +78,6 @@ export default function EditUserFormModal({ refetchUsers }) {
     [userResponse?.active, userResponse?.name, userResponse?.type]
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       editUser(
@@ -102,14 +93,14 @@ export default function EditUserFormModal({ refetchUsers }) {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchUsers()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
         }
       )
     },
-    [editUser, editingUserId, refetchUsers, router]
+    [editUser, editingUserId, handleCloseModal, refetchUsers]
   )
 
   return (
@@ -125,7 +116,7 @@ export default function EditUserFormModal({ refetchUsers }) {
       isFormLoading={isUserLoading}
       isSubmitLoading={isEditUserLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

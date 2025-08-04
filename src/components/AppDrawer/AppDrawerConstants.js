@@ -3,7 +3,7 @@ import BusinessIcon from '@mui/icons-material/Business'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste'
 import GroupIcon from '@mui/icons-material/Group'
 import HistoryIcon from '@mui/icons-material/History'
-import MenuBookIcon from '@mui/icons-material/MenuBook'
+import InventoryIcon from '@mui/icons-material/Inventory'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
@@ -115,10 +115,10 @@ export const appDrawerItems = [
     ],
   },
   {
-    key: 'books',
-    icon: MenuBookIcon,
-    name: 'Books',
-    href: '/',
+    key: 'items',
+    icon: InventoryIcon,
+    name: 'Items',
+    href: (stockCycle) => `/${stockCycle}/items`,
   },
 ]
 

@@ -13,3 +13,11 @@ export const passwordRegex = new RegExp(
 export const amountRegex = new RegExp(/^\d+(\.\d{1,2})?$/)
 
 export const negativeAmountRegex = new RegExp(/^-?\d+(\.\d{1,2})?$/)
+
+export const prefixRegex = function (regexString1, delim, regexString2) {
+  if (!delim) return regexString2
+  return `${regexString1.replaceAll('$', '')}${delim}${regexString2.replaceAll(
+    '^',
+    ''
+  )}`
+}

@@ -8,6 +8,7 @@ import { getPaginatedData } from '@/lib/pagination'
 import { trackUpdates } from '@/lib/utils/auditLogUtils'
 import { isSuperAdmin } from '@/lib/utils/userUtils'
 import { withAuth } from '@/lib/withAuth'
+import withTransaction from '@/lib/withTransaction'
 import * as models from '@/models'
 import { modelConstants } from '@/models/constants'
 
@@ -38,7 +39,7 @@ async function getDocuments(
   }
   const modelExports = models[modelConstants?.[collectionName].modelName]
   const model = modelExports.default
-  const dbEditorIgnoreFields = modelExports.dbEditorIgnoreFields
+  const dbEditorIgnoreFields = model.dbEditorIgnoreFields ?? []
 
   const objectIdFields = new Set(
     Object.entries({
@@ -119,7 +120,7 @@ async function getDocument(collectionName, documentId, loggedinUser) {
   }
   const modelExports = models[modelConstants?.[collectionName].modelName]
   const model = modelExports.default
-  const dbEditorIgnoreFields = modelExports.dbEditorIgnoreFields
+  const dbEditorIgnoreFields = model.dbEditorIgnoreFields ?? []
 
   const objectIdFields = new Set(
     Object.entries({
@@ -199,7 +200,7 @@ async function editDocument(
   try {
     const modelExports = models[modelConstants?.[collectionName].modelName]
     const model = modelExports.default
-    const dbEditorIgnoreFields = modelExports.dbEditorIgnoreFields
+    const dbEditorIgnoreFields = model.dbEditorIgnoreFields ?? []
 
     const objectIdFields = new Set(
       Object.entries({
@@ -214,26 +215,58 @@ async function editDocument(
       delete documentReq[formField]
     })
 
-    const oldDocument = await model
-      .findOneAndUpdate(
-        {
-          _id: objectIdFields.has('_id')
-            ? new mongoose.Types.ObjectId(documentId)
-            : documentId,
-        },
-        documentReq,
-        {
-          runValidators: true,
+    if (model?.schema?.methods?.normalizer) {
+      const { oldDocument, newDocument } = await withTransaction(
+        async ({ session }) => {
+          const document = await model
+            .findById(
+              objectIdFields.has('_id')
+                ? new mongoose.Types.ObjectId(documentId)
+                : documentId
+            )
+            .session(session)
+            .exec()
+
+          const oldDocument = document.toObject()
+
+          Object.assign(document, documentReq)
+          await document.normalizer(oldDocument, session)
+          await document.save({ session })
+
+          const newDocument = document.toObject()
+
+          return { oldDocument, newDocument }
         }
       )
-      .lean()
 
-    trackUpdates({
-      model,
-      documentId: documentId,
-      oldDocument: oldDocument,
-      newDocument: documentReq,
-    })
+      trackUpdates({
+        model,
+        documentId: documentId,
+        oldDocument: oldDocument,
+        newDocument: newDocument,
+      })
+    } else {
+      const oldDocument = await model
+        .findOneAndUpdate(
+          {
+            _id: objectIdFields.has('_id')
+              ? new mongoose.Types.ObjectId(documentId)
+              : documentId,
+          },
+          documentReq,
+          {
+            runValidators: true,
+          }
+        )
+        .lean()
+
+      trackUpdates({
+        model,
+        documentId: documentId,
+        oldDocument: oldDocument,
+        newDocument: documentReq,
+      })
+    }
 
     return {
       success: true,

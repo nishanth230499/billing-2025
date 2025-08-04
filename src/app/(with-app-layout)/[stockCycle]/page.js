@@ -13,12 +13,14 @@ import SearchBar from '@/components/common/SearchBar'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import AddExistingCustomerFormModal from './AddExistingCustomerFormModal'
 import CreateCustomerFormModal from './CreateCustomerFormModal'
 import CustomerTableActions from './CustomerTableActions'
 import EditCustomerFormModal from './EditCustomerFormModal'
+import ViewShippingAddressModal from './ViewShippingAddressModal'
 
 const customersTableColumns = {
   _id: { label: 'ID' },
@@ -32,7 +34,7 @@ const customersTableColumns = {
 }
 
 export default function Page() {
-  const { getURL, searchParams } = useHandleSearchParams()
+  const { searchParams } = useHandleSearchParams()
   const params = useParams()
 
   const stockCycleId = params.stockCycle
@@ -51,6 +53,9 @@ export default function Page() {
   )
   const { appConfig } = useContext(AppContext)
   const { IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE } = appConfig
+
+  const { setModalValue: setCreateUserModalValue } = useModalControl('create')
+  const { setModalValue: setAddUserModalValue } = useModalControl('add')
 
   const {
     data: customersResponse,
@@ -80,18 +85,14 @@ export default function Page() {
           <Button
             className='rounded-3xl'
             variant='outlined'
-            onClick={() =>
-              window.history.pushState({}, '', getURL({ create: true }))
-            }>
+            onClick={() => setCreateUserModalValue(true)}>
             Create New Customer
           </Button>
           {IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE && (
             <Button
               className='rounded-3xl hidden sm:block'
               variant='outlined'
-              onClick={() =>
-                window.history.pushState({}, '', getURL({ add: true }))
-              }>
+              onClick={() => setAddUserModalValue(true)}>
               Add Existing Customer
             </Button>
           )}
@@ -102,9 +103,7 @@ export default function Page() {
           <Button
             className='rounded-3xl'
             variant='outlined'
-            onClick={() =>
-              window.history.pushState({}, '', getURL({ add: true }))
-            }>
+            onClick={() => setAddUserModalValue(true)}>
             Add Existing Customer
           </Button>
         </Box>
@@ -115,6 +114,7 @@ export default function Page() {
       <CreateCustomerFormModal refetchCustomers={refetchCustomers} />
       <AddExistingCustomerFormModal refetchCustomers={refetchCustomers} />
       <EditCustomerFormModal refetchCustomers={refetchCustomers} />
+      <ViewShippingAddressModal />
       {isCustomersLoading && <TableSkeleton />}
       <ErrorAlert isError={isCustomersError} error={customersError}>
         <DataTable

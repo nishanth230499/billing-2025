@@ -7,8 +7,10 @@ import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
 import { trackCreation, trackUpdates } from '@/lib/utils/auditLogUtils'
 import { withAuth } from '@/lib/withAuth'
+import withTransaction from '@/lib/withTransaction'
 import Company from '@/models/Company'
 import { modelConstants } from '@/models/constants'
+import Item from '@/models/Item'
 
 import { AUTO_GENERATE_COMPANY_ID } from '../../appConfig'
 
@@ -89,7 +91,11 @@ async function getCompany(companyId) {
   await connectDB()
   const company = await Company.aggregate([
     {
-      $match: { _id: companyId },
+      $match: {
+        _id: AUTO_GENERATE_COMPANY_ID
+          ? new mongoose.Types.ObjectId(companyId)
+          : companyId,
+      },
     },
     {
       $lookup: {
@@ -168,18 +174,45 @@ async function editCompany(companyId, companyReq) {
       tags: companyReq?.tags,
     }
 
-    const oldCompany = await Company.findOneAndUpdate(
-      {
-        _id: AUTO_GENERATE_COMPANY_ID
-          ? mongoose.Types.ObjectId(companyId)
-          : companyId,
-      },
-      companyUpdateFields,
-      {
-        runValidators: true,
-      }
-    ).lean()
+    const oldCompany = await withTransaction(async ({ session }) => {
+      const oldCompany = await Company.findOneAndUpdate(
+        {
+          _id: AUTO_GENERATE_COMPANY_ID
+            ? new mongoose.Types.ObjectId(companyId)
+            : companyId,
+        },
+        companyUpdateFields,
+        {
+          runValidators: true,
+          session,
+        }
+      ).lean()
 
+      if (
+        oldCompany?.name !== companyUpdateFields?.name ||
+        oldCompany?.shortName !== companyUpdateFields?.shortName ||
+        oldCompany?.tags !== companyUpdateFields?.tags
+      ) {
+        await Item.updateMany(
+          {
+            companyId: AUTO_GENERATE_COMPANY_ID
+              ? new mongoose.Types.ObjectId(companyId)
+              : companyId,
+          },
+          {
+            $set: {
+              company: {
+                name: companyUpdateFields?.name,
+                shortName: companyUpdateFields?.shortName,
+                tags: companyUpdateFields?.tags,
+              },
+            },
+          },
+          { runValidators: true, session }
+        )
+      }
+      return oldCompany
+    })
     trackUpdates({
       model: Company,
       documentId: oldCompany._id,

@@ -11,6 +11,7 @@ import SearchBar from '@/components/common/SearchBar'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 import CompanyTableActions from './CompanyTableActions'
@@ -28,7 +29,7 @@ const companiesTableColumns = {
 }
 
 export default function Page() {
-  const { getURL, searchParams } = useHandleSearchParams()
+  const { searchParams } = useHandleSearchParams()
 
   const pageNumber = useMemo(
     () => Number(searchParams.get('pageNumber')) || 0,
@@ -42,6 +43,9 @@ export default function Page() {
     () => searchParams.get('searchText') || '',
     [searchParams]
   )
+
+  const { setModalValue: setCreateCompanyModalValue } =
+    useModalControl('create')
 
   const {
     data: companiesResponse,
@@ -68,9 +72,7 @@ export default function Page() {
           <Button
             className='rounded-3xl'
             variant='outlined'
-            onClick={() =>
-              window.history.pushState({}, '', getURL({ create: true }))
-            }>
+            onClick={() => setCreateCompanyModalValue(true)}>
             Create New Company
           </Button>
         </Box>
@@ -97,7 +99,7 @@ export default function Page() {
             (user) => user?._id
           )}
           columns={companiesTableColumns}
-          totalCount={companiesTableColumns?.totalCount}
+          totalCount={companiesResponse?.totalCount}
         />
       </ErrorAlert>
     </>

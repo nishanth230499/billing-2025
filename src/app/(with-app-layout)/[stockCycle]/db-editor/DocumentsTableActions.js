@@ -1,19 +1,21 @@
 'use client'
 
 import EditIcon from '@mui/icons-material/Edit'
-import { IconButton } from '@mui/material'
+import { IconButton, Tooltip } from '@mui/material'
 
-import useHandleSearchParams from '@/hooks/useHandleSearchParams'
+import useModalControl from '@/hooks/useModalControl'
 
 export default function DocumentsTableActions({ data }) {
-  const { getURL } = useHandleSearchParams()
+  const { setModalValue: setEditDocumentModalValue } =
+    useModalControl('editDocument')
+
   return (
-    <IconButton
-      color='primary'
-      onClick={() =>
-        window.history.pushState({}, '', getURL({ editDocument: data?._id }))
-      }>
-      <EditIcon />
-    </IconButton>
+    <Tooltip title='Edit Document'>
+      <IconButton
+        color='primary'
+        onClick={() => setEditDocumentModalValue(data?._id)}>
+        <EditIcon />
+      </IconButton>
+    </Tooltip>
   )
 }

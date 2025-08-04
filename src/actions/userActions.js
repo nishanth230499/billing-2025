@@ -12,7 +12,7 @@ import { withAuth } from '@/lib/withAuth'
 import User from '@/models/User'
 
 async function getUsers(
-  { pageNumber = 0, pageSize = DEFAULT_PAGE_SIZE, searchKey = '' },
+  { pageNumber = 0, pageSize = DEFAULT_PAGE_SIZE, searchText = '' },
   loggedinUser
 ) {
   await connectDB()
@@ -25,15 +25,11 @@ async function getUsers(
   }
 
   const users = await getPaginatedData(User, {
-    filtersPipeline: searchKey
+    filtersPipeline: searchText
       ? [
           {
-            $search: {
-              index: 'name_search_index', // optional, defaults to "default"
-              autocomplete: {
-                query: searchKey,
-                path: 'name',
-              },
+            $match: {
+              name: { $regex: searchText, $options: 'i' },
             },
           },
         ]

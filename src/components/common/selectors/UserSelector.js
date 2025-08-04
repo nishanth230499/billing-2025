@@ -12,7 +12,7 @@ import ErrorAlert from '../ErrorAlert'
 
 export default function UserSelector({ selectedUserId, setSelectedUserId }) {
   const [inputValue, setInputValue] = useState('')
-  const [searchKey] = useDebounce(inputValue, 1000)
+  const [searchText] = useDebounce(inputValue, 1000)
 
   const {
     data: usersResponse,
@@ -21,8 +21,8 @@ export default function UserSelector({ selectedUserId, setSelectedUserId }) {
     error: usersError,
   } = useQuery({
     queryFn: async () =>
-      await handleServerAction(getUsersAction, { searchKey }),
-    queryKey: ['getUsersAction', searchKey],
+      await handleServerAction(getUsersAction, { searchText }),
+    queryKey: ['getUsersAction', searchText],
   })
 
   const {

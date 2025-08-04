@@ -28,6 +28,8 @@ import ErrorAlert from './ErrorAlert'
 
 interface FormFieldBase {
   size: ResponsiveStyleValue<GridSize>
+  // eslint-disable-next-line no-unused-vars
+  hidden?: (value: any, values: Object) => boolean
 }
 
 interface TextFormField extends FormFieldBase {
@@ -44,7 +46,9 @@ interface InputFormField extends FormFieldBase {
   autoFocus?: boolean
   multiline?: boolean
   // eslint-disable-next-line no-unused-vars
-  validator?: (value: any, values: Object) => boolean
+  validator?: (value: any, values: Object) => boolean | object
+  // eslint-disable-next-line no-unused-vars
+  startAdornment?: (value: any, values: Object) => ReactNode
   helperText?: string
   fontFamily?: string
 }
@@ -55,7 +59,7 @@ interface SelectFormField extends FormFieldBase {
   required?: boolean
   autoFocus?: boolean
   // eslint-disable-next-line no-unused-vars
-  validator?: (value: any, values: Object) => boolean
+  validator?: (value: any, values: Object) => boolean | object
   options: { value: string; label: string }[]
   helperText?: string
 }
@@ -71,7 +75,7 @@ interface TagsFormField extends FormFieldBase {
   required?: boolean
   autoFocus?: boolean
   // eslint-disable-next-line no-unused-vars
-  validator?: (value: any, values: Object) => boolean
+  validator?: (value: any, values: Object) => boolean | object
   helperText?: string
 }
 
@@ -82,10 +86,12 @@ interface CustomFormField extends FormFieldBase {
     value: any
     // eslint-disable-next-line no-unused-vars
     onChange: (value: any) => void
+    required?: boolean
     error: boolean
   }) => ReactNode
+  required?: boolean
   // eslint-disable-next-line no-unused-vars
-  validator?: (value: any, values: Object) => boolean
+  validator?: (value: any, values: Object) => boolean | object
 }
 
 interface DividerFormField extends FormFieldBase {
@@ -170,7 +176,12 @@ export default function FormModal({
   }, [])
 
   const setFormFieldError = useCallback(
-    (value: any, formFieldName: string, validator?: Function | undefined) => {
+    (
+      value: any,
+      formFieldName: string,
+      // eslint-disable-next-line no-unused-vars
+      validator?: ((value: any, values: Object) => boolean | object) | undefined
+    ) => {
       if (typeof validator === 'function') {
         const validationPassed = validator(value, {
           ...formFieldValues,
@@ -244,173 +255,197 @@ export default function FormModal({
         <ErrorAlert isError={isError} error={error}>
           <Box component='form' id={formId} noValidate onSubmit={handleSubmit}>
             <Grid container columnSpacing={2}>
-              {Object.entries(formFields).map(([formFieldName, formField]) => (
-                <Grid
-                  key={formFieldName}
-                  size={formField?.size ?? { xs: 12, sm: 6 }}
-                  alignSelf={
-                    formField?.type === 'switch' || formField?.type === 'text'
-                      ? 'center'
-                      : 'flex-start'
-                  }>
-                  {formField.type === 'text' && formField?.text}
-                  {formField.type === 'input' && (
-                    <TextField
-                      type={formField?.inputType ?? 'text'}
-                      margin='normal'
-                      fullWidth
-                      multiline={formField?.multiline}
-                      autoFocus={formField?.autoFocus}
-                      required={formField?.required}
-                      name={formField?.inputName ?? formFieldName}
-                      label={formField?.label}
-                      value={formFieldValues?.[formFieldName] ?? ''}
-                      onChange={(e) => {
-                        setFormFieldValue(e.target.value, formFieldName)
-                        setFormFieldError(
-                          e.target.value,
-                          formFieldName,
-                          formField?.validator
-                        )
-                        setFormFieldsTouched((fields) => ({
-                          ...fields,
-                          [formFieldName]: true,
-                        }))
-                      }}
-                      error={
-                        formFieldsTouched?.[formFieldName] &&
-                        formFieldErrors?.[formFieldName]
-                      }
-                      helperText={formField?.helperText}
-                      slotProps={{
-                        htmlInput: {
-                          sx: {
-                            fontFamily: formField?.fontFamily ?? undefined,
-                            whiteSpace: formField?.multiline
-                              ? 'pre'
-                              : undefined,
-                          },
-                        },
-                      }}
-                    />
-                  )}
-                  {formField.type === 'select' && (
-                    <TextField
-                      select
-                      margin='normal'
-                      fullWidth
-                      autoFocus={formField?.autoFocus}
-                      required={formField?.required}
-                      name={formFieldName}
-                      label={formField?.label}
-                      value={formFieldValues?.[formFieldName] ?? ''}
-                      onChange={(e) => {
-                        setFormFieldValue(e.target.value, formFieldName)
-                        setFormFieldError(
-                          e.target.value,
-                          formFieldName,
-                          formField?.validator
-                        )
-                        setFormFieldsTouched((fields) => ({
-                          ...fields,
-                          [formFieldName]: true,
-                        }))
-                      }}
-                      error={
-                        formFieldsTouched?.[formFieldName] &&
-                        formFieldErrors?.[formFieldName]
-                      }
-                      helperText={formField?.helperText}>
-                      {formField?.options?.map(({ value, label }) => (
-                        <MenuItem key={value} value={value}>
-                          {label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                  {formField?.type === 'switch' && (
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          name={formFieldName}
-                          checked={formFieldValues?.[formFieldName] ?? false}
+              {Object.entries(formFields).map(
+                ([formFieldName, formField]) =>
+                  !(
+                    typeof formField?.hidden === 'function' &&
+                    formField?.hidden(
+                      formFieldValues?.[formFieldName],
+                      formFieldValues
+                    )
+                  ) && (
+                    <Grid
+                      key={formFieldName}
+                      size={formField?.size ?? { xs: 12, sm: 6 }}
+                      alignSelf={
+                        formField?.type === 'switch' ||
+                        formField?.type === 'text'
+                          ? 'center'
+                          : 'flex-start'
+                      }>
+                      {formField.type === 'text' && formField?.text}
+                      {formField.type === 'input' && (
+                        <TextField
+                          type={formField?.inputType ?? 'text'}
+                          margin='normal'
+                          fullWidth
+                          multiline={formField?.multiline}
+                          autoFocus={formField?.autoFocus}
+                          required={formField?.required}
+                          name={formField?.inputName ?? formFieldName}
+                          label={formField?.label}
+                          value={formFieldValues?.[formFieldName] ?? ''}
                           onChange={(e) => {
-                            setFormFieldValue(e.target.checked, formFieldName)
+                            setFormFieldValue(e.target.value, formFieldName)
+                            setFormFieldError(
+                              e.target.value,
+                              formFieldName,
+                              formField?.validator
+                            )
                             setFormFieldsTouched((fields) => ({
                               ...fields,
                               [formFieldName]: true,
                             }))
                           }}
-                        />
-                      }
-                      name={formFieldName}
-                      label={formField?.label}
-                      labelPlacement='start'
-                    />
-                  )}
-                  {formField.type === 'tags' && (
-                    <Autocomplete
-                      clearIcon={false}
-                      options={[]}
-                      freeSolo
-                      multiple
-                      value={formFieldValues?.[formFieldName] ?? []}
-                      onChange={(_, values) => {
-                        setFormFieldValue(values, formFieldName)
-                        setFormFieldsTouched((fields) => ({
-                          ...fields,
-                          [formFieldName]: true,
-                        }))
-                      }}
-                      renderValue={(values, props) =>
-                        values.map((value, index) => (
-                          <Chip
-                            label={value}
-                            {...props({ index })}
-                            key={value}
-                          />
-                        ))
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          margin='normal'
-                          autoFocus={formField?.autoFocus}
-                          required={formField?.required}
-                          label={formField?.label}
                           error={
                             formFieldsTouched?.[formFieldName] &&
                             formFieldErrors?.[formFieldName]
                           }
                           helperText={formField?.helperText}
+                          slotProps={{
+                            input: {
+                              startAdornment: formField?.startAdornment
+                                ? formField?.startAdornment(
+                                    formFieldValues?.[formFieldName],
+                                    formFieldValues
+                                  )
+                                : undefined,
+                            },
+                            htmlInput: {
+                              sx: {
+                                fontFamily: formField?.fontFamily ?? undefined,
+                                whiteSpace: formField?.multiline
+                                  ? 'pre'
+                                  : undefined,
+                              },
+                            },
+                          }}
                         />
                       )}
-                    />
-                  )}
-                  {formField?.type === 'divider' && (
-                    <Divider className='my-4' />
-                  )}
-                  {formField?.type === 'custom' &&
-                    formField?.component({
-                      value: formFieldValues?.[formFieldName] ?? '',
-                      onChange: (val) => {
-                        setFormFieldValue(val, formFieldName)
-                        setFormFieldError(
-                          val,
-                          formFieldName,
-                          formField?.validator
-                        )
-                        setFormFieldsTouched((fields) => ({
-                          ...fields,
-                          [formFieldName]: true,
-                        }))
-                      },
-                      error:
-                        formFieldsTouched?.[formFieldName] &&
-                        formFieldErrors?.[formFieldName],
-                    })}
-                </Grid>
-              ))}
+                      {formField.type === 'select' && (
+                        <TextField
+                          select
+                          margin='normal'
+                          fullWidth
+                          autoFocus={formField?.autoFocus}
+                          required={formField?.required}
+                          name={formFieldName}
+                          label={formField?.label}
+                          value={formFieldValues?.[formFieldName] ?? ''}
+                          onChange={(e) => {
+                            setFormFieldValue(e.target.value, formFieldName)
+                            setFormFieldError(
+                              e.target.value,
+                              formFieldName,
+                              formField?.validator
+                            )
+                            setFormFieldsTouched((fields) => ({
+                              ...fields,
+                              [formFieldName]: true,
+                            }))
+                          }}
+                          error={
+                            formFieldsTouched?.[formFieldName] &&
+                            formFieldErrors?.[formFieldName]
+                          }
+                          helperText={formField?.helperText}>
+                          {formField?.options?.map(({ value, label }) => (
+                            <MenuItem key={value} value={value}>
+                              {label}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      )}
+                      {formField?.type === 'switch' && (
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              name={formFieldName}
+                              checked={
+                                formFieldValues?.[formFieldName] ?? false
+                              }
+                              onChange={(e) => {
+                                setFormFieldValue(
+                                  e.target.checked,
+                                  formFieldName
+                                )
+                                setFormFieldsTouched((fields) => ({
+                                  ...fields,
+                                  [formFieldName]: true,
+                                }))
+                              }}
+                            />
+                          }
+                          name={formFieldName}
+                          label={formField?.label}
+                          labelPlacement='start'
+                        />
+                      )}
+                      {formField.type === 'tags' && (
+                        <Autocomplete
+                          clearIcon={false}
+                          options={[]}
+                          freeSolo
+                          multiple
+                          value={formFieldValues?.[formFieldName] ?? []}
+                          onChange={(_, values) => {
+                            setFormFieldValue(values, formFieldName)
+                            setFormFieldsTouched((fields) => ({
+                              ...fields,
+                              [formFieldName]: true,
+                            }))
+                          }}
+                          renderValue={(values, props) =>
+                            values.map((value, index) => (
+                              <Chip
+                                label={value}
+                                {...props({ index })}
+                                key={value}
+                              />
+                            ))
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              margin='normal'
+                              autoFocus={formField?.autoFocus}
+                              required={formField?.required}
+                              label={formField?.label}
+                              error={
+                                formFieldsTouched?.[formFieldName] &&
+                                formFieldErrors?.[formFieldName]
+                              }
+                              helperText={formField?.helperText}
+                            />
+                          )}
+                        />
+                      )}
+                      {formField?.type === 'divider' && (
+                        <Divider className='my-4' />
+                      )}
+                      {formField?.type === 'custom' &&
+                        formField?.component({
+                          value: formFieldValues?.[formFieldName] ?? '',
+                          onChange: (val) => {
+                            setFormFieldValue(val, formFieldName)
+                            setFormFieldError(
+                              val,
+                              formFieldName,
+                              formField?.validator
+                            )
+                            setFormFieldsTouched((fields) => ({
+                              ...fields,
+                              [formFieldName]: true,
+                            }))
+                          },
+                          required: formField?.required,
+                          error:
+                            formFieldsTouched?.[formFieldName] &&
+                            formFieldErrors?.[formFieldName],
+                        })}
+                    </Grid>
+                  )
+              )}
             </Grid>
           </Box>
         </ErrorAlert>

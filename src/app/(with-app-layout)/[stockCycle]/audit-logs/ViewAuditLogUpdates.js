@@ -2,22 +2,16 @@
 
 import { Button, DialogActions, DialogContent } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useMemo } from 'react'
 
 import { getAuditLogAction } from '@/actions/auditLogActions'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import Modal from '@/components/common/Modal'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 
 export default function ViewAuditLogUpdates() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const viewAuditLogId = useMemo(
-    () => searchParams.get('viewAuditLog'),
-    [searchParams]
-  )
+  const { modalValue: viewAuditLogId, handleCloseModal } =
+    useModalControl('viewAuditLog')
 
   const {
     data: auditLogResponse,
@@ -31,16 +25,12 @@ export default function ViewAuditLogUpdates() {
     enabled: Boolean(viewAuditLogId),
   })
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   return (
     <Modal
       open={Boolean(viewAuditLogId)}
       title='Updates'
       isLoading={isAuditLogLoading}
-      onClose={handleClose}>
+      onClose={handleCloseModal}>
       <DialogContent hidden={isAuditLogLoading}>
         <ErrorAlert isError={isAuditLogError} error={auditLogError}>
           <pre className='border p-4 rounded overflow-auto'>
@@ -49,7 +39,7 @@ export default function ViewAuditLogUpdates() {
         </ErrorAlert>
       </DialogContent>
       <DialogActions className='px-6 pb-4'>
-        <Button onClick={router.back}>Close</Button>
+        <Button onClick={handleCloseModal}>Close</Button>
       </DialogActions>
     </Modal>
   )

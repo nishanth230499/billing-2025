@@ -1,7 +1,7 @@
 'use client'
 
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useContext, useMemo } from 'react'
 
@@ -11,6 +11,7 @@ import {
 } from '@/actions/customerActions'
 import { AppContext } from '@/app/ClientProviders'
 import FormModal from '@/components/common/FormModal'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import {
   multilineNonEmptyRegex,
@@ -19,17 +20,13 @@ import {
 } from '@/lib/regex'
 
 export default function EditCustomerFormModal({ refetchCustomers }) {
-  const router = useRouter()
   const params = useParams()
-  const searchParams = useSearchParams()
   const { appConfig } = useContext(AppContext)
 
   const stockCycleId = params.stockCycle
 
-  const editingCustomerId = useMemo(
-    () => searchParams.get('editCustomer'),
-    [searchParams]
-  )
+  const { modalValue: editingCustomerId, handleCloseModal } =
+    useModalControl('editCustomer')
 
   const {
     IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
@@ -182,10 +179,6 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
     ]
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       editCustomer(
@@ -210,7 +203,7 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchCustomers()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
@@ -223,7 +216,7 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
       IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
       stockCycleId,
       refetchCustomers,
-      router,
+      handleCloseModal,
     ]
   )
 
@@ -240,7 +233,7 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
       isFormLoading={isCustomerLoading}
       isSubmitLoading={isEditCustomerLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

@@ -1,23 +1,18 @@
 'use client'
 
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useMemo } from 'react'
 
 import { getUserAction, resetPasswordAction } from '@/actions/userActions'
 import FormModal from '@/components/common/FormModal'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { passwordRegex } from '@/lib/regex'
 
 export default function ResetPasswordFormModal() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const resettingPasswordUserId = useMemo(
-    () => searchParams.get('resetPasswordUser'),
-    [searchParams]
-  )
+  const { modalValue: resettingPasswordUserId, handleCloseModal } =
+    useModalControl('resetPasswordUser')
 
   const {
     data: userResponse,
@@ -87,22 +82,18 @@ export default function ResetPasswordFormModal() {
     []
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       resetPassword([userResponse?._id, formFieldValues?.password], {
         onSuccess: async (data) => {
           enqueueSnackbar(data, { variant: 'success' })
-          router.back()
+          handleCloseModal()
         },
         onError: (error) =>
           enqueueSnackbar(error.message, { variant: 'error' }),
       })
     },
-    [resetPassword, userResponse?._id, router]
+    [resetPassword, userResponse?._id, handleCloseModal]
   )
 
   return (
@@ -118,7 +109,7 @@ export default function ResetPasswordFormModal() {
       isFormLoading={isUserLoading}
       isSubmitLoading={isResetPasswordLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }

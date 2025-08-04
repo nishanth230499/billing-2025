@@ -15,6 +15,7 @@ export default async function Page() {
   if (!success) {
     return <Alert severity='error'>{defaultStockCycleError}</Alert>
   }
+
   if (defaultStockCycle?._id) redirect(`/${defaultStockCycle?._id}`)
   return null
 }

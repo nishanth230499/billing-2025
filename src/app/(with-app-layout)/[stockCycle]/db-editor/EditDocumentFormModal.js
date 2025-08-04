@@ -1,18 +1,18 @@
 'use client'
 
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import { useCallback, useMemo } from 'react'
 
 import { editDocumentAction, getDocumentAction } from '@/actions/dbActions'
 import FormModal from '@/components/common/FormModal'
+import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { parseJsonString } from '@/lib/utils/jsonUtils'
 import { modelConstants } from '@/models/constants'
 
 export default function EditDocumentFormModal({ refetchDocuments }) {
-  const router = useRouter()
   const searchParams = useSearchParams()
 
   const collectionName = useMemo(
@@ -20,10 +20,8 @@ export default function EditDocumentFormModal({ refetchDocuments }) {
     [searchParams]
   )
 
-  const editingDocumentId = useMemo(
-    () => searchParams.get('editDocument') ?? '',
-    [searchParams]
-  )
+  const { modalValue: editingDocumentId, handleCloseModal } =
+    useModalControl('editDocument')
 
   const {
     data: documentResponse,
@@ -89,10 +87,6 @@ export default function EditDocumentFormModal({ refetchDocuments }) {
     [documentResponse]
   )
 
-  const handleClose = useCallback(() => {
-    router.back()
-  }, [router])
-
   const handleSubmit = useCallback(
     async (formFieldValues) => {
       editDocument(
@@ -105,14 +99,20 @@ export default function EditDocumentFormModal({ refetchDocuments }) {
           onSuccess: async (data) => {
             enqueueSnackbar(data, { variant: 'success' })
             await refetchDocuments()
-            router.back()
+            handleCloseModal()
           },
           onError: (error) =>
             enqueueSnackbar(error.message, { variant: 'error' }),
         }
       )
     },
-    [collectionName, editDocument, editingDocumentId, refetchDocuments, router]
+    [
+      collectionName,
+      editDocument,
+      editingDocumentId,
+      handleCloseModal,
+      refetchDocuments,
+    ]
   )
 
   return (
@@ -128,7 +128,7 @@ export default function EditDocumentFormModal({ refetchDocuments }) {
       isFormLoading={isDocumentLoading}
       isSubmitLoading={isEditDocumentLoading}
       onSubmit={handleSubmit}
-      onClose={handleClose}
+      onClose={handleCloseModal}
     />
   )
 }
