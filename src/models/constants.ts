@@ -9,6 +9,7 @@ type ModelConstantsKeyType =
   | 'company'
   | 'hsn'
   | 'item'
+  | 'customer_shipping_address'
 
 type ModelConstantsType = {
   [key in ModelConstantsKeyType]: {
@@ -49,5 +50,9 @@ export const modelConstants: ModelConstantsType = {
   item: {
     modelName: 'Item',
     collectionName: 'item',
+  },
+  customer_shipping_address: {
+    modelName: 'CustomerShippingAddress',
+    collectionName: 'customer_shipping_address',
   },
 }

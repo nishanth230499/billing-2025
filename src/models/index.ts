@@ -1,6 +1,7 @@
 export * as AuditLog from './AuditLog'
 export * as Company from './Company'
 export * as Customer from './Customer'
+export * as CustomerShippingAddress from './CustomerShippingAddress'
 export * as Firm from './Firm'
 export * as Hsn from './Hsn'
 export * as Item from './Item'

@@ -63,7 +63,6 @@ const customerSchema = mongoose.Schema(
                 type: String,
                 required: true,
                 index: true,
-                unique: true,
                 ref: modelConstants.stock_cycle.modelName,
               },
               ...Object.fromEntries(

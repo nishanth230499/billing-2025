@@ -5,15 +5,18 @@ import { IconButton, Tooltip } from '@mui/material'
 
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 
-export default function ItemTableActions({ data }) {
+export default function ShippingAddressTableActions({ data }) {
   const { getURL } = useHandleSearchParams()
   return (
-    <Tooltip title='Edit Item'>
+    <Tooltip title='Edit Shipping Address'>
       <IconButton
         color='primary'
-        title='Edit Item'
         onClick={() =>
-          window.history.pushState({}, '', getURL({ editItem: data?._id }))
+          window.history.pushState(
+            {},
+            '',
+            getURL({ editShippingAddress: data?._id })
+          )
         }>
         <EditIcon />
       </IconButton>

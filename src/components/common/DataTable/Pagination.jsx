@@ -5,11 +5,16 @@ import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import { MenuItem, Select, TablePagination } from '@mui/material'
 import Link from 'next/link'
 
-export default function Pagination({ totalCount }) {
+export default function Pagination({
+  totalCount,
+  pageNumberSearchParamName = 'pageNumber',
+  pageSizeSearchParamName = 'pageSize',
+}) {
   const { searchParams, getURL } = useHandleSearchParams()
 
-  const pageNumber = Number(searchParams.get('pageNumber')) || 0
-  const pageSize = Number(searchParams.get('pageSize')) || DEFAULT_PAGE_SIZE
+  const pageNumber = Number(searchParams.get(pageNumberSearchParamName)) || 0
+  const pageSize =
+    Number(searchParams.get(pageSizeSearchParamName)) || DEFAULT_PAGE_SIZE
 
   return (
     <>
@@ -31,13 +36,13 @@ export default function Pagination({ totalCount }) {
           actions: {
             nextButton: {
               component: Link,
-              href: getURL({ pageNumber: pageNumber + 1 }),
+              href: getURL({ [pageNumberSearchParamName]: pageNumber + 1 }),
               replace: true,
               onClick: null,
             },
             previousButton: {
               component: Link,
-              href: getURL({ pageNumber: pageNumber - 1 }),
+              href: getURL({ [pageNumberSearchParamName]: pageNumber - 1 }),
               replace: true,
               onClick: null,
             },
@@ -60,8 +65,8 @@ export default function Pagination({ totalCount }) {
                 <MenuItem
                   {...child?.props}
                   href={getURL({
-                    pageSize: child?.props?.value,
-                    pageNumber: 0,
+                    [pageSizeSearchParamName]: child?.props?.value,
+                    [pageNumberSearchParamName]: 0,
                   })}
                   component={Link}
                   replace

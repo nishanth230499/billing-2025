@@ -50,6 +50,9 @@ const itemSchema = mongoose.Schema(
     tags: [{ type: String, required: true }],
     companyId: {
       type: AUTO_GENERATE_COMPANY_ID ? mongoose.Schema.Types.ObjectId : String,
+      match: AUTO_GENERATE_COMPANY_ID
+        ? undefined
+        : new RegExp(COMPANY_ID_REGEX),
       required: true,
       ref: modelConstants?.company?.modelName,
       index: 1,

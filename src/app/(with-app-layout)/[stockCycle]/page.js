@@ -19,6 +19,7 @@ import AddExistingCustomerFormModal from './AddExistingCustomerFormModal'
 import CreateCustomerFormModal from './CreateCustomerFormModal'
 import CustomerTableActions from './CustomerTableActions'
 import EditCustomerFormModal from './EditCustomerFormModal'
+import ViewShippingAddressModal from './ViewShippingAddressModal'
 
 const customersTableColumns = {
   _id: { label: 'ID' },
@@ -115,6 +116,7 @@ export default function Page() {
       <CreateCustomerFormModal refetchCustomers={refetchCustomers} />
       <AddExistingCustomerFormModal refetchCustomers={refetchCustomers} />
       <EditCustomerFormModal refetchCustomers={refetchCustomers} />
+      <ViewShippingAddressModal />
       {isCustomersLoading && <TableSkeleton />}
       <ErrorAlert isError={isCustomersError} error={customersError}>
         <DataTable
