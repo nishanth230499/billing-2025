@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button, Paper, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import React from 'react'
 
@@ -55,7 +55,7 @@ export default function Page() {
     ],
   })
   return (
-    <>
+    <Paper className='overflow-auto h-full flex flex-col p-4'>
       <Box className='flex items-center justify-between mb-4'>
         <Typography variant='h6'>Users</Typography>
         <Button
@@ -85,6 +85,6 @@ export default function Page() {
           }}
         />
       </ErrorAlert>
-    </>
+    </Paper>
   )
 }

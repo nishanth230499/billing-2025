@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Grid, Typography } from '@mui/material'
+import { Box, Grid, Paper, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import React, { useCallback, useMemo } from 'react'
 
@@ -47,9 +47,14 @@ export default function Page() {
     [searchParams]
   )
 
-  const filter = useMemo(
-    () => parseJsonString(searchParams.get('filter')) ?? {},
+  const stringFilter = useMemo(
+    () => searchParams.get('filter') ?? '',
     [searchParams]
+  )
+
+  const jsonFilter = useMemo(
+    () => parseJsonString(stringFilter) ?? {},
+    [stringFilter]
   )
 
   const paginationProps = usePaginationControl()
@@ -74,20 +79,20 @@ export default function Page() {
       await handleServerAction(getDocumentsAction, collectionName, {
         pageNumber: paginationProps?.pageNumber,
         pageSize: paginationProps?.pageSize,
-        filter,
+        filter: jsonFilter,
       }),
     queryKey: [
       'getDocumentsAction',
       collectionName,
       paginationProps?.pageNumber,
       paginationProps?.pageSize,
-      filter,
+      jsonFilter,
     ],
     enabled: Boolean(collectionName),
   })
 
   return (
-    <>
+    <Paper className='overflow-auto h-full flex flex-col p-4'>
       <Box className='flex items-center justify-between mb-4'>
         <Typography variant='h6'>Documents</Typography>
       </Box>
@@ -103,7 +108,7 @@ export default function Page() {
           <SearchBar
             label='Filters'
             validator={(filter) => filter === '' || parseJsonString(filter)}
-            searchText={filter}
+            searchText={stringFilter}
             setSearchText={(text) => replaceURL({ filter: text || undefined })}
           />
         </Grid>
@@ -129,6 +134,6 @@ export default function Page() {
           }}
         />
       </ErrorAlert>
-    </>
+    </Paper>
   )
 }

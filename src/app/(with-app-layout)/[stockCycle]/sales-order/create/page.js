@@ -1,8 +1,8 @@
 'use client'
 
-import { Box, Grid, Paper, Typography } from '@mui/material'
+import { Grid, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { Fragment, useCallback, useEffect, useState } from 'react'
 
 import { getItemsAction } from '@/actions/itemsActions'
 import DataTable from '@/components/common/DataTable'
@@ -133,11 +133,11 @@ export default function Page() {
 
   return (
     <>
-      <Typography className='mb-4' variant='h6'>
-        Create New Order
-      </Typography>
-      <SplitPanel direction='vertical'>
-        <Box key='123' className='h-full flex flex-col p-4' component={Paper}>
+      <SplitPanel>
+        <Fragment key='123'>
+          <Typography className='mb-2' variant='h6'>
+            Create New Order
+          </Typography>
           <DataTable
             columns={selectedItemTableColumns}
             data={selectedItems}
@@ -146,8 +146,8 @@ export default function Page() {
             onDataOrderChange={setSelectedItemsOrder}
             className='grow'
           />
-        </Box>
-        <Box key='456' className='h-full flex flex-col p-4' component={Paper}>
+        </Fragment>
+        <Fragment key='456'>
           <Grid container columnSpacing={2} columns={3} className='mb-2'>
             <Grid size={{ xs: 3, sm: 1 }}>
               <CompanySelector
@@ -163,7 +163,6 @@ export default function Page() {
               />
             </Grid>
           </Grid>
-          <Box className='mb-4'></Box>
           {isItemsLoading && <TableSkeleton />}
           <ErrorAlert isError={isItemsError} error={itemsError}>
             <DataTable
@@ -183,7 +182,7 @@ export default function Page() {
               className='grow flex flex-col justify-between'
             />
           </ErrorAlert>
-        </Box>
+        </Fragment>
       </SplitPanel>
     </>
   )

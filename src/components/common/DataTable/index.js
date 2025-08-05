@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  Paper,
   Table,
   TableBody,
   TableContainer,
@@ -114,9 +113,13 @@ export default function DataTable({
 
   return (
     <TableContainer
-      component={Paper}
       hidden={hidden}
-      className={`min-h-60 ${className}`}>
+      className={`min-h-60 ${className}`}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1,
+      }}>
       <Table stickyHeader size={isMobileWidth ? 'small' : 'medium'}>
         <TableHead>
           <TableRow>

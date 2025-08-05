@@ -41,7 +41,7 @@ export default async function Layout({ children, params }) {
         userType={loggedinUser?.type}
         firms={firms}
       />
-      <main className='min-w-0 w-full p-4 max-h-screen print:max-h-none flex flex-col'>
+      <main className='min-w-0 w-full max-h-screen print:max-h-none'>
         {children}
       </main>
     </Box>

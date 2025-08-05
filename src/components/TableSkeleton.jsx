@@ -13,7 +13,13 @@ import {
 
 export default function TableSkeleton() {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer
+      className='min-h-60'
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1,
+      }}>
       <Table>
         <TableHead>
           <TableRow>

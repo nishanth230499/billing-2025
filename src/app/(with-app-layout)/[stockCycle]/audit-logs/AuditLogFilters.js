@@ -117,7 +117,16 @@ export default function AuditLogFilters() {
 
   return (
     <Box className='mb-4'>
-      <Accordion>
+      <Accordion
+        slotProps={{
+          root: {
+            sx: {
+              boxShadow: 'none',
+              border: '1px solid',
+              borderColor: 'divider',
+            },
+          },
+        }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls='audit-log-filters-content'

@@ -66,8 +66,7 @@ export default function AppDrawer({
             userType={userType}
           />
         </SwipeableDrawer>
-        <Paper
-          elevation={16}
+        <Box
           sx={{
             transition: isDrawerOpen
               ? 'left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms'
@@ -87,7 +86,7 @@ export default function AppDrawer({
               <KeyboardArrowRightIcon />
             )}
           </IconButton>
-        </Paper>
+        </Box>
       </>
     )
   const isDrawerExpanded = isDrawerOpen || isMouseInsideDrawer
@@ -95,10 +94,11 @@ export default function AppDrawer({
     <Drawer
       variant='permanent'
       className='print:hidden'
+      slots={{ paper: Box }}
       slotProps={{
         paper: {
-          elevation: 1,
-          className: classNames('h-screen max-h-screen sticky', {
+          square: '',
+          className: classNames('h-screen max-h-screen sticky flex flex-col', {
             'w-3xs': isDrawerExpanded,
             'w-16': !isDrawerExpanded,
           }),
