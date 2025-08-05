@@ -22,6 +22,7 @@ export default function SearchBar({
     <TextField
       slotProps={{
         input: {
+          slotProps: { input: { enterKeyHint: 'search' } },
           className: 'rounded-4xl px-4',
           endAdornment: (selectedSearchText || searchText) && (
             <InputAdornment position='end'>

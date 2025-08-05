@@ -21,10 +21,13 @@ import ItemTableActions from './ItemTableActions'
 
 const itemTableColumns = {
   _id: { label: 'ID' },
-  companyShortName: { label: 'Company Short Name' },
+  companyShortName: {
+    label: 'Company Short Name',
+    format: (item) => item?.company?.shortName,
+  },
   name: { label: 'Name' },
   group: { label: 'Group' },
-  price: { label: 'Price' },
+  price: { label: 'Price', format: (item) => item?.price?.toFixed(2) },
   hsnId: { label: 'HSN' },
   actions: {
     label: 'Actions',
@@ -111,14 +114,8 @@ export default function Page() {
         <DataTable
           hidden={isItemsLoading}
           data={Object.fromEntries(
-            itemsResponse?.paginatedResults?.map((item) => [
-              item?._id,
-              {
-                ...item,
-                companyShortName: item?.company?.shortName,
-                price: item?.price?.toFixed(2),
-              },
-            ]) || []
+            itemsResponse?.paginatedResults?.map((item) => [item?._id, item]) ||
+              []
           )}
           dataOrder={itemsResponse?.paginatedResults?.map((user) => user?._id)}
           columns={itemTableColumns}

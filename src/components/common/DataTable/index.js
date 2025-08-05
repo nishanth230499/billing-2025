@@ -25,6 +25,8 @@ export default function DataTable({
   paginationProps,
   onDataChange,
   onDataOrderChange,
+  onEnterPress,
+  className,
 }) {
   const inputsRef = useRef({})
 
@@ -56,6 +58,11 @@ export default function DataTable({
       switch (event.key) {
         case 'ArrowUp':
           inputsRef?.current?.[dataOrder[dataIndex - 1]]?.[columnKey].select()
+          event.preventDefault()
+          break
+        case 'Enter':
+          onEnterPress && onEnterPress(dataOrder[dataIndex], columnKey)
+          inputsRef?.current?.[dataOrder[dataIndex + 1]]?.[columnKey].select()
           event.preventDefault()
           break
         case 'ArrowDown':
@@ -91,7 +98,7 @@ export default function DataTable({
           return
       }
     },
-    [columns, dataOrder]
+    [columns, dataOrder, onEnterPress]
   )
 
   const handleInputChange = useCallback(
@@ -106,11 +113,19 @@ export default function DataTable({
   )
 
   return (
-    <TableContainer component={Paper} hidden={hidden} className='min-h-60'>
+    <TableContainer
+      component={Paper}
+      hidden={hidden}
+      className={`min-h-60 ${className}`}>
       <Table stickyHeader size={isMobileWidth ? 'small' : 'medium'}>
         <TableHead>
           <TableRow>
-            {canUpdateOrder && <TableCell className='w-[40px] pr-0' />}
+            {canUpdateOrder && (
+              <TableCell
+                className='w-[40px] pr-0'
+                sx={{ backgroundImage: 'var(--mui-overlays-8)' }}
+              />
+            )}
             {Object.entries(columns).map(([columnKey, column]) => (
               <TableCell
                 key={columnKey}
@@ -141,12 +156,7 @@ export default function DataTable({
           ))}
         </TableBody>
       </Table>
-      {paginationProps?.totalCount ? (
-        <Pagination
-          {...paginationProps}
-          className='sticky bottom-0 bg-inherit'
-        />
-      ) : null}
+      {paginationProps?.totalCount ? <Pagination {...paginationProps} /> : null}
     </TableContainer>
   )
 }

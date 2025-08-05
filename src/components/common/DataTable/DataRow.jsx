@@ -1,5 +1,5 @@
 'use client'
-import { TableCell, TableRow, Typography } from '@mui/material'
+import { Input, TableCell, TableRow, Typography } from '@mui/material'
 import React, { useCallback } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
@@ -87,16 +87,28 @@ export default function DataRow({
               return column?.component({ data })
             }
             if (column?.editable) {
+              const error = column?.validator && !column?.validator(data)
               return (
-                <input
-                  ref={(ele) => setInputRef(ele, columnKey)}
+                <Input
+                  inputRef={(ele) => setInputRef(ele, columnKey)}
                   onKeyDown={(e) => handleInputKeyDown(e, columnKey)}
-                  value={data?.[columnKey]}
+                  value={
+                    (column?.format
+                      ? column?.format(data)
+                      : data?.[columnKey]) ?? ''
+                  }
                   onChange={(e) => handleInputChange(e, columnKey)}
+                  error={error}
+                  inputProps={{ enterKeyHint: 'Done' }}
+                  enterKeyHint='done'
+                  sx={{
+                    borderBottomWidth: error ? 2 : undefined,
+                    borderBottomColor: (theme) => theme.palette.error.main,
+                  }}
                 />
               )
             }
-            return data?.[columnKey]
+            return column?.format ? column?.format(data) : data?.[columnKey]
           })()}
         </TableCell>
       ))}

@@ -10,6 +10,8 @@ export const passwordRegex = new RegExp(
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&^])[A-Za-z\d@.#$!%*?&]{8,15}$/
 )
 
+export const numberRegex = new RegExp(/^\d+?$/)
+
 export const amountRegex = new RegExp(/^\d+(\.\d{1,2})?$/)
 
 export const negativeAmountRegex = new RegExp(/^-?\d+(\.\d{1,2})?$/)

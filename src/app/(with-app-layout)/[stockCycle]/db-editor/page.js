@@ -114,9 +114,9 @@ export default function Page() {
         <DataTable
           hidden={isDocumentsLoading}
           data={Object.fromEntries(
-            documentsResponse?.paginatedResults?.map((auditLog) => [
-              auditLog?._id,
-              auditLog,
+            documentsResponse?.paginatedResults?.map((document) => [
+              document?._id,
+              document,
             ]) || []
           )}
           dataOrder={documentsResponse?.paginatedResults?.map(

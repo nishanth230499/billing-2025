@@ -26,7 +26,7 @@ export default function Pagination({
         rowsPerPage={pageSize}
         page={pageNumber}
         labelRowsPerPage='Page Size:'
-        className='sticky bottom-0 left-0'
+        className='sticky bottom-0 left-0 shrink-0'
         onPageChange={(_, page) => setPageNumber(page)}
         onRowsPerPageChange={(e) => setPageSize(e.target.value)}
         slotProps={{

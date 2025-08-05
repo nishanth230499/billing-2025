@@ -31,17 +31,6 @@ async function getItems({
     pageNumber,
     pageSize,
     filtersPipeline: [
-      ...(companyId
-        ? [
-            {
-              $match: {
-                companyId: AUTO_GENERATE_COMPANY_ID
-                  ? new mongoose.Types.ObjectId(companyId)
-                  : companyId,
-              },
-            },
-          ]
-        : []),
       ...(searchText || companySearchText
         ? [
             {
@@ -103,6 +92,17 @@ async function getItems({
                       : []),
                   ],
                 },
+              },
+            },
+          ]
+        : []),
+      ...(companyId
+        ? [
+            {
+              $match: {
+                companyId: AUTO_GENERATE_COMPANY_ID
+                  ? new mongoose.Types.ObjectId(companyId)
+                  : companyId,
               },
             },
           ]
