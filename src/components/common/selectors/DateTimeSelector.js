@@ -1,31 +1,31 @@
 import ClearIcon from '@mui/icons-material/Clear'
 import { IconButton, InputAdornment, TextField } from '@mui/material'
 
-export default function DateSelector({
+import { formatForDateTimeInput } from '@/lib/utils/dateUtils'
+
+export default function DateTimeSelector({
   label,
-  selectedDate,
-  setSelectedDate,
-  required,
-  error,
+  selectedDateTime,
+  setSelectedDateTime,
 }) {
   return (
     <TextField
       margin='normal'
-      type='date'
+      type='datetime-local'
       fullWidth
       label={label}
-      required={required}
-      error={error}
-      value={selectedDate}
+      value={formatForDateTimeInput(selectedDateTime)}
       onChange={(e) => {
-        setSelectedDate(e.target.value)
+        setSelectedDateTime(
+          e.target.value ? Number(new Date(e.target.value)) : null
+        )
       }}
       slotProps={{
         inputLabel: { shrink: true },
         input: {
-          endAdornment: selectedDate ? (
+          endAdornment: selectedDateTime ? (
             <InputAdornment position='end'>
-              <IconButton onClick={() => setSelectedDate('')}>
+              <IconButton onClick={() => setSelectedDateTime(null)}>
                 <ClearIcon />
               </IconButton>
             </InputAdornment>

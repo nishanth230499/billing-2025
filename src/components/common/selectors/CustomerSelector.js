@@ -55,7 +55,7 @@ export default function CustomerSelector({
             highlightColor: customer?.firm?.color,
           })) || []
         }
-        placeholder='Search for Customers to Add'
+        placeholder='Customer'
         noOptionsText='No Customers Found'
       />
     </ErrorAlert>

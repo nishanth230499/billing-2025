@@ -84,7 +84,7 @@ export default function DataRow({
           {...(column?.slotProps?.tableBodyCell || {})}>
           {(() => {
             if (column?.component) {
-              return column?.component({ data })
+              return column?.component({ dataKey, data, columnKey })
             }
             if (column?.editable) {
               const error = column?.validator && !column?.validator(data)

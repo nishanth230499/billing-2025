@@ -174,6 +174,7 @@ async function getDocument(collectionName, documentId, loggedinUser) {
 async function editDocument(
   collectionName,
   documentId,
+  // TODO: Convert all the object ID fields to objectID before saving
   documentReq,
   loggedinUser
 ) {

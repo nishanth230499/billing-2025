@@ -1,3 +1,5 @@
+import { dateRegex } from '../regex'
+
 export function formatForDateTimeInput(timestamp: number): string {
   if (!timestamp) return ''
   const date = new Date(timestamp)
@@ -8,4 +10,8 @@ export function formatForDateTimeInput(timestamp: number): string {
   const minutes = String(date.getMinutes()).padStart(2, '0')
 
   return `${year}-${month}-${day}T${hours}:${minutes}`
+}
+
+export function dateStringValidator(dateString: string) {
+  return dateRegex.test(dateString) && !isNaN(new Date(dateString).getTime())
 }

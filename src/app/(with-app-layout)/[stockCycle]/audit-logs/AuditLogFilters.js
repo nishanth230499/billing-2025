@@ -16,7 +16,7 @@ import {
 import { useCallback, useMemo, useState } from 'react'
 
 import CollectionSelector from '@/components/common/selectors/CollectionSelector'
-import DateSelector from '@/components/common/selectors/DateSelector'
+import DateTimeSelector from '@/components/common/selectors/DateTimeSelector'
 import UserSelector from '@/components/common/selectors/UserSelector'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import { AuditLogType } from '@/models/AuditLog'
@@ -187,17 +187,15 @@ export default function AuditLogFilters() {
               />
             </Grid>
             <Grid size={1}>
-              <DateSelector
+              <DateTimeSelector
                 label='Select Start Date & Time'
-                searchKeyParam='startDateTime'
                 selectedDateTime={selectedStartDateTime}
                 setSelectedDateTime={setSelectedStartDateTime}
               />
             </Grid>
             <Grid size={1}>
-              <DateSelector
+              <DateTimeSelector
                 label='Select End Date & Time'
-                searchKeyParam='endDateTime'
                 selectedDateTime={selectedEndDateTime}
                 setSelectedDateTime={setSelectedEndDateTime}
               />

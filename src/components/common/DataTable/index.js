@@ -60,7 +60,12 @@ export default function DataTable({
           event.preventDefault()
           break
         case 'Enter':
-          onEnterPress && onEnterPress(dataOrder[dataIndex], columnKey)
+          onEnterPress &&
+            onEnterPress({
+              dataKey: dataOrder[dataIndex],
+              columnKey,
+              data: data?.[dataOrder[dataIndex]],
+            })
           inputsRef?.current?.[dataOrder[dataIndex + 1]]?.[columnKey].select()
           event.preventDefault()
           break
@@ -97,7 +102,7 @@ export default function DataTable({
           return
       }
     },
-    [columns, dataOrder, onEnterPress]
+    [columns, data, dataOrder, onEnterPress]
   )
 
   const handleInputChange = useCallback(
@@ -114,7 +119,7 @@ export default function DataTable({
   return (
     <TableContainer
       hidden={hidden}
-      className={`min-h-60 ${className}`}
+      className={`min-h-60 flex flex-col justify-between ${className}`}
       sx={{
         border: '1px solid',
         borderColor: 'divider',

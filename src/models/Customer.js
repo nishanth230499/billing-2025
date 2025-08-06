@@ -19,12 +19,15 @@ export const additionalCustomerFields = {
   },
   gstin: {
     type: String,
+    default: '',
   },
   phoneNumber: {
     type: String,
+    default: '',
   },
   emailId: {
     type: String,
+    default: '',
   },
 }
 

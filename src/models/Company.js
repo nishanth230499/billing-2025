@@ -19,10 +19,12 @@ const companySchema = mongoose.Schema(
     },
     shortName: {
       type: String,
+      default: '',
     },
     tags: [{ type: String, required: true }],
     address: {
       type: String,
+      default: '',
     },
     firmId: {
       type: String,
@@ -31,18 +33,23 @@ const companySchema = mongoose.Schema(
     },
     gstin: {
       type: String,
+      default: '',
     },
     phoneNumber: {
       type: String,
+      default: '',
     },
     emailId: {
       type: String,
+      default: '',
     },
     shippingAddress: {
       type: String,
+      default: '',
     },
     shippingPhoneNumber: {
       type: String,
+      default: '',
     },
   },
   { autoSearchIndex: true }

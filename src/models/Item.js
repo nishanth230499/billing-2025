@@ -45,6 +45,7 @@ const itemSchema = mongoose.Schema(
     },
     group: {
       type: String,
+      default: '',
     },
     price: { type: Number },
     tags: [{ type: String, required: true }],
