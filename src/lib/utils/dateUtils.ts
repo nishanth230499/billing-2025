@@ -15,3 +15,12 @@ export function formatForDateTimeInput(isoDateString: string): string {
 export function dateStringValidator(dateString: string) {
   return dateRegex.test(dateString) && !isNaN(new Date(dateString).getTime())
 }
+
+export function getCurrentDateString() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0') // Months are 0-indexed
+  const day = String(today.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}

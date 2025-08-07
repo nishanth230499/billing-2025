@@ -30,7 +30,10 @@ import DateSelector from '@/components/common/selectors/DateSelector'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
 import { numberRegex } from '@/lib/regex'
-import { dateStringValidator } from '@/lib/utils/dateUtils'
+import {
+  dateStringValidator,
+  getCurrentDateString,
+} from '@/lib/utils/dateUtils'
 
 import SelectedItemTableActions from './SelectedItemTableActions'
 
@@ -177,6 +180,7 @@ export default function SelectedItemsPanel({
         {
           customerId,
           customerShippingAddressId: customerShippingAddressId || undefined,
+          date: getCurrentDateString(),
           supplyDate,
           orderRef,
           isSetPack,

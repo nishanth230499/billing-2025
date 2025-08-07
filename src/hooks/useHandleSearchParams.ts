@@ -22,11 +22,22 @@ export default function useHandleSearchParams() {
     [pathname, searchParams]
   )
 
+  const getNewURL = useCallback(
+    (newPathname: string, newParams: { [s: string]: string }) => {
+      const params = new URLSearchParams()
+      Object.entries(newParams).forEach(([key, value]) => {
+        params.set(key, value)
+      })
+      return `${newPathname}${params.toString() ? `?${params.toString()}` : ''}`
+    },
+    []
+  )
+
   const replaceURL = useCallback(
     (newParams: { [s: string]: string | null | undefined }) =>
       window.history.replaceState({}, '', generateURL(newParams)),
     [generateURL]
   )
 
-  return { searchParams, getURL: generateURL, replaceURL }
+  return { searchParams, getURL: generateURL, getNewURL, replaceURL }
 }

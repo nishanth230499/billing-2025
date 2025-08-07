@@ -2,6 +2,7 @@
 
 import { Box, Button, Grid, Paper, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import Link from 'next/link'
 import React, { useMemo } from 'react'
 
 import { getItemsAction } from '@/actions/itemsActions'
@@ -51,7 +52,7 @@ export default function Page() {
   )
 
   const paginationProps = usePaginationControl()
-  const { setModalValue: setCreateItemModalValue } = useModalControl('create')
+  const { getModalURL: getCreateItemModalURL } = useModalControl('create')
 
   const {
     data: itemsResponse,
@@ -85,7 +86,8 @@ export default function Page() {
           <Button
             className='rounded-3xl'
             variant='outlined'
-            onClick={() => setCreateItemModalValue(true)}>
+            LinkComponent={Link}
+            href={getCreateItemModalURL(true)}>
             Create New Item
           </Button>
         </Box>

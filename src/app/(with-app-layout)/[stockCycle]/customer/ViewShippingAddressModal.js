@@ -2,6 +2,7 @@
 
 import { Button, DialogContent } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import Link from 'next/link'
 
 import { getCustomerShippingAddressesAction } from '@/actions/customerShippingAddressActions'
 import DataTable from '@/components/common/DataTable'
@@ -35,7 +36,7 @@ export default function ViewShippingAddressModal() {
     'viewShippingAddress',
     ['shippingAddressPageNumber', 'shippingAddressPageSize']
   )
-  const { setModalValue: setCreateShippingAddressModalValue } = useModalControl(
+  const { getModalURL: getCreateShippingAddressModalURL } = useModalControl(
     'createShippingAddress'
   )
 
@@ -70,7 +71,8 @@ export default function ViewShippingAddressModal() {
         <Button
           className='rounded-3xl mb-4'
           variant='outlined'
-          onClick={() => setCreateShippingAddressModalValue(true)}>
+          LinkComponent={Link}
+          href={getCreateShippingAddressModalURL(true)}>
           Create Shipping Address
         </Button>
         <CreateShippingAddressFormModal

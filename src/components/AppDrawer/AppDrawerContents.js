@@ -65,12 +65,14 @@ export default function AppDrawerContents({
               return {
                 ...menuItem,
                 href: href,
-                selected: href === pathname,
+                selected: pathname.startsWith(href),
               }
             }
             return menuItem
           })
-          const active = newMenuItems?.some(({ href }) => href === pathname)
+          const active = newMenuItems?.some(({ href }) =>
+            pathname.startsWith(href)
+          )
           return (
             <Dropdown
               key={item?.key}

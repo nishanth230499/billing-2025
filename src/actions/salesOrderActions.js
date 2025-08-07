@@ -1,84 +1,84 @@
 'use server'
 
+import mongoose from 'mongoose'
+
+import { DEFAULT_PAGE_SIZE } from '@/constants'
 import connectDB from '@/lib/connectDB'
 import { getIncrementedNumber } from '@/lib/getIncrementedNumber'
+import { getPaginatedData } from '@/lib/pagination'
 import { trackCreation } from '@/lib/utils/auditLogUtils'
 import { withAuth } from '@/lib/withAuth'
 import withTransaction from '@/lib/withTransaction'
+import { modelConstants } from '@/models/constants'
 import SalesOrder from '@/models/SalesOrder'
 
-// async function getCompanies({
-//   pageNumber = 0,
-//   pageSize = DEFAULT_PAGE_SIZE,
-//   searchText = '',
-//   sortFields = {},
-// }) {
-//   await connectDB()
-//   const companies = await getPaginatedData(Company, {
-//     pageNumber,
-//     pageSize,
-//     filtersPipeline: [
-//       ...(searchText
-//         ? [
-//             {
-//               $search: {
-//                 index: 'id_name_shortName_tags_searchIndex',
-//                 compound: {
-//                   should: [
-//                     { autocomplete: { query: searchText, path: '_id' } },
-//                     {
-//                       autocomplete: {
-//                         query: searchText,
-//                         path: 'name',
-//                       },
-//                     },
-//                     {
-//                       autocomplete: {
-//                         query: searchText,
-//                         path: 'shortName',
-//                       },
-//                     },
-//                     { autocomplete: { query: searchText, path: 'tags' } },
-//                   ],
-//                 },
-//               },
-//             },
-//           ]
-//         : []),
-//       ...(Object.keys(sortFields).length
-//         ? [
-//             {
-//               $sort: sortFields,
-//             },
-//           ]
-//         : []),
-//     ],
-//     paginatedResultsPipeline: [
-//       {
-//         $lookup: {
-//           from: modelConstants.firm.collectionName,
-//           localField: 'firmId',
-//           foreignField: '_id',
-//           as: 'firm',
-//         },
-//       },
-//       {
-//         $set: {
-//           firm: { $first: '$firm' },
-//         },
-//       },
-//       {
-//         $project: {
-//           _id: 1,
-//           name: 1,
-//           'firm.color': 1,
-//         },
-//       },
-//     ],
-//   })
+import { AUTO_GENERATE_CUSTOMER_ID } from '../../appConfig'
 
-//   return { success: true, data: companies }
-// }
+async function getSalesOrders({
+  pageNumber = 0,
+  pageSize = DEFAULT_PAGE_SIZE,
+  stockCycleId,
+  customerId,
+}) {
+  await connectDB()
+
+  const salesOrders = await getPaginatedData(SalesOrder, {
+    pageNumber,
+    pageSize,
+    filtersPipeline: [
+      {
+        $match: {
+          stockCycleId,
+          ...(customerId
+            ? {
+                customerId: AUTO_GENERATE_CUSTOMER_ID
+                  ? new mongoose.Types.ObjectId(customerId)
+                  : customerId,
+              }
+            : {}),
+        },
+      },
+      { $sort: { number: 1 } },
+    ],
+    paginatedResultsPipeline: [
+      {
+        $lookup: {
+          from: modelConstants.customer.collectionName,
+          localField: 'customerId',
+          foreignField: '_id',
+          as: 'customer',
+        },
+      },
+      {
+        $lookup: {
+          from: modelConstants.customer_shipping_address.collectionName,
+          localField: 'customerShippingAddressId',
+          foreignField: '_id',
+          as: 'customerShippingAddress',
+        },
+      },
+      {
+        $set: {
+          customer: { $first: '$customer' },
+          customerShippingAddress: { $first: '$customerShippingAddress' },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          number: 1,
+          orderRef: 1,
+          date: 1,
+          supplyDate: 1,
+          'customer.name': 1,
+          'customerShippingAddress.name': 1,
+        },
+      },
+    ],
+  })
+
+  return { success: true, data: salesOrders }
+}
 
 // async function getCompany(companyId) {
 //   await connectDB()
@@ -104,6 +104,7 @@ async function createSalesOrder(stockCycleId, salesOrderReq) {
         number,
         customerId: salesOrderReq?.customerId,
         customerShippingAddressId: salesOrderReq?.customerShippingAddressId,
+        date: salesOrderReq?.date,
         supplyDate: salesOrderReq?.supplyDate,
         orderRef: salesOrderReq?.orderRef,
         isSetPack: salesOrderReq?.isSetPack,
@@ -186,7 +187,7 @@ async function createSalesOrder(stockCycleId, salesOrderReq) {
 //   }
 // }
 
-// export const getCompaniesAction = withAuth(getCompanies)
+export const getSalesOrdersAction = withAuth(getSalesOrders)
 // export const getCompanyAction = withAuth(getCompany)
 export const createSalesOrderAction = withAuth(createSalesOrder)
 // export const editCompanyAction = withAuth(editCompany)

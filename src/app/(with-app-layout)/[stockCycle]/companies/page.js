@@ -2,6 +2,7 @@
 
 import { Box, Button, Paper, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import Link from 'next/link'
 import React, { useMemo } from 'react'
 
 import { getCompaniesAction } from '@/actions/companyActions'
@@ -36,8 +37,7 @@ export default function Page() {
   )
 
   const paginationProps = usePaginationControl()
-  const { setModalValue: setCreateCompanyModalValue } =
-    useModalControl('create')
+  const { getModalURL: getCreateCompanyModalURL } = useModalControl('create')
 
   const {
     data: companiesResponse,
@@ -69,7 +69,8 @@ export default function Page() {
           <Button
             className='rounded-3xl'
             variant='outlined'
-            onClick={() => setCreateCompanyModalValue(true)}>
+            LinkComponent={Link}
+            href={getCreateCompanyModalURL(true)}>
             Create New Company
           </Button>
         </Box>

@@ -2,6 +2,7 @@
 
 import { Box, Button, Paper, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import Link from 'next/link'
 import React from 'react'
 
 import { getUsersAction } from '@/actions/userActions'
@@ -34,7 +35,7 @@ const usersTableColumns = {
 
 export default function Page() {
   const paginationProps = usePaginationControl()
-  const { setModalValue: setCreateUserModalValue } = useModalControl('create')
+  const { getModalURL: getCreateUserModalURL } = useModalControl('create')
 
   const {
     data: usersResponse,
@@ -61,7 +62,8 @@ export default function Page() {
         <Button
           className='rounded-3xl'
           variant='outlined'
-          onClick={() => setCreateUserModalValue(true)}>
+          LinkComponent={Link}
+          href={getCreateUserModalURL(true)}>
           Create User
         </Button>
         <CreateUserFormModal refetchUsers={refetchUsers} />

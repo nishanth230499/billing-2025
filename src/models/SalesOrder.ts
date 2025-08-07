@@ -80,6 +80,14 @@ const salesOrderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: modelConstants.customer_shipping_address.modelName,
     },
+    date: {
+      type: String,
+      required: true,
+      validate: {
+        validator: dateStringValidator,
+        message: 'The order date should be valid.',
+      },
+    },
     supplyDate: {
       type: String,
       required: true,
