@@ -296,8 +296,8 @@ export default function SelectedItemsPanel({
         columns={selectedItemTableColumns}
         data={selectedItems}
         dataOrder={selectedItemsOrder}
-        onDataChange={setSelectedItems}
-        onDataOrderChange={setSelectedItemsOrder}
+        setData={setSelectedItems}
+        setDataOrder={setSelectedItemsOrder}
         className='grow'
       />
       <Box className='flex items-center justify-between mt-4'>

@@ -11,7 +11,7 @@ export default function Page() {
   const [selectedItems, setSelectedItems] = useState({})
   const [selectedItemsOrder, setSelectedItemsOrder] = useState([])
 
-  const handleAddItem = useCallback(({ data: item }) => {
+  const handleAddItem = useCallback((item) => {
     // TODO: Doesnot work in mobile. Use npm uuid
     const selectedItemKey = crypto.randomUUID()
     setSelectedItems((items) => ({

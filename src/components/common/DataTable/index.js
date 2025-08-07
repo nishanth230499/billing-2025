@@ -9,30 +9,28 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import TableCell from '@mui/material/TableCell'
-import { useCallback, useMemo, useRef } from 'react'
+import { memo, useCallback, useMemo, useRef } from 'react'
 
 import { MOBILE_MAX_WIDTH } from '@/constants'
 
 import DataRow from './DataRow'
 import Pagination from './Pagination'
 
-export default function DataTable({
+function DataTable({
   hidden,
   data,
   dataOrder,
   columns,
   paginationProps,
-  onDataChange,
-  onDataOrderChange,
+  setData,
+  setDataOrder,
   onEnterPress,
   className,
 }) {
+  console.log('Table Rerendered')
   const inputsRef = useRef({})
 
-  const canUpdateOrder = useMemo(
-    () => Boolean(onDataOrderChange),
-    [onDataOrderChange]
-  )
+  const canUpdateOrder = useMemo(() => Boolean(setDataOrder), [setDataOrder])
 
   const isMobileWidth = useMediaQuery(`(max-width:${MOBILE_MAX_WIDTH})`)
 
@@ -43,13 +41,15 @@ export default function DataTable({
 
   const handleMoveRow = useCallback(
     (sourceDataKey, targetDataIndex) => {
-      const newDataOrder = [...dataOrder]
-      const sourceDataIndex = newDataOrder.indexOf(sourceDataKey)
-      const movingDataKeys = newDataOrder.splice(sourceDataIndex, 1)
-      newDataOrder.splice(targetDataIndex, 0, ...movingDataKeys)
-      onDataOrderChange(newDataOrder)
+      setDataOrder((dataOrder) => {
+        const newDataOrder = [...dataOrder]
+        const sourceDataIndex = newDataOrder.indexOf(sourceDataKey)
+        const movingDataKeys = newDataOrder.splice(sourceDataIndex, 1)
+        newDataOrder.splice(targetDataIndex, 0, ...movingDataKeys)
+        return newDataOrder
+      })
     },
-    [dataOrder, onDataOrderChange]
+    [setDataOrder]
   )
 
   const handleInputKeyDown = useCallback(
@@ -64,7 +64,7 @@ export default function DataTable({
             onEnterPress({
               dataKey: dataOrder[dataIndex],
               columnKey,
-              data: data?.[dataOrder[dataIndex]],
+              value: event.target.value,
             })
           inputsRef?.current?.[dataOrder[dataIndex + 1]]?.[columnKey].select()
           event.preventDefault()
@@ -102,18 +102,24 @@ export default function DataTable({
           return
       }
     },
-    [columns, data, dataOrder, onEnterPress]
+    [columns, dataOrder, onEnterPress]
   )
 
   const handleInputChange = useCallback(
-    (event, dataKey, columnKey) => {
-      const newData = { ...data }
-      newData[dataKey][columnKey] = columns?.[columnKey]?.inputParser
-        ? columns?.[columnKey]?.inputParser(event.target.value)
-        : event.target.value
-      onDataChange(newData)
+    (value, dataKey, columnKey) => {
+      setData((data) => {
+        const newData = { ...data }
+        newData[dataKey] = {
+          ...newData[dataKey],
+          [columnKey]: columns?.[columnKey]?.inputParser
+            ? columns?.[columnKey]?.inputParser(value)
+            : value,
+        }
+
+        return newData
+      })
     },
-    [columns, data, onDataChange]
+    [columns, setData]
   )
 
   return (
@@ -145,6 +151,7 @@ export default function DataTable({
         </TableHead>
         <TableBody>
           {dataOrder?.map((dataKey, dataIndex) => (
+            // Do not define any inline function, the reference of the function will change, and the memo of DataRow will not work, and leads to unnecessary rerendering
             <DataRow
               key={dataKey}
               dataKey={dataKey}
@@ -154,12 +161,8 @@ export default function DataTable({
               canUpdateOrder={canUpdateOrder}
               inputsRef={getinputsRef(dataKey)}
               handleMoveRow={handleMoveRow}
-              handleInputKeyDown={(e, columnKey) =>
-                handleInputKeyDown(e, dataIndex, columnKey)
-              }
-              handleInputChange={(e, columnKey) =>
-                handleInputChange(e, dataKey, columnKey)
-              }
+              handleInputKeyDown={handleInputKeyDown}
+              handleInputChange={handleInputChange}
             />
           ))}
         </TableBody>
@@ -168,3 +171,5 @@ export default function DataTable({
     </TableContainer>
   )
 }
+
+export default memo(DataTable)

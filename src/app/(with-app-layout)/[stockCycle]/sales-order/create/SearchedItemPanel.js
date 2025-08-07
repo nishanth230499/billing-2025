@@ -96,6 +96,26 @@ export default function SearchedItemPanel({ handleAddItem }) {
     )
   }, [itemsResponse?.paginatedResults])
 
+  const handleEnterPress = useCallback(
+    ({ columnKey, dataKey, value }) => {
+      handleAddItem({ ...searchedItems?.[dataKey], [columnKey]: value })
+    },
+    [handleAddItem, searchedItems]
+  )
+
+  const paginationProps = useMemo(
+    () => ({
+      pageNumber,
+      setPageNumber,
+      pageSize,
+      setPageSize: handlePageSizeChange,
+      totalCount: itemsResponse?.totalCount,
+    }),
+    [handlePageSizeChange, itemsResponse?.totalCount, pageNumber, pageSize]
+  )
+
+  const dataOrder = useMemo(() => Object.keys(searchedItems), [searchedItems])
+
   return (
     <Fragment>
       <Typography variant='h6'>Select Items</Typography>
@@ -120,16 +140,10 @@ export default function SearchedItemPanel({ handleAddItem }) {
           hidden={isItemsLoading}
           columns={itemTableColumns}
           data={searchedItems}
-          dataOrder={Object.keys(searchedItems)}
-          onDataChange={setSearchedItems}
-          onEnterPress={handleAddItem}
-          paginationProps={{
-            pageNumber,
-            setPageNumber,
-            pageSize,
-            setPageSize: handlePageSizeChange,
-            totalCount: itemsResponse?.totalCount,
-          }}
+          dataOrder={dataOrder}
+          setData={setSearchedItems}
+          onEnterPress={handleEnterPress}
+          paginationProps={paginationProps}
           className='grow'
         />
       </ErrorAlert>

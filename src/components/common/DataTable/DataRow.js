@@ -1,11 +1,13 @@
 'use client'
-import { Input, TableCell, TableRow, Typography } from '@mui/material'
-import React, { useCallback } from 'react'
-import { useDrag, useDrop } from 'react-dnd'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
+import { TableCell, TableRow } from '@mui/material'
 import classNames from 'classnames'
+import React, { memo, useCallback } from 'react'
+import { useDrag, useDrop } from 'react-dnd'
 
-export default function DataRow({
+import DataInput from './DataInput'
+
+function DataRow({
   dataKey,
   dataIndex,
   canUpdateOrder,
@@ -16,6 +18,7 @@ export default function DataRow({
   handleInputChange,
   handleMoveRow,
 }) {
+  // console.log('Data Row Rerendered', data?.group)
   const setInputRef = useCallback(
     (ele, columnKey) => {
       inputsRef[columnKey] = ele
@@ -23,7 +26,7 @@ export default function DataRow({
     [inputsRef]
   )
 
-  const [_, drag, dragPreview] = useDrag(
+  const [, drag, dragPreview] = useDrag(
     () => ({
       type: 'tableRow',
       item: { dataKey, originalDataIndex: dataIndex },
@@ -52,6 +55,16 @@ export default function DataRow({
       }),
     }),
     [handleMoveRow]
+  )
+
+  const onKeyDown = useCallback(
+    (e, columnKey) => handleInputKeyDown(e, dataIndex, columnKey),
+    [dataIndex, handleInputKeyDown]
+  )
+
+  const onChange = useCallback(
+    (v, columnKey) => handleInputChange(v, dataKey, columnKey),
+    [dataKey, handleInputChange]
   )
 
   return (
@@ -87,24 +100,14 @@ export default function DataRow({
               return column?.component({ dataKey, data, columnKey })
             }
             if (column?.editable) {
-              const error = column?.validator && !column?.validator(data)
               return (
-                <Input
-                  inputRef={(ele) => setInputRef(ele, columnKey)}
-                  onKeyDown={(e) => handleInputKeyDown(e, columnKey)}
-                  value={
-                    (column?.format
-                      ? column?.format(data)
-                      : data?.[columnKey]) ?? ''
-                  }
-                  onChange={(e) => handleInputChange(e, columnKey)}
-                  error={error}
-                  inputProps={{ enterKeyHint: 'Done' }}
-                  enterKeyHint='done'
-                  sx={{
-                    borderBottomWidth: error ? 2 : undefined,
-                    borderBottomColor: (theme) => theme.palette.error.main,
-                  }}
+                <DataInput
+                  column={column}
+                  columnKey={columnKey}
+                  data={data}
+                  setInputRef={setInputRef}
+                  onKeyDown={onKeyDown}
+                  onChange={onChange}
                 />
               )
             }
@@ -115,3 +118,26 @@ export default function DataRow({
     </TableRow>
   )
 }
+
+export default memo(DataRow, (prevProps, nextProps) => {
+  const dataEqual =
+    JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
+  // if (nextProps.data.group === 'Nursery') console.log(dataEqual)
+
+  for (const key in prevProps) {
+    if (key !== 'data') {
+      if (prevProps[key] !== nextProps[key]) {
+        // if (nextProps.data.group === 'Nursery') console.log(key)
+        return false
+      }
+    }
+  }
+
+  for (const key in nextProps) {
+    if (key !== 'data' && !(key in prevProps)) {
+      // if (nextProps?.data?.group === 'Nursery') console.log(key)
+      return false
+    }
+  }
+  return dataEqual
+})
