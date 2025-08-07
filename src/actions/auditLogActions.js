@@ -54,6 +54,7 @@ async function getAuditLogs(filters = {}, loggedinUser) {
     pageSize,
     paginatedResultsPipeline: [
       {
+        // TODO: Instead of lookup everywhere, see if hydrating, populating and toJSON is a better option?
         $lookup: {
           from: 'user',
           localField: 'updatedById',
@@ -90,13 +91,11 @@ async function getAuditLog(auditLogId, loggedinUser) {
     }
   }
 
-  const auditLog = await AuditLog.findOne(
-    { _id: auditLogId },
-    { _id: 1, updatedFields: 1 }
-  ).lean()
-  auditLog._id = auditLog._id.toString()
-
-  return { success: true, data: auditLog }
+  const auditLog = await AuditLog.findById(auditLogId, {
+    _id: 1,
+    updatedFields: 1,
+  })
+  return { success: true, data: auditLog.toJSON() }
 }
 
 export const getAuditLogsAction = withAuth(getAuditLogs)

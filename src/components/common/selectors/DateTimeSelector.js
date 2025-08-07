@@ -17,7 +17,7 @@ export default function DateTimeSelector({
       value={formatForDateTimeInput(selectedDateTime)}
       onChange={(e) => {
         setSelectedDateTime(
-          e.target.value ? Number(new Date(e.target.value)) : null
+          e.target.value ? new Date(e.target.value)?.toISOString() : null
         )
       }}
       slotProps={{

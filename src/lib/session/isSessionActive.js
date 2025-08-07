@@ -11,10 +11,9 @@ export default async function isSessionActive() {
   await connectDB()
   const loggedinAt = parseInt((await headers()).get('x-loggedin-at'))
   const loggedinUserId = await getLoggedinUserId()
-  const loggedinUser = await User.findOne(
-    { _id: loggedinUserId },
-    { hashedPassword: 0 }
-  )
+  const loggedinUser = await User.findById(loggedinUserId, {
+    hashedPassword: 0,
+  })
   if (!loggedinUser.active) {
     throw new Error('User is not active! Contact admin!')
   }

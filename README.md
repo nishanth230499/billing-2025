@@ -45,3 +45,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - Either model.save or {runValidators: true} should be given
 - AuditLog along with transaction is added for every server action which updates DB
 - When new mongoose model is created, make sure it is also exported from index.ts
+- Add toJSON for all schemas
+  - Removes id
+  - Removes \_\_v
+  - converts ObjectId to string
+  - converts Date to ISO Date String
+  - converts any other data type to respective primitive data type

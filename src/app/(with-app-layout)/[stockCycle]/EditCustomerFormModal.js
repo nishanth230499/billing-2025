@@ -18,6 +18,7 @@ import {
   negativeAmountRegex,
   nonEmptyRegex,
 } from '@/lib/regex'
+import { formatAmount } from '@/lib/utils/amoutUtils'
 
 export default function EditCustomerFormModal({ refetchCustomers }) {
   const params = useParams()
@@ -160,7 +161,7 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
     () => ({
       name: customerResponse?.name,
       place: customerResponse?.place,
-      openingBalance: customerResponse?.openingBalance?.toFixed(2),
+      openingBalance: formatAmount(customerResponse?.openingBalance) ?? '',
       billingName: customerResponse?.billingName,
       billingAddress: customerResponse?.billingAddress,
       gstin: customerResponse?.gstin,
@@ -188,7 +189,7 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
             name: formFieldValues?.name?.trim(),
             place: formFieldValues?.place?.trim(),
             firmId: formFieldValues?.firmId,
-            openingBalance: parseFloat(formFieldValues?.openingBalance),
+            openingBalance: formFieldValues?.openingBalance,
             stockCycleId: IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
               ? stockCycleId
               : undefined,

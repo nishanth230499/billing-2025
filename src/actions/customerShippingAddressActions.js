@@ -55,12 +55,11 @@ async function getCustomerShippingAddresses({
 async function getCustomerShippingAddress(customerShippingAddressId) {
   await connectDB()
   const shippingAddress = await CustomerShippingAddress.findById(
-    new mongoose.Types.ObjectId(customerShippingAddressId)
-  ).lean()
+    customerShippingAddressId
+  )
 
   if (shippingAddress) {
-    shippingAddress._id = shippingAddress._id.toString()
-    return { success: true, data: shippingAddress }
+    return { success: true, data: shippingAddress.toJSON() }
   }
   return { success: false, error: 'Shipping Address not found!' }
 }
@@ -70,10 +69,7 @@ async function createCustomerShippingAddress(shippingAddressReq) {
 
   try {
     const customerShippingAddress = new CustomerShippingAddress({
-      customerId: AUTO_GENERATE_CUSTOMER_ID
-        ? new mongoose.Types.ObjectId(shippingAddressReq?.customerId)
-        : shippingAddressReq?.customerId,
-
+      customerId: shippingAddressReq?.customerId,
       name: shippingAddressReq?.name,
       address: shippingAddressReq?.address,
       gstin: shippingAddressReq?.gstin,
@@ -86,7 +82,7 @@ async function createCustomerShippingAddress(shippingAddressReq) {
     trackCreation({
       model: CustomerShippingAddress,
       documentId: customerShippingAddress._id,
-      newDocument: customerShippingAddress.toObject(),
+      newDocument: customerShippingAddress.toJSON(),
     })
 
     return {
@@ -117,20 +113,18 @@ async function editCustomerShippingAddress(
       emailId: shippingAddressReq?.emailId,
     }
 
-    const oldShippingAddress = await CustomerShippingAddress.findOneAndUpdate(
-      {
-        _id: new mongoose.Types.ObjectId(shippingAddressId),
-      },
+    const oldShippingAddress = await CustomerShippingAddress.findByIdAndUpdate(
+      shippingAddressId,
       shippingAddressFields,
       {
         runValidators: true,
       }
-    ).lean()
+    )
 
     trackUpdates({
       model: CustomerShippingAddress,
       documentId: oldShippingAddress._id,
-      oldDocument: oldShippingAddress,
+      oldDocument: oldShippingAddress.toJSON(),
       newDocument: shippingAddressFields,
     })
 

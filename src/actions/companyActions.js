@@ -1,7 +1,5 @@
 'use server'
 
-import mongoose from 'mongoose'
-
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
@@ -10,7 +8,6 @@ import { withAuth } from '@/lib/withAuth'
 import withTransaction from '@/lib/withTransaction'
 import Company from '@/models/Company'
 import { modelConstants } from '@/models/constants'
-import Item from '@/models/Item'
 
 import { AUTO_GENERATE_COMPANY_ID } from '../../appConfig'
 
@@ -89,34 +86,12 @@ async function getCompanies({
 
 async function getCompany(companyId) {
   await connectDB()
-  const company = await Company.aggregate([
-    {
-      $match: {
-        _id: AUTO_GENERATE_COMPANY_ID
-          ? new mongoose.Types.ObjectId(companyId)
-          : companyId,
-      },
-    },
-    {
-      $lookup: {
-        from: modelConstants.firm.collectionName,
-        localField: 'firmId',
-        foreignField: '_id',
-        as: 'firm',
-      },
-    },
-    {
-      $set: {
-        firm: { $first: '$firm' },
-      },
-    },
-  ])
+  const company = await Company.findById(companyId).populate('firm')
 
-  if (company[0]) {
-    company[0]._id = company[0]._id.toString()
-    return { success: true, data: company[0] }
+  if (company) {
+    return { success: true, data: company.toJSON() }
   }
-  return { success: false, error: 'User not found!' }
+  return { success: false, error: 'Company not found!' }
 }
 
 async function createCompany(companyReq) {
@@ -142,7 +117,7 @@ async function createCompany(companyReq) {
     trackCreation({
       model: Company,
       documentId: company._id,
-      newDocument: company.toObject(),
+      newDocument: company.toJSON(),
     })
 
     return {
@@ -174,50 +149,28 @@ async function editCompany(companyId, companyReq) {
       tags: companyReq?.tags,
     }
 
-    const oldCompany = await withTransaction(async ({ session }) => {
-      const oldCompany = await Company.findOneAndUpdate(
-        {
-          _id: AUTO_GENERATE_COMPANY_ID
-            ? new mongoose.Types.ObjectId(companyId)
-            : companyId,
-        },
-        companyUpdateFields,
-        {
-          runValidators: true,
-          session,
-        }
-      ).lean()
+    const { oldCompanyJSON, newCompanyJSON } = await withTransaction(
+      async ({ session }) => {
+        const company = await Company.findById(companyId)
+          .session(session)
+          .exec()
+        const oldCompany = company.toObject()
+        const oldCompanyJSON = company.toJSON()
 
-      if (
-        oldCompany?.name !== companyUpdateFields?.name ||
-        oldCompany?.shortName !== companyUpdateFields?.shortName ||
-        oldCompany?.tags !== companyUpdateFields?.tags
-      ) {
-        await Item.updateMany(
-          {
-            companyId: AUTO_GENERATE_COMPANY_ID
-              ? new mongoose.Types.ObjectId(companyId)
-              : companyId,
-          },
-          {
-            $set: {
-              company: {
-                name: companyUpdateFields?.name,
-                shortName: companyUpdateFields?.shortName,
-                tags: companyUpdateFields?.tags,
-              },
-            },
-          },
-          { runValidators: true, session }
-        )
+        Object.assign(company, companyUpdateFields)
+        await company.normalizer(oldCompany, session)
+        await company.save({ session })
+
+        const newCompanyJSON = company.toJSON()
+
+        return { oldCompanyJSON, newCompanyJSON }
       }
-      return oldCompany
-    })
+    )
     trackUpdates({
       model: Company,
-      documentId: oldCompany._id,
-      oldDocument: oldCompany,
-      newDocument: companyUpdateFields,
+      documentId: oldCompanyJSON._id,
+      oldDocument: oldCompanyJSON,
+      newDocument: newCompanyJSON,
     })
 
     return {

@@ -60,11 +60,11 @@ export default function Page() {
   )
 
   const startDateTime = useMemo(
-    () => Number(searchParams.get('startDateTime')),
+    () => searchParams.get('startDateTime') ?? '',
     [searchParams]
   )
   const endDateTime = useMemo(
-    () => Number(searchParams.get('endDateTime')),
+    () => searchParams.get('endDateTime') ?? '',
     [searchParams]
   )
 

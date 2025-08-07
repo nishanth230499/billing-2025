@@ -6,11 +6,9 @@ import Firm from '@/models/Firm'
 export default async function getFirmsAction() {
   await connectDB()
 
-  const firms = await Firm.find({})
-    .sort({
-      _id: 1,
-    })
-    .lean()
+  const firms = await Firm.find({}).sort({
+    _id: 1,
+  })
 
-  return firms
+  return firms.map((s) => s.toJSON())
 }

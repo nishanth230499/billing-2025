@@ -34,9 +34,9 @@ async function getHsns({
 async function getHsn(hsnId) {
   await connectDB()
 
-  const hsn = await Hsn.findOne({ _id: hsnId }).lean()
+  const hsn = await Hsn.findById(hsnId)
   if (hsn) {
-    return { success: true, data: hsn }
+    return { success: true, data: hsn.toJSON() }
   }
   return { success: false, error: 'HSN not found!' }
 }

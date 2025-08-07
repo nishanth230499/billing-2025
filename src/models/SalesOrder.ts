@@ -34,6 +34,7 @@ const salesOrderItemSchema = new mongoose.Schema({
   },
   quantity: {
     type: Number,
+    required: true,
     min: [0, 'Quantity should not be negative'],
     validate: {
       validator: Number.isInteger,
@@ -42,6 +43,7 @@ const salesOrderItemSchema = new mongoose.Schema({
   },
   unitQuantity: {
     type: Number,
+    required: true,
     min: [0, 'Unit Quantity should not be negative'],
     validate: {
       validator: Number.isInteger,
@@ -50,47 +52,70 @@ const salesOrderItemSchema = new mongoose.Schema({
   },
 })
 
-const salesOrderSchema = new mongoose.Schema({
-  stockCycleId: {
-    type: String,
-    required: true,
-  },
-  number: {
-    type: Number,
-    required: true,
-    min: [1, 'Order Number should be positive'],
-  },
-  customerId: {
-    type: AUTO_GENERATE_CUSTOMER_ID ? mongoose.Schema.Types.ObjectId : String,
-    match: AUTO_GENERATE_CUSTOMER_ID
-      ? undefined
-      : new RegExp(CUSTOMER_ID_REGEX),
-    required: true,
-    ref: modelConstants.customer.modelName,
-  },
-  customerShippingAddressId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: modelConstants.customer_shipping_address.modelName,
-  },
-  supplyDate: {
-    type: String,
-    required: true,
-    validate: {
-      validator: dateStringValidator,
-      message: 'The supply date should be valid.',
+const salesOrderSchema = new mongoose.Schema(
+  {
+    stockCycleId: {
+      type: String,
+      required: true,
+      ref: modelConstants.stock_cycle.modelName,
     },
+    number: {
+      type: Number,
+      required: true,
+      min: [1, 'Order Number should be positive'],
+      validate: {
+        validator: Number.isInteger,
+        message: 'Order number should be a counting number.',
+      },
+    },
+    customerId: {
+      type: AUTO_GENERATE_CUSTOMER_ID ? mongoose.Schema.Types.ObjectId : String,
+      match: AUTO_GENERATE_CUSTOMER_ID
+        ? undefined
+        : new RegExp(CUSTOMER_ID_REGEX),
+      required: true,
+      ref: modelConstants.customer.modelName,
+    },
+    customerShippingAddressId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: modelConstants.customer_shipping_address.modelName,
+    },
+    supplyDate: {
+      type: String,
+      required: true,
+      validate: {
+        validator: dateStringValidator,
+        message: 'The supply date should be valid.',
+      },
+    },
+    orderRef: {
+      type: String,
+      default: '',
+    },
+    isSetPack: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    items: { type: [salesOrderItemSchema], required: true },
   },
-  orderRef: {
-    type: String,
-    default: '',
-  },
-  isSetPack: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  items: { type: [salesOrderItemSchema], required: true },
-})
+  {
+    toJSON: {
+      transform: function (_, ret: any) {
+        delete ret.id
+        delete ret.__v
+
+        ret._id = ret?._id?.toString()
+        ret.customerId = ret?.customerId?.toString()
+        ret.customerShippingAddressId =
+          ret?.customerShippingAddressId?.toString()
+        ret.items.forEach((item: any) => {
+          item.itemId = item?.itemId?.toString()
+        })
+      },
+    },
+  }
+)
 
 const model = modelConstants.sales_order
 

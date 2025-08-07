@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 
 import { prefixRegex } from '@/lib/regex'
+import { formatAmount } from '@/lib/utils/amoutUtils'
 
 import {
   AUTO_GENERATE_COMPANY_ID,
@@ -47,7 +48,11 @@ const itemSchema = mongoose.Schema(
       type: String,
       default: '',
     },
-    price: { type: Number },
+    price: {
+      type: Number,
+      set: formatAmount,
+      min: [0, 'Item price can not be negative'],
+    },
     tags: [{ type: String, required: true }],
     companyId: {
       type: AUTO_GENERATE_COMPANY_ID ? mongoose.Schema.Types.ObjectId : String,
@@ -74,13 +79,24 @@ const itemSchema = mongoose.Schema(
       ref: modelConstants?.hsn?.modelName,
     },
   },
-  { autoSearchIndex: true }
+  {
+    autoSearchIndex: true,
+    toJSON: {
+      transform: function (_, ret) {
+        delete ret.id
+        delete ret.__v
+
+        ret._id = ret?._id?.toString()
+        ret.companyId = ret?.companyId?.toString()
+      },
+    },
+  }
 )
 
 itemSchema.statics.dbEditorIgnoreFields = ['company']
 
-itemSchema.methods.normalizer = async function (oldFields, session) {
-  if (oldFields?.companyId?.toString() !== this.companyId?.toString()) {
+itemSchema.methods.normalizer = async function (oldDocument, session) {
+  if (oldDocument?.companyId?.toString() !== this.companyId?.toString()) {
     const company = await Company.findById(this.companyId, {
       _id: 1,
       name: 1,

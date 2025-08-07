@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
 
+import { formatAmount } from '@/lib/utils/amoutUtils'
+
 import {
   AUTO_GENERATE_CUSTOMER_ID,
   CUSTOMER_ID_REGEX,
@@ -51,7 +53,7 @@ const customerSchema = mongoose.Schema(
       required: true,
       ref: modelConstants?.firm?.modelName,
     },
-    openingBalance: { type: Number, required: true },
+    openingBalance: { type: Number, required: true, set: formatAmount },
     ...Object.fromEntries(
       Object.entries(additionalCustomerFields).filter(
         ([fieldName]) =>
@@ -78,7 +80,16 @@ const customerSchema = mongoose.Schema(
         }
       : {}),
   },
-  { autoSearchIndex: true }
+  {
+    autoSearchIndex: true,
+    toJSON: {
+      transform: function (_, ret) {
+        delete ret.id
+        delete ret.__v
+        ret._id = ret?._id?.toString()
+      },
+    },
+  }
 )
 
 customerSchema.searchIndex({

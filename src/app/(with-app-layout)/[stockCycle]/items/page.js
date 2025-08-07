@@ -14,6 +14,7 @@ import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import useModalControl from '@/hooks/useModalControl'
 import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
+import { formatAmount } from '@/lib/utils/amoutUtils'
 
 import CreateItemFormModal from './CreateItemFormModal'
 import EditItemFormModal from './EditItemFormModal'
@@ -27,7 +28,7 @@ const itemTableColumns = {
   },
   name: { label: 'Name' },
   group: { label: 'Group' },
-  price: { label: 'Price', format: (item) => item?.price?.toFixed(2) },
+  price: { label: 'Price', format: (item) => formatAmount(item?.price) ?? '' },
   hsnId: { label: 'HSN' },
   actions: {
     label: 'Actions',

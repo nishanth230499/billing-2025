@@ -11,20 +11,21 @@ async function getStockCycles() {
     .sort({
       name: 1,
     })
-    .lean()
+    .exec()
 
-  return { success: true, data: stockCycles }
+  return { success: true, data: stockCycles.map((s) => s.toJSON()) }
 }
 
 async function getDefaultStockCycle() {
   await connectDB()
 
-  const defaultStockCycle = await StockCycle.find({ default: true })
+  const defaultStockCycle = await StockCycle.findOne({ default: true })
     .sort({ name: -1 })
-    .limit(1)
-    .lean()
+    .exec()
 
-  return { success: true, data: defaultStockCycle[0] }
+  if (defaultStockCycle)
+    return { success: true, data: defaultStockCycle.toJSON() }
+  return { success: false, error: 'No default Stock Cycle Found.' }
 }
 
 export const getStockCyclesAction = withAuth(getStockCycles)

@@ -204,7 +204,7 @@ async function createCustomer(customerReq) {
     trackCreation({
       model: Customer,
       documentId: customer._id,
-      newDocument: customer.toObject(),
+      newDocument: customer.toJSON(),
     })
 
     return {
@@ -231,24 +231,24 @@ async function addCustomer(customerId, customerReq) {
     })
     stockCycleFields._id = customerReq?.stockCycleId
 
-    const { oldCustomer, newCustomer } = await withTransaction(
+    const { oldCustomerJSON, newCustomerJSON } = await withTransaction(
       async ({ session }) => {
         const customer = await Customer.findById(customerId)
           .session(session)
           .exec()
-        const oldCustomer = customer.toObject()
+        const oldCustomerJSON = customer.toJSON()
         customer.stockCycleOverrides.push(stockCycleFields)
         await customer.save({ session })
-        const newCustomer = customer.toObject()
-        return { oldCustomer, newCustomer }
+        const newCustomerJSON = customer.toJSON()
+        return { oldCustomerJSON, newCustomerJSON }
       }
     )
 
     trackUpdates({
       model: Customer,
-      documentId: oldCustomer._id,
-      oldDocument: oldCustomer,
-      newDocument: newCustomer,
+      documentId: oldCustomerJSON._id,
+      oldDocument: oldCustomerJSON,
+      newDocument: newCustomerJSON,
     })
     return {
       success: true,
@@ -267,16 +267,12 @@ async function editCustomer(customerId, customerReq) {
   await connectDB()
 
   try {
-    const { oldCustomer, newCustomer } = await withTransaction(
+    const { oldCustomerJSON, newCustomerJSON } = await withTransaction(
       async ({ session }) => {
-        const customer = await Customer.findById(
-          AUTO_GENERATE_CUSTOMER_ID
-            ? new mongoose.Types.ObjectId(customerId)
-            : customerId
-        )
+        const customer = await Customer.findById(customerId)
           .session(session)
           .exec()
-        const oldCustomer = customer.toObject()
+        const oldCustomerJSON = customer.toJSON()
 
         customer.name = customerReq?.name
         customer.place = customerReq?.place
@@ -303,16 +299,16 @@ async function editCustomer(customerId, customerReq) {
         }
 
         await customer.save({ session })
-        const newCustomer = customer.toObject()
-        return { oldCustomer, newCustomer }
+        const newCustomerJSON = customer.toJSON()
+        return { oldCustomerJSON, newCustomerJSON }
       }
     )
 
     trackUpdates({
       model: Customer,
-      documentId: oldCustomer._id,
-      oldDocument: oldCustomer,
-      newDocument: newCustomer,
+      documentId: oldCustomerJSON._id,
+      oldDocument: oldCustomerJSON,
+      newDocument: newCustomerJSON,
     })
 
     return {

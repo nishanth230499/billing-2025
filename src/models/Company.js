@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 
 import { AUTO_GENERATE_COMPANY_ID, COMPANY_ID_REGEX } from '../../appConfig'
 import { modelConstants } from './constants'
+import Item from './Item'
 
 const companySchema = mongoose.Schema(
   {
@@ -52,8 +53,49 @@ const companySchema = mongoose.Schema(
       default: '',
     },
   },
-  { autoSearchIndex: true }
+  {
+    autoSearchIndex: true,
+    toJSON: {
+      virtuals: true,
+      transform: function (_, ret) {
+        delete ret.id
+        delete ret.__v
+        ret._id = ret?._id?.toString()
+      },
+    },
+  }
 )
+
+companySchema.virtual('firm', {
+  ref: modelConstants?.firm?.modelName,
+  localField: 'firmId',
+  foreignField: '_id',
+  justOne: true,
+})
+
+companySchema.methods.normalizer = async function (oldDocument, session) {
+  if (
+    oldDocument?.name !== this.name ||
+    oldDocument?.shortName !== this?.shortName ||
+    JSON.stringify(oldDocument?.tags) !== JSON.stringify(this?.tags)
+  ) {
+    await Item.updateMany(
+      {
+        companyId: this._id,
+      },
+      {
+        $set: {
+          company: {
+            name: this?.name,
+            shortName: this?.shortName,
+            tags: this?.tags,
+          },
+        },
+      },
+      { runValidators: true, session }
+    )
+  }
+}
 
 companySchema.searchIndex({
   name: 'id_name_shortName_tags_searchIndex',

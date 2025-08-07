@@ -140,22 +140,18 @@ async function getItems({
 
 async function getItem(itemId) {
   await connectDB()
-  const item = await Item.findById(
-    AUTO_GENERATE_ITEM_ID ? new mongoose.Types.ObjectId(itemId) : itemId,
-    {
-      _id: 1,
-      name: 1,
-      group: 1,
-      price: 1,
-      tags: 1,
-      'company.shortName': 1,
-      hsnId: 1,
-    }
-  ).lean()
+  const item = await Item.findById(itemId, {
+    _id: 1,
+    name: 1,
+    group: 1,
+    price: 1,
+    tags: 1,
+    'company.shortName': 1,
+    hsnId: 1,
+  })
 
   if (item) {
-    item._id = item._id.toString()
-    return { success: true, data: item }
+    return { success: true, data: item.toJSON() }
   }
   return { success: false, error: 'Item not found!' }
 }
@@ -220,9 +216,7 @@ async function createItem(itemReq) {
         group: itemReq?.group,
         price: itemReq?.price,
         tags: itemReq?.tags,
-        companyId: AUTO_GENERATE_ITEM_ID
-          ? new mongoose.Types.ObjectId(itemReq?.companyId)
-          : itemReq?.companyId,
+        companyId: itemReq?.companyId,
         hsnId: itemReq?.hsnId,
       })
 
@@ -233,7 +227,7 @@ async function createItem(itemReq) {
     trackCreation({
       model: Item,
       documentId: item._id,
-      newDocument: item.toObject(),
+      newDocument: item.toJSON(),
     })
 
     return {
@@ -262,20 +256,14 @@ async function editItem(itemId, itemReq) {
       hsnId: itemReq?.hsnId,
     }
 
-    const oldItem = await Item.findOneAndUpdate(
-      {
-        _id: AUTO_GENERATE_ITEM_ID ? mongoose.Types.ObjectId(itemId) : itemId,
-      },
-      itemUpdateFields,
-      {
-        runValidators: true,
-      }
-    ).lean()
+    const oldItem = await Item.findByIdAndUpdate(itemId, itemUpdateFields, {
+      runValidators: true,
+    })
 
     trackUpdates({
       model: Item,
       documentId: oldItem._id,
-      oldDocument: oldItem,
+      oldDocument: oldItem.toJSON(),
       newDocument: itemUpdateFields,
     })
 

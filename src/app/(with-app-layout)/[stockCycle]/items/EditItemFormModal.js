@@ -10,6 +10,7 @@ import HsnSelector from '@/components/common/selectors/HsnSelector'
 import useModalControl from '@/hooks/useModalControl'
 import handleServerAction from '@/lib/handleServerAction'
 import { amountRegex, nonEmptyRegex } from '@/lib/regex'
+import { formatAmount } from '@/lib/utils/amoutUtils'
 
 export default function EditItemFormModal({ refetchItems }) {
   const { modalValue: editingItemId, handleCloseModal } =
@@ -88,7 +89,7 @@ export default function EditItemFormModal({ refetchItems }) {
     () => ({
       name: itemResponse?.name ?? '',
       group: itemResponse?.group ?? '',
-      price: itemResponse?.price?.toFixed(2) ?? '',
+      price: formatAmount(itemResponse?.price) ?? '',
       tags: itemResponse?.tags ?? [],
       hsnId: itemResponse?.hsnId ?? '',
     }),
@@ -109,9 +110,7 @@ export default function EditItemFormModal({ refetchItems }) {
           {
             name: formFieldValues?.name?.trim(),
             group: formFieldValues?.group?.trim(),
-            price: formFieldValues?.price
-              ? parseFloat(formFieldValues?.price)
-              : undefined,
+            price: formFieldValues?.price,
             tags: formFieldValues?.tags?.map((tag) => tag.trim()) ?? [],
             hsnId: formFieldValues?.hsnId,
           },

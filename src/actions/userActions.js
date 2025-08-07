@@ -51,13 +51,15 @@ async function getUser(userId, loggedinUser) {
     throw Error('Only admins can request for users.')
   }
 
-  const user = await User.findOne(
-    { _id: userId },
-    { _id: 1, emailId: 1, name: 1, type: 1, active: 1 }
-  ).lean()
+  const user = await User.findById(userId, {
+    _id: 1,
+    emailId: 1,
+    name: 1,
+    type: 1,
+    active: 1,
+  })
   if (user) {
-    user._id = user._id.toString()
-    return { success: true, data: user }
+    return { success: true, data: user.toJSON() }
   }
   return { success: false, error: 'User not found!' }
 }
@@ -95,7 +97,7 @@ async function createUser(userReq, loggedinUser) {
     trackCreation({
       model: User,
       documentId: user._id,
-      newDocument: user.toObject(),
+      newDocument: user.toJSON(),
     })
     return {
       success: true,
@@ -126,18 +128,14 @@ async function editUser(userId, userReq, loggedinUser) {
     active: userReq?.active,
   }
 
-  const oldUser = await User.findOneAndUpdate(
-    { _id: userId },
-    userUpdateFields,
-    {
-      runValidators: true,
-    }
-  ).lean()
+  const oldUser = await User.findByIdAndUpdate(userId, userUpdateFields, {
+    runValidators: true,
+  })
 
   trackUpdates({
     model: User,
     documentId: oldUser._id,
-    oldDocument: oldUser,
+    oldDocument: oldUser.toJSON(),
     newDocument: userUpdateFields,
   })
 
@@ -171,18 +169,14 @@ async function resetPassword(userId, password, loggedinUser) {
     passwordChangedAt: new Date(),
   }
 
-  const oldUser = await User.findOneAndUpdate(
-    { _id: userId },
-    userUpdateFields,
-    {
-      runValidators: true,
-    }
-  ).lean()
+  const oldUser = await User.findByIdAndUpdate(userId, userUpdateFields, {
+    runValidators: true,
+  })
 
   trackUpdates({
     model: User,
     documentId: oldUser._id,
-    oldDocument: oldUser,
+    oldDocument: oldUser.toJSON(),
     newDocument: userUpdateFields,
   })
 

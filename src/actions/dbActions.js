@@ -122,59 +122,20 @@ async function getDocument(collectionName, documentId, loggedinUser) {
   const model = modelExports.default
   const dbEditorIgnoreFields = model.dbEditorIgnoreFields ?? []
 
-  const objectIdFields = new Set(
-    Object.entries({
-      ...model.schema.paths,
-      ...model.schema.subpaths,
+  const document = (await model.findById(documentId)).toJSON()
+  if (document) {
+    dbEditorIgnoreFields?.forEach((fieldName) => {
+      delete document[fieldName]
     })
-      .filter(([, schema]) => schema?.instance === 'ObjectId')
-      .map(([fieldName]) => fieldName)
-  )
-
-  const document = await model.aggregate([
-    {
-      $match: {
-        _id: objectIdFields.has('_id')
-          ? new mongoose.Types.ObjectId(documentId)
-          : documentId,
-      },
-    },
-    ...(objectIdFields.size
-      ? [
-          {
-            $addFields: Object.fromEntries(
-              [...objectIdFields].map((fieldName) => [
-                fieldName,
-                { $toString: `$${fieldName}` },
-              ])
-            ),
-          },
-        ]
-      : []),
-    {
-      $project: { __v: 0 },
-    },
-    ...(Array.isArray(dbEditorIgnoreFields) && dbEditorIgnoreFields.length
-      ? [
-          {
-            $project: Object.fromEntries(
-              dbEditorIgnoreFields?.map((fieldName) => [fieldName, 0]) ?? []
-            ),
-          },
-        ]
-      : []),
-  ])
-
-  if (document[0]) {
-    return { success: true, data: document[0] }
+    return { success: true, data: document }
   }
+
   return { success: false, error: 'Document not found!' }
 }
 
 async function editDocument(
   collectionName,
   documentId,
-  // TODO: Convert all the object ID fields to objectID before saving
   documentReq,
   loggedinUser
 ) {
@@ -203,68 +164,50 @@ async function editDocument(
     const model = modelExports.default
     const dbEditorIgnoreFields = model.dbEditorIgnoreFields ?? []
 
-    const objectIdFields = new Set(
-      Object.entries({
-        ...model.schema.paths,
-        ...model.schema.subpaths,
-      })
-        .filter(([, schema]) => schema?.instance === 'ObjectId')
-        .map(([fieldName]) => fieldName)
-    )
-
     dbEditorIgnoreFields?.forEach((formField) => {
       delete documentReq[formField]
     })
 
     if (model?.schema?.methods?.normalizer) {
-      const { oldDocument, newDocument } = await withTransaction(
+      const { oldDocumentJSON, newDocumentJSON } = await withTransaction(
         async ({ session }) => {
           const document = await model
-            .findById(
-              objectIdFields.has('_id')
-                ? new mongoose.Types.ObjectId(documentId)
-                : documentId
-            )
+            .findById(documentId)
             .session(session)
             .exec()
 
           const oldDocument = document.toObject()
+          const oldDocumentJSON = document.toJSON()
 
           Object.assign(document, documentReq)
           await document.normalizer(oldDocument, session)
           await document.save({ session })
 
-          const newDocument = document.toObject()
+          const newDocumentJSON = document.toJSON()
 
-          return { oldDocument, newDocument }
+          return { oldDocumentJSON, newDocumentJSON }
         }
       )
 
       trackUpdates({
         model,
         documentId: documentId,
-        oldDocument: oldDocument,
-        newDocument: newDocument,
+        oldDocument: oldDocumentJSON,
+        newDocument: newDocumentJSON,
       })
     } else {
-      const oldDocument = await model
-        .findOneAndUpdate(
-          {
-            _id: objectIdFields.has('_id')
-              ? new mongoose.Types.ObjectId(documentId)
-              : documentId,
-          },
-          documentReq,
-          {
-            runValidators: true,
-          }
-        )
-        .lean()
+      const oldDocument = await model.findByIdAndUpdate(
+        documentId,
+        documentReq,
+        {
+          runValidators: true,
+        }
+      )
 
       trackUpdates({
         model,
         documentId: documentId,
-        oldDocument: oldDocument,
+        oldDocument: oldDocument.toJSON(),
         newDocument: documentReq,
       })
     }
