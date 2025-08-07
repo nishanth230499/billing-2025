@@ -1,3 +1,5 @@
+'use server'
+
 import { DEFAULT_PAGE_SIZE } from '@/constants'
 
 export async function getPaginatedData(model, options = {}) {

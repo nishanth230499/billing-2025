@@ -7,8 +7,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
+import { enqueueSnackbar } from 'notistack'
 import {
   Fragment,
   useCallback,
@@ -19,6 +20,7 @@ import {
 } from 'react'
 
 import { getCustomerAction } from '@/actions/customerActions'
+import { createSalesOrderAction } from '@/actions/salesOrderActions'
 import { AppContext } from '@/app/ClientProviders'
 import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
@@ -86,7 +88,12 @@ export default function SelectedItemsPanel({
         format: (item) => item?.company?.shortName,
       },
       name: { label: 'Name' },
-      group: { label: 'Group', editable: true, nextColumnKey: 'quantity' },
+      group: {
+        label: 'Group',
+        editable: true,
+        nextColumnKey: 'quantity',
+        validator: (item) => !isSetPack || item?.group,
+      },
       quantity: {
         label: 'Quantity',
         editable: true,
@@ -111,7 +118,7 @@ export default function SelectedItemsPanel({
         slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
       },
     }),
-    [handleDeleteItem]
+    [handleDeleteItem, isSetPack]
   )
 
   const {
@@ -125,6 +132,86 @@ export default function SelectedItemsPanel({
     queryKey: ['getCustomerAction', customerId, stockCycleId],
     enabled: Boolean(customerId) && Boolean(stockCycleId),
   })
+
+  const { mutate: createSalesOrder, isPending: isCreateSalesOrderLoading } =
+    useMutation({
+      mutationFn: (data) => handleServerAction(createSalesOrderAction, ...data),
+    })
+
+  const handleSubmit = useCallback(() => {
+    setIsCustomerIdTouched(true)
+    setIsSupplyDateTouched(true)
+    // This rule is not present in DB
+    if (!selectedItemsOrder?.length) {
+      enqueueSnackbar('Please add items on to the order.', {
+        variant: 'error',
+      })
+      return
+    }
+    if (!(customerId && supplyDate)) {
+      enqueueSnackbar('Please resolve errors on the order.', {
+        variant: 'error',
+      })
+      return
+    }
+
+    if (
+      selectedItemsOrder?.some((itemKey) => {
+        const item = selectedItems?.[itemKey]
+        return !(
+          item?.quantity &&
+          item?.unitQuantity &&
+          // This rule is not present in DB
+          (!isSetPack || item?.group)
+        )
+      })
+    ) {
+      enqueueSnackbar('Please resolve errors on the order.', {
+        variant: 'error',
+      })
+      return
+    }
+    createSalesOrder(
+      [
+        stockCycleId,
+        {
+          customerId,
+          customerShippingAddressId: customerShippingAddressId || undefined,
+          supplyDate,
+          orderRef,
+          isSetPack,
+          items: selectedItemsOrder?.map((itemKey) => {
+            const item = selectedItems?.[itemKey]
+            return {
+              itemId: item?._id,
+              group: item?.group,
+              quantity: item?.quantity,
+              unitQuantity: item?.unitQuantity,
+            }
+          }),
+        },
+      ],
+      {
+        onSuccess: async (data) => {
+          enqueueSnackbar(data, { variant: 'success' })
+          // await refetchCustomers()
+          // handleCloseModal()
+        },
+        onError: (error) =>
+          enqueueSnackbar(error.message, { variant: 'error' }),
+      }
+    )
+  }, [
+    createSalesOrder,
+    customerId,
+    customerShippingAddressId,
+    isSetPack,
+    orderRef,
+    selectedItems,
+    selectedItemsOrder,
+    stockCycleId,
+    supplyDate,
+  ])
 
   return (
     <Fragment key='123'>
@@ -220,8 +307,9 @@ export default function SelectedItemsPanel({
         <Button
           className='rounded-3xl'
           variant='contained'
-          disabled={false}
-          loading={false}>
+          disabled={isCreateSalesOrderLoading}
+          loading={isCreateSalesOrderLoading}
+          onClick={handleSubmit}>
           Save
         </Button>
       </Box>

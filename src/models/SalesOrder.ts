@@ -117,6 +117,8 @@ const salesOrderSchema = new mongoose.Schema(
   }
 )
 
+salesOrderSchema.index({ stockCycleId: 1, number: -1 })
+
 const model = modelConstants.sales_order
 
 export default mongoose.models?.[model?.modelName] ||
