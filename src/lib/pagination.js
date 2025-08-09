@@ -1,6 +1,6 @@
 'use server'
 
-import { DEFAULT_PAGE_SIZE } from '@/constants'
+import { DEFAULT_PAGE_SIZE } from '@/constants/generalConstants'
 
 export async function getPaginatedData(model, options = {}) {
   const {

@@ -1,6 +1,9 @@
 'use client'
 
-import { CONTACT_ADMIN, SOMETHING_WENT_WRONG } from '@/constants'
+import {
+  CONTACT_ADMIN,
+  SOMETHING_WENT_WRONG,
+} from '@/constants/generalConstants'
 
 export default async function handleServerAction(action, ...params) {
   try {

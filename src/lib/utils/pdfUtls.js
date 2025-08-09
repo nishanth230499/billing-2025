@@ -25,8 +25,8 @@ export async function convertHtmlToPdfBinary(htmlContent, { title = '' }) {
     format: 'A4',
     displayHeaderFooter: true,
 
-    footerTemplate: `<div style="font-size: 10px; text-align: right; width: 100%; margin-right: 16px;">
-                       Page <span class="pageNumber"></span> of <span class="totalPages"></span>
+    footerTemplate: `<div style="font-size: 10px; width: 100%; display: flex; justify-content: end; padding: 0 16px;">
+                       <div>Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>
                      </div>`,
   })
   await browser.close()

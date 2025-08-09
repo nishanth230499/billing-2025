@@ -2,7 +2,10 @@
 
 import { Paper, TablePagination } from '@mui/material'
 
-import { DEFAULT_PAFE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '@/constants'
+import {
+  DEFAULT_PAFE_SIZE_OPTIONS,
+  DEFAULT_PAGE_SIZE,
+} from '@/constants/generalConstants'
 
 export default function Pagination({
   totalCount,

@@ -11,7 +11,7 @@ import {
 import TableCell from '@mui/material/TableCell'
 import { memo, useCallback, useMemo, useRef } from 'react'
 
-import { MOBILE_MAX_WIDTH } from '@/constants'
+import { MOBILE_MAX_WIDTH } from '@/constants/generalConstants'
 
 import DataRow from './DataRow'
 import Pagination from './Pagination'

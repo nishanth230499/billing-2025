@@ -2,7 +2,7 @@
 
 import bcrypt from 'bcryptjs'
 
-import { DEFAULT_PAGE_SIZE } from '@/constants'
+import { DEFAULT_PAGE_SIZE } from '@/constants/generalConstants'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
 import { passwordRegex } from '@/lib/regex'

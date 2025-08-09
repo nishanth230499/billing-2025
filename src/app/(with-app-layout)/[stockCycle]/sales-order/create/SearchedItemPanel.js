@@ -8,7 +8,7 @@ import ErrorAlert from '@/components/common/ErrorAlert'
 import SearchBar from '@/components/common/SearchBar'
 import CompanySelector from '@/components/common/selectors/CompanySelector'
 import TableSkeleton from '@/components/TableSkeleton'
-import { DEFAULT_PAGE_SIZE } from '@/constants'
+import { DEFAULT_PAGE_SIZE } from '@/constants/generalConstants'
 import handleServerAction from '@/lib/handleServerAction'
 import { numberRegex } from '@/lib/regex'
 

@@ -2,7 +2,7 @@
 
 import mongoose from 'mongoose'
 
-import { DEFAULT_PAGE_SIZE } from '@/constants'
+import { DEFAULT_PAGE_SIZE } from '@/constants/generalConstants'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
 import { trackUpdates } from '@/lib/utils/auditLogUtils'

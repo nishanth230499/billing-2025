@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 
 import { isAdmin } from '@/lib/utils/userUtils'
 
-import { DEFAULT_PAGE_SIZE } from '../constants'
+import { DEFAULT_PAGE_SIZE } from '../constants/generalConstants'
 import { getPaginatedData } from '../lib/pagination'
 import { withAuth } from '../lib/withAuth'
 import AuditLog from '../models/AuditLog'

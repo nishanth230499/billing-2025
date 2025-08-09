@@ -15,7 +15,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import classNames from 'classnames'
 import AppDrawerContents from './AppDrawerContents'
-import { TABLET_MAX_WIDTH } from '@/constants'
+import { TABLET_MAX_WIDTH } from '@/constants/generalConstants'
 
 export default function AppDrawer({
   stockCycles,
