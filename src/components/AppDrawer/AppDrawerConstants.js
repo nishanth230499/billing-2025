@@ -15,6 +15,8 @@ import { LuPackagePlus } from 'react-icons/lu'
 import { SiBookstack } from 'react-icons/si'
 import { TbDatabaseEdit } from 'react-icons/tb'
 
+import routes from '@/constants/routeConstants'
+
 export const appDrawerItems = [
   {
     key: 'Customer',
@@ -23,13 +25,13 @@ export const appDrawerItems = [
     menuItems: [
       {
         key: 'customers',
-        href: (stockCycle) => `/${stockCycle}/customer`,
+        href: (stockCycleId) => routes.customer.home(stockCycleId),
         icon: FaSchoolFlag,
         name: 'Customers',
       },
       {
         key: 'sales-order',
-        href: (stockCycle) => `/${stockCycle}/sales-order`,
+        href: (stockCycleId) => routes.salesOrder.home(stockCycleId),
         icon: PlaylistAddIcon,
         name: 'Sales Orders',
       },
@@ -96,7 +98,7 @@ export const appDrawerItems = [
     menuItems: [
       {
         key: 'companies',
-        href: (stockCycle) => `/${stockCycle}/companies`,
+        href: (stockCycleId) => routes.company.home(stockCycleId),
         icon: BusinessIcon,
         name: 'Companies',
       },
@@ -118,7 +120,7 @@ export const appDrawerItems = [
     key: 'items',
     icon: InventoryIcon,
     name: 'Items',
-    href: (stockCycle) => `/${stockCycle}/items`,
+    href: (stockCycleId) => routes.item.home(stockCycleId),
   },
 ]
 
@@ -127,13 +129,13 @@ export const adminDrawerItems = [
     key: 'users',
     icon: GroupIcon,
     name: 'Users',
-    href: (stockCycle) => `/${stockCycle}/users`,
+    href: (stockCycleId) => routes.user.home(stockCycleId),
   },
   {
     key: 'audit-logs',
     icon: HistoryIcon,
     name: 'Audit Logs',
-    href: (stockCycle) => `/${stockCycle}/audit-logs`,
+    href: (stockCycleId) => routes.auditLog.home(stockCycleId),
   },
 ]
 
@@ -142,6 +144,6 @@ export const superAdminDrawerItems = [
     key: 'db-editor',
     icon: TbDatabaseEdit,
     name: 'DB Editor',
-    href: (stockCycle) => `/${stockCycle}/db-editor`,
+    href: (stockCycleId) => routes.dbEditor.home(stockCycleId),
   },
 ]

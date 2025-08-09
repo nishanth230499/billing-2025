@@ -20,7 +20,9 @@ export async function GET(_, { params }) {
   if (!success) return new NextResponse(error)
 
   const pdfBinary = await convertHtmlToPdfBinary(
-    renderToString(<SalesOrderTemplate salesOrder={salesOrder} />),
+    renderToString(
+      <SalesOrderTemplate salesOrder={salesOrder} stockCycleId={stockCycleId} />
+    ),
     { title: `Sales Order ${stockCycleId}_${salesOrderNumber}` }
   )
 

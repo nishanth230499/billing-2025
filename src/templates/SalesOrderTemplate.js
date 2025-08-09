@@ -1,6 +1,8 @@
+import routes from '@/constants/routeConstants'
 import { getFullItemName } from '@/lib/utils/itemUtils'
+import TemplateLink from '@/templates/TemplateLink'
 
-export default function SalesOrderTemplate({ salesOrder }) {
+export default function SalesOrderTemplate({ salesOrder, stockCycleId }) {
   return (
     <table className='w-full text-left'>
       <thead>
@@ -100,93 +102,19 @@ export default function SalesOrderTemplate({ salesOrder }) {
         {salesOrder?.items?.map((item, i) => (
           <tr key={i}>
             <td className='border p-2'>{i + 1}</td>
-            <td className='border p-2'>{item?.itemId}</td>
+            <td className='border p-2'>
+              <TemplateLink
+                href={routes.item.legend(stockCycleId, item?.itemId)}>
+                {item?.itemId}
+              </TemplateLink>
+            </td>
             <td className='border p-2'>{getFullItemName(item.item)}</td>
             <td className='border p-2'>{item?.group}</td>
             <td className='border p-2 text-right'>{item?.quantity}</td>
             <td className='border p-2 text-right'>{item?.unitQuantity}</td>
           </tr>
         ))}
-        {salesOrder?.items?.map((item, i) => (
-          <tr key={i}>
-            <td className='border p-2'>{i + 1}</td>
-            <td className='border p-2'>{item?.itemId}</td>
-            <td className='border p-2'>{getFullItemName(item.item)}</td>
-            <td className='border p-2'>{item?.group}</td>
-            <td className='border p-2 text-right'>{item?.quantity}</td>
-            <td className='border p-2 text-right'>{item?.unitQuantity}</td>
-          </tr>
-        ))}
-        {salesOrder?.items?.map((item, i) => (
-          <tr key={i}>
-            <td className='border p-2'>{i + 1}</td>
-            <td className='border p-2'>{item?.itemId}</td>
-            <td className='border p-2'>{getFullItemName(item.item)}</td>
-            <td className='border p-2'>{item?.group}</td>
-            <td className='border p-2 text-right'>{item?.quantity}</td>
-            <td className='border p-2 text-right'>{item?.unitQuantity}</td>
-          </tr>
-        ))}
-        {salesOrder?.items?.map((item, i) => (
-          <tr key={i}>
-            <td className='border p-2'>{i + 1}</td>
-            <td className='border p-2'>{item?.itemId}</td>
-            <td className='border p-2'>{getFullItemName(item.item)}</td>
-            <td className='border p-2'>{item?.group}</td>
-            <td className='border p-2 text-right'>{item?.quantity}</td>
-            <td className='border p-2 text-right'>{item?.unitQuantity}</td>
-          </tr>
-        ))}
-        {salesOrder?.items?.map((item, i) => (
-          <tr key={i}>
-            <td className='border p-2'>{i + 1}</td>
-            <td className='border p-2'>{item?.itemId}</td>
-            <td className='border p-2'>{getFullItemName(item.item)}</td>
-            <td className='border p-2'>{item?.group}</td>
-            <td className='border p-2 text-right'>{item?.quantity}</td>
-            <td className='border p-2 text-right'>{item?.unitQuantity}</td>
-          </tr>
-        ))}
-        {salesOrder?.items?.map((item, i) => (
-          <tr key={i}>
-            <td className='border p-2'>{i + 1}</td>
-            <td className='border p-2'>{item?.itemId}</td>
-            <td className='border p-2'>{getFullItemName(item.item)}</td>
-            <td className='border p-2'>{item?.group}</td>
-            <td className='border p-2 text-right'>{item?.quantity}</td>
-            <td className='border p-2 text-right'>{item?.unitQuantity}</td>
-          </tr>
-        ))}
-        {salesOrder?.items?.map((item, i) => (
-          <tr key={i}>
-            <td className='border p-2'>{i + 1}</td>
-            <td className='border p-2'>{item?.itemId}</td>
-            <td className='border p-2'>{getFullItemName(item.item)}</td>
-            <td className='border p-2'>{item?.group}</td>
-            <td className='border p-2 text-right'>{item?.quantity}</td>
-            <td className='border p-2 text-right'>{item?.unitQuantity}</td>
-          </tr>
-        ))}
-        {salesOrder?.items?.map((item, i) => (
-          <tr key={i}>
-            <td className='border p-2'>{i + 1}</td>
-            <td className='border p-2'>{item?.itemId}</td>
-            <td className='border p-2'>{getFullItemName(item.item)}</td>
-            <td className='border p-2'>{item?.group}</td>
-            <td className='border p-2 text-right'>{item?.quantity}</td>
-            <td className='border p-2 text-right'>{item?.unitQuantity}</td>
-          </tr>
-        ))}
-        {salesOrder?.items?.map((item, i) => (
-          <tr key={i}>
-            <td className='border p-2'>{i + 1}</td>
-            <td className='border p-2'>{item?.itemId}</td>
-            <td className='border p-2'>{getFullItemName(item.item)}</td>
-            <td className='border p-2'>{item?.group}</td>
-            <td className='border p-2 text-right'>{item?.quantity}</td>
-            <td className='border p-2 text-right'>{item?.unitQuantity}</td>
-          </tr>
-        ))}
+
         <tr>
           <td colSpan={4} className='border p-2 text-right'>
             Total

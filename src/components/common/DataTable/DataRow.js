@@ -113,7 +113,10 @@ function DataRow({
             }
             if (column?.href) {
               return (
-                <Link href={column?.href(data)} className='underline'>
+                <Link
+                  href={column?.href(data)}
+                  target={column?.target}
+                  className='underline'>
                   {column?.format ? column?.format(data) : data?.[columnKey]}
                 </Link>
               )

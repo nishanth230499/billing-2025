@@ -10,6 +10,7 @@ import { getSalesOrdersAction } from '@/actions/salesOrderActions'
 import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import TableSkeleton from '@/components/TableSkeleton'
+import routes from '@/constants/routeConstants'
 import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
 
@@ -44,7 +45,7 @@ export default function Page() {
       number: {
         label: 'Number',
         href: (salesOrder) =>
-          `/${stockCycleId}/sales-order/view/${salesOrder?.number}`,
+          routes.salesOrder.view(stockCycleId, salesOrder?.number),
       },
       date: { label: 'Order Date' },
       customer: {
@@ -79,7 +80,7 @@ export default function Page() {
         <Button
           className='rounded-3xl'
           variant='outlined'
-          href={`/${stockCycleId}/sales-order/create`}
+          href={routes.salesOrder.create(stockCycleId)}
           component={Link}>
           Create Sales Order
         </Button>

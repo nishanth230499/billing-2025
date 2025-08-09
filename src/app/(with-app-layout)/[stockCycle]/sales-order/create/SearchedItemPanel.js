@@ -1,5 +1,6 @@
 import { Grid, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'next/navigation'
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { getItemsAction } from '@/actions/itemsActions'
@@ -9,12 +10,17 @@ import SearchBar from '@/components/common/SearchBar'
 import CompanySelector from '@/components/common/selectors/CompanySelector'
 import TableSkeleton from '@/components/TableSkeleton'
 import { DEFAULT_PAGE_SIZE } from '@/constants/generalConstants'
+import routes from '@/constants/routeConstants'
 import handleServerAction from '@/lib/handleServerAction'
 import { numberRegex } from '@/lib/regex'
 
 import SearchedItemTableActions from './SearchedItemTableActions'
 
 export default function SearchedItemPanel({ handleAddItem }) {
+  const params = useParams()
+
+  const stockCycleId = params.stockCycle
+
   const [selectedCompanyId, setSelectedCompanyId] = useState('')
   const [searchText, setSearchText] = useState('')
   const [pageNumber, setPageNumber] = useState(0)
@@ -29,7 +35,11 @@ export default function SearchedItemPanel({ handleAddItem }) {
 
   const itemTableColumns = useMemo(
     () => ({
-      _id: { label: 'ID' },
+      _id: {
+        label: 'ID',
+        href: (item) => routes.item.legend(stockCycleId, item?._id),
+        target: '_blank',
+      },
       companyShortName: {
         label: 'Company Short Name',
         format: (item) => item?.company?.shortName,
@@ -59,7 +69,7 @@ export default function SearchedItemPanel({ handleAddItem }) {
         slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
       },
     }),
-    [handleAddItem]
+    [handleAddItem, stockCycleId]
   )
 
   const {

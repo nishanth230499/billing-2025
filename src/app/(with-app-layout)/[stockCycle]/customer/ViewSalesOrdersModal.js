@@ -11,6 +11,7 @@ import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import Modal from '@/components/common/Modal'
 import TableSkeleton from '@/components/TableSkeleton'
+import routes from '@/constants/routeConstants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import useModalControl from '@/hooks/useModalControl'
 import usePaginationControl from '@/hooks/usePaginationControl'
@@ -59,7 +60,7 @@ export default function ViewSalesOrdersModal() {
       number: {
         label: 'Number',
         href: (salesOrder) =>
-          `/${stockCycleId}/sales-order/view/${salesOrder?.number}`,
+          routes.salesOrder.view(stockCycleId, salesOrder?.number),
       },
       date: { label: 'Order Date' },
       customer: {
@@ -98,7 +99,7 @@ export default function ViewSalesOrdersModal() {
           className='rounded-3xl mb-4'
           variant='outlined'
           LinkComponent={Link}
-          href={getNewURL(`/${stockCycleId}/sales-order/create`, {
+          href={getNewURL(routes.salesOrder.create(stockCycleId), {
             customerId,
           })}>
           Create Sales Order

@@ -27,6 +27,7 @@ import ErrorAlert from '@/components/common/ErrorAlert'
 import CustomerSelector from '@/components/common/selectors/CustomerSelector'
 import CustomerShippingAddressSelector from '@/components/common/selectors/CustomerShippingAddressSelector'
 import DateSelector from '@/components/common/selectors/DateSelector'
+import routes from '@/constants/routeConstants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
 import { numberRegex } from '@/lib/regex'
@@ -85,7 +86,11 @@ export default function SelectedItemsPanel({
 
   const selectedItemTableColumns = useMemo(
     () => ({
-      _id: { label: 'ID' },
+      _id: {
+        label: 'ID',
+        href: (item) => routes.item.legend(stockCycleId, item?._id),
+        target: '_blank',
+      },
       companyShortName: {
         label: 'Company Short Name',
         format: (item) => item?.company?.shortName,
@@ -121,7 +126,7 @@ export default function SelectedItemsPanel({
         slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
       },
     }),
-    [handleDeleteItem, isSetPack]
+    [handleDeleteItem, isSetPack, stockCycleId]
   )
 
   const {

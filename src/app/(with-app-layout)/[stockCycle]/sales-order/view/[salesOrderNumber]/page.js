@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation'
 
 import { getSalesOrderAction } from '@/actions/salesOrderActions'
 import ErrorAlert from '@/components/common/ErrorAlert'
+import routes from '@/constants/routeConstants'
 import handleServerAction from '@/lib/handleServerAction'
 import SalesOrderTemplate from '@/templates/SalesOrderTemplate'
 
@@ -43,18 +44,24 @@ export default function Page() {
                 className='rounded-3xl mb-4'
                 variant='outlined'
                 LinkComponent={Link}
-                href={`/${stockCycleId}/sales-order/view/${salesOrderNumber}/pdf`}
+                href={routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)}
                 target='_blank'>
                 View PDF
               </Button>
             </Box>
-            <SalesOrderTemplate salesOrder={salesOrderResponse} />
+            <SalesOrderTemplate
+              salesOrder={salesOrderResponse}
+              stockCycleId={stockCycleId}
+            />
           </ErrorAlert>
         )}
       </Paper>
       <Box className='hidden print:block'>
         {!isSalesOrderLoading && !isSalesOrderError && (
-          <SalesOrderTemplate salesOrder={salesOrderResponse} />
+          <SalesOrderTemplate
+            salesOrder={salesOrderResponse}
+            stockCycleId={stockCycleId}
+          />
         )}
       </Box>
     </>

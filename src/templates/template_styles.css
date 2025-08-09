@@ -10,6 +10,19 @@ body {
   line-height: 1.5;
 }
 
+/* Display */
+.hidden {
+  display: none;
+}
+@media print {
+  .print\:hidden {
+    display: none;
+  }
+  .print\:block {
+    display: block;
+  }
+}
+
 /* Width */
 .w-full {
   width: 100%;

@@ -3,6 +3,7 @@
 import { Box, Button, Grid, Paper, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import React, { useMemo } from 'react'
 
 import { getItemsAction } from '@/actions/itemsActions'
@@ -11,6 +12,7 @@ import ErrorAlert from '@/components/common/ErrorAlert'
 import SearchBar from '@/components/common/SearchBar'
 import CompanySelector from '@/components/common/selectors/CompanySelector'
 import TableSkeleton from '@/components/TableSkeleton'
+import routes from '@/constants/routeConstants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import useModalControl from '@/hooks/useModalControl'
 import usePaginationControl from '@/hooks/usePaginationControl'
@@ -21,25 +23,11 @@ import CreateItemFormModal from './CreateItemFormModal'
 import EditItemFormModal from './EditItemFormModal'
 import ItemTableActions from './ItemTableActions'
 
-const itemTableColumns = {
-  _id: { label: 'ID' },
-  companyShortName: {
-    label: 'Company Short Name',
-    format: (item) => item?.company?.shortName,
-  },
-  name: { label: 'Name' },
-  group: { label: 'Group' },
-  price: { label: 'Price', format: (item) => formatAmount(item?.price) ?? '' },
-  hsnId: { label: 'HSN' },
-  actions: {
-    label: 'Actions',
-    component: ItemTableActions,
-    slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
-  },
-}
-
 export default function Page() {
   const { searchParams, replaceURL } = useHandleSearchParams()
+  const params = useParams()
+
+  const stockCycleId = params.stockCycle
 
   const companyId = useMemo(
     () => searchParams.get('companyId') || '',
@@ -77,6 +65,30 @@ export default function Page() {
       searchText,
     ],
   })
+
+  const itemTableColumns = {
+    _id: {
+      label: 'ID',
+      href: (item) => routes.item.legend(stockCycleId, item?._id),
+      target: '_blank',
+    },
+    companyShortName: {
+      label: 'Company Short Name',
+      format: (item) => item?.company?.shortName,
+    },
+    name: { label: 'Name' },
+    group: { label: 'Group' },
+    price: {
+      label: 'Price',
+      format: (item) => formatAmount(item?.price) ?? '',
+    },
+    hsnId: { label: 'HSN' },
+    actions: {
+      label: 'Actions',
+      component: ItemTableActions,
+      slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
+    },
+  }
 
   return (
     <Paper className='overflow-auto h-full flex flex-col p-4'>
