@@ -4,7 +4,7 @@ import { Box, Button, Paper, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { getSalesOrdersAction } from '@/actions/salesOrderActions'
 import DataTable from '@/components/common/DataTable'
@@ -12,36 +12,6 @@ import ErrorAlert from '@/components/common/ErrorAlert'
 import TableSkeleton from '@/components/TableSkeleton'
 import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
-
-const salesOrdersTableColumns = {
-  number: { label: 'Number' },
-  date: { label: 'Order Date' },
-  customer: {
-    label: 'Customer',
-    component: ({ data: order }) => order?.customer?.name ?? '',
-  },
-  customerShippingAddress: {
-    label: 'Shipping Address',
-    component: ({ data: order }) => order?.customerShippingAddress?.name ?? '',
-  },
-  orderRef: {
-    label: 'Order Ref',
-    component: ({ data: order }) => order?.orderRef,
-  },
-  isSetPack: {
-    label: 'Set Pack',
-    component: ({ data: order }) => (order?.isSetPack ? 'Yes' : 'No'),
-  },
-  supplyDate: {
-    label: 'Supply Date',
-    component: ({ data: order }) => order?.supplyDate,
-  },
-  actions: {
-    label: 'Actions',
-    // component: UsersTableActions,
-    slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
-  },
-}
 
 export default function Page() {
   const params = useParams()
@@ -68,6 +38,40 @@ export default function Page() {
       stockCycleId,
     ],
   })
+
+  const salesOrdersTableColumns = useMemo(
+    () => ({
+      number: {
+        label: 'Number',
+        href: (salesOrder) =>
+          `/${stockCycleId}/sales-order/view/${salesOrder?.number}`,
+      },
+      date: { label: 'Order Date' },
+      customer: {
+        label: 'Customer',
+        component: ({ data: order }) => order?.customer?.name ?? '',
+      },
+      customerShippingAddress: {
+        label: 'Shipping Address',
+        component: ({ data: order }) =>
+          order?.customerShippingAddress?.name ?? '',
+      },
+      orderRef: {
+        label: 'Order Ref',
+        component: ({ data: order }) => order?.orderRef,
+      },
+      isSetPack: {
+        label: 'Set Pack',
+        component: ({ data: order }) => (order?.isSetPack ? 'Yes' : 'No'),
+      },
+      supplyDate: {
+        label: 'Supply Date',
+        component: ({ data: order }) => order?.supplyDate,
+      },
+    }),
+    [stockCycleId]
+  )
+
   return (
     <Paper className='overflow-auto h-full flex flex-col p-4'>
       <Box className='flex items-center justify-between mb-4'>

@@ -162,8 +162,8 @@ export default function SelectedItemsPanel({
       selectedItemsOrder?.some((itemKey) => {
         const item = selectedItems?.[itemKey]
         return !(
-          item?.quantity &&
-          item?.unitQuantity &&
+          numberRegex.test(item?.quantity) &&
+          numberRegex.test(item?.unitQuantity) &&
           // This rule is not present in DB
           (!isSetPack || item?.group)
         )

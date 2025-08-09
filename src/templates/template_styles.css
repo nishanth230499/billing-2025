@@ -1,0 +1,87 @@
+@page {
+  margin: 1rem 1.5rem;
+}
+
+/* Body */
+body {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Width */
+.w-full {
+  width: 100%;
+}
+
+/* Table */
+table {
+  text-indent: 0;
+  border-color: inherit;
+  border-collapse: collapse;
+}
+
+/* Flex */
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+
+/* Border */
+.border {
+  border-style: solid;
+  border-width: 1px;
+}
+
+/* Margin */
+.ml-4 {
+  margin-left: 1rem;
+}
+
+/* Padding */
+.p-2 {
+  padding: 0.5rem;
+}
+
+/* Text Align */
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* Font Size */
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: calc(2 / 1.5);
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: calc(2.5 / 2.25);
+}
+
+/* Font Weight */
+.font-normal {
+  --tw-font-weight: 400;
+  font-weight: 400;
+}
+
+.font-bold {
+  --tw-font-weight: 700;
+  font-weight: 700;
+}
+
+/* Text Decoration */
+.underline {
+  text-decoration-line: underline;
+}

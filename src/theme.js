@@ -1,5 +1,6 @@
 'use client'
 import { createTheme } from '@mui/material/styles'
+import Link from 'next/link'
 
 const theme = createTheme({
   cssVariables: {
@@ -40,6 +41,11 @@ const theme = createTheme({
         root: {
           fontSize: 16,
         },
+      },
+    },
+    MuiLink: {
+      defaultProps: {
+        component: Link,
       },
     },
   },

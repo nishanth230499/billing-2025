@@ -80,15 +80,43 @@ async function getSalesOrders({
   return { success: true, data: salesOrders }
 }
 
-// async function getCompany(companyId) {
-//   await connectDB()
-//   const company = await Company.findById(companyId).populate('firm')
+async function getSalesOrder(stockCycleId, number) {
+  await connectDB()
+  const salesOrder = await SalesOrder.findOne(
+    {
+      stockCycleId,
+      number,
+    },
+    {
+      number: 1,
+      customerId: 1,
+      customerShippingAddressId: 1,
+      date: 1,
+      orderRef: 1,
+      supplyDate: 1,
+      'items.itemId': 1,
+      'items.group': 1,
+      'items.quantity': 1,
+      'items.unitQuantity': 1,
+    }
+  )
+    .populate({
+      path: 'customer',
+      select: 'name place firmId',
+      populate: {
+        path: 'firm',
+        select: 'name gstin address phoneNumber emailId',
+      },
+    })
+    .populate('customerShippingAddress', 'name address')
+    .populate('items.item', { name: 1, 'company.shortName': 1 })
+    .exec()
 
-//   if (company) {
-//     return { success: true, data: company.toJSON() }
-//   }
-//   return { success: false, error: 'Company not found!' }
-// }
+  if (salesOrder) {
+    return { success: true, data: salesOrder.toJSON() }
+  }
+  return { success: false, error: 'Sales Order not found!' }
+}
 
 async function createSalesOrder(stockCycleId, salesOrderReq) {
   await connectDB()
@@ -188,6 +216,6 @@ async function createSalesOrder(stockCycleId, salesOrderReq) {
 // }
 
 export const getSalesOrdersAction = withAuth(getSalesOrders)
-// export const getCompanyAction = withAuth(getCompany)
+export const getSalesOrderAction = withAuth(getSalesOrder)
 export const createSalesOrderAction = withAuth(createSalesOrder)
 // export const editCompanyAction = withAuth(editCompany)

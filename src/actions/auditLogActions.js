@@ -55,6 +55,8 @@ async function getAuditLogs(filters = {}, loggedinUser) {
     paginatedResultsPipeline: [
       {
         // TODO: Instead of lookup everywhere, see if hydrating, populating and toJSON is a better option?
+        // 1. Network call is again made for each field populating
+        // 2. Simplifies the code
         $lookup: {
           from: 'user',
           localField: 'updatedById',
@@ -76,6 +78,7 @@ async function getAuditLogs(filters = {}, loggedinUser) {
           updatedBy: {
             _id: { $toString: '$_id' },
           },
+          updatedAt: { $toString: '$updatedAt' },
         },
       },
     ],

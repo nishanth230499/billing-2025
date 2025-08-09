@@ -1,6 +1,6 @@
 'use client'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
-import { TableCell, TableRow } from '@mui/material'
+import { Link, TableCell, TableRow } from '@mui/material'
 import classNames from 'classnames'
 import React, { memo, useCallback } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
@@ -97,7 +97,7 @@ function DataRow({
           {...(column?.slotProps?.tableBodyCell || {})}>
           {(() => {
             if (column?.component) {
-              return column?.component({ dataKey, data, columnKey })
+              return column?.component({ dataKey, data })
             }
             if (column?.editable) {
               return (
@@ -109,6 +109,13 @@ function DataRow({
                   onKeyDown={onKeyDown}
                   onChange={onChange}
                 />
+              )
+            }
+            if (column?.href) {
+              return (
+                <Link href={column?.href(data)} className='underline'>
+                  {column?.format ? column?.format(data) : data?.[columnKey]}
+                </Link>
               )
             }
             return column?.format ? column?.format(data) : data?.[columnKey]

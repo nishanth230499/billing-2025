@@ -30,7 +30,7 @@ const auditLogColumns = {
   },
   updatedAt: {
     label: 'Updated At',
-    component: ({ data }) => data?.updatedAt?.toLocaleString(),
+    component: ({ data }) => new Date(data?.updatedAt).toLocaleString(),
   },
   actions: {
     label: 'Actions',

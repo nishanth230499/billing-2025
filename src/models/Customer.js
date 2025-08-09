@@ -83,6 +83,7 @@ const customerSchema = mongoose.Schema(
   {
     autoSearchIndex: true,
     toJSON: {
+      virtuals: true,
       transform: function (_, ret) {
         delete ret.id
         delete ret.__v
@@ -91,6 +92,13 @@ const customerSchema = mongoose.Schema(
     },
   }
 )
+
+customerSchema.virtual('firm', {
+  ref: modelConstants?.firm?.modelName,
+  localField: 'firmId',
+  foreignField: '_id',
+  justOne: true,
+})
 
 customerSchema.searchIndex({
   name: 'id_name_place_searchIndex',

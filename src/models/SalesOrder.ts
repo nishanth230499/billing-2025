@@ -13,44 +13,55 @@ import {
 } from '../../appConfig'
 import { modelConstants } from './constants'
 
-const salesOrderItemSchema = new mongoose.Schema({
-  itemId: {
-    type: AUTO_GENERATE_ITEM_ID ? mongoose.Schema.Types.ObjectId : String,
-    match: AUTO_GENERATE_ITEM_ID
-      ? undefined
-      : new RegExp(
-          prefixRegex(
-            COMPANY_ID_REGEX,
-            COMPANY_ID_ITEM_ID_DELIM,
-            ITEM_CODE_REGEX
-          )
-        ),
-    required: true,
-    ref: modelConstants.item.modelName,
-  },
-  group: {
-    type: String,
-    default: '',
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: [0, 'Quantity should not be negative'],
-    validate: {
-      validator: Number.isInteger,
-      message: 'Quantity should be integer.',
+const salesOrderItemSchema = new mongoose.Schema(
+  {
+    itemId: {
+      type: AUTO_GENERATE_ITEM_ID ? mongoose.Schema.Types.ObjectId : String,
+      match: AUTO_GENERATE_ITEM_ID
+        ? undefined
+        : new RegExp(
+            prefixRegex(
+              COMPANY_ID_REGEX,
+              COMPANY_ID_ITEM_ID_DELIM,
+              ITEM_CODE_REGEX
+            )
+          ),
+      required: true,
+      ref: modelConstants.item.modelName,
+    },
+    group: {
+      type: String,
+      default: '',
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: [0, 'Quantity should not be negative'],
+      validate: {
+        validator: Number.isInteger,
+        message: 'Quantity should be integer.',
+      },
+    },
+    unitQuantity: {
+      type: Number,
+      required: true,
+      min: [0, 'Unit Quantity should not be negative'],
+      validate: {
+        validator: Number.isInteger,
+        message: 'Unit Quantity should be integer.',
+      },
     },
   },
-  unitQuantity: {
-    type: Number,
-    required: true,
-    min: [0, 'Unit Quantity should not be negative'],
-    validate: {
-      validator: Number.isInteger,
-      message: 'Unit Quantity should be integer.',
+  {
+    _id: false,
+    toJSON: {
+      virtuals: true,
+      transform: function (_, ret: any) {
+        ret.itemId = ret?.itemId?.toString()
+      },
     },
-  },
-})
+  }
+)
 
 const salesOrderSchema = new mongoose.Schema(
   {
@@ -109,6 +120,7 @@ const salesOrderSchema = new mongoose.Schema(
   },
   {
     toJSON: {
+      virtuals: true,
       transform: function (_, ret: any) {
         delete ret.id
         delete ret.__v
@@ -117,13 +129,31 @@ const salesOrderSchema = new mongoose.Schema(
         ret.customerId = ret?.customerId?.toString()
         ret.customerShippingAddressId =
           ret?.customerShippingAddressId?.toString()
-        ret.items.forEach((item: any) => {
-          item.itemId = item?.itemId?.toString()
-        })
       },
     },
   }
 )
+
+salesOrderSchema.virtual('customer', {
+  ref: modelConstants?.customer?.modelName,
+  localField: 'customerId',
+  foreignField: '_id',
+  justOne: true,
+})
+
+salesOrderSchema.virtual('customerShippingAddress', {
+  ref: modelConstants?.customer_shipping_address?.modelName,
+  localField: 'customerShippingAddressId',
+  foreignField: '_id',
+  justOne: true,
+})
+
+salesOrderItemSchema.virtual('item', {
+  ref: modelConstants?.item?.modelName,
+  localField: 'itemId',
+  foreignField: '_id',
+  justOne: true,
+})
 
 salesOrderSchema.index({ stockCycleId: 1, number: -1 })
 

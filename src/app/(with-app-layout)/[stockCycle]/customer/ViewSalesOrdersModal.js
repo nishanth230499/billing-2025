@@ -4,6 +4,7 @@ import { Button, DialogContent } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useMemo } from 'react'
 
 import { getSalesOrdersAction } from '@/actions/salesOrderActions'
 import DataTable from '@/components/common/DataTable'
@@ -14,31 +15,6 @@ import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import useModalControl from '@/hooks/useModalControl'
 import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
-
-const salesOrdersTableColumns = {
-  number: { label: 'Number' },
-  date: { label: 'Order Date' },
-  customer: {
-    label: 'Customer',
-    component: ({ data: order }) => order?.customer?.name ?? '',
-  },
-  customerShippingAddress: {
-    label: 'Shipping Address',
-    component: ({ data: order }) => order?.customerShippingAddress?.name ?? '',
-  },
-  orderRef: {
-    label: 'Order Ref',
-    component: ({ data: order }) => order?.orderRef,
-  },
-  isSetPack: {
-    label: 'Set Pack',
-    component: ({ data: order }) => (order?.isSetPack ? 'Yes' : 'No'),
-  },
-  supplyDate: {
-    label: 'Supply Date',
-    component: ({ data: order }) => order?.supplyDate,
-  },
-}
 
 export default function ViewSalesOrdersModal() {
   const params = useParams()
@@ -78,10 +54,44 @@ export default function ViewSalesOrdersModal() {
     enabled: Boolean(customerId),
   })
 
+  const salesOrdersTableColumns = useMemo(
+    () => ({
+      number: {
+        label: 'Number',
+        href: (salesOrder) =>
+          `/${stockCycleId}/sales-order/view/${salesOrder?.number}`,
+      },
+      date: { label: 'Order Date' },
+      customer: {
+        label: 'Customer',
+        component: ({ data: order }) => order?.customer?.name ?? '',
+      },
+      customerShippingAddress: {
+        label: 'Shipping Address',
+        component: ({ data: order }) =>
+          order?.customerShippingAddress?.name ?? '',
+      },
+      orderRef: {
+        label: 'Order Ref',
+        component: ({ data: order }) => order?.orderRef,
+      },
+      isSetPack: {
+        label: 'Set Pack',
+        component: ({ data: order }) => (order?.isSetPack ? 'Yes' : 'No'),
+      },
+      supplyDate: {
+        label: 'Supply Date',
+        component: ({ data: order }) => order?.supplyDate,
+      },
+    }),
+    [stockCycleId]
+  )
+
   return (
     <Modal
       open={Boolean(customerId)}
       title='Sales Order'
+      maxWidth='xl'
       onClose={handleCloseModal}>
       <DialogContent className='flex flex-col items-start'>
         <Button

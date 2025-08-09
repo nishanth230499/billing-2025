@@ -68,21 +68,6 @@ async function getDocuments(
     pageNumber,
     pageSize,
     paginatedResultsPipeline: [
-      ...(objectIdFields.size
-        ? [
-            {
-              $addFields: Object.fromEntries(
-                [...objectIdFields].map((fieldName) => [
-                  fieldName,
-                  { $toString: `$${fieldName}` },
-                ])
-              ),
-            },
-          ]
-        : []),
-      {
-        $project: { __v: 0 },
-      },
       ...(Array.isArray(dbEditorIgnoreFields) && dbEditorIgnoreFields.length
         ? [
             {
@@ -94,6 +79,9 @@ async function getDocuments(
         : []),
     ],
   })
+  documents.paginatedResults = documents.paginatedResults.map((document) =>
+    model.hydrate(document).toJSON()
+  )
   return { success: true, data: documents }
 }
 

@@ -11,6 +11,18 @@ const firmSchema = mongoose.Schema(
     },
     color: { type: String, required: true },
     icon: { type: String, required: true },
+    gstin: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    emailId: {
+      type: String,
+      required: true,
+    },
   },
   {
     toJSON: {
