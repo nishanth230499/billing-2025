@@ -4,13 +4,12 @@ import { Box, Button, CircularProgress, Paper } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useCallback } from 'react'
 
 import { getSalesOrderAction } from '@/actions/salesOrderActions'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import routes from '@/constants/routeConstants'
 import handleServerAction from '@/lib/handleServerAction'
-import convertPdfUrlToPdfFileAndShare from '@/lib/utils/pdfUtils/convertPdfUrlToPdfFileAndShare'
+import useFetchAndShare from '@/lib/utils/pdfUtils/useFetchAndShare'
 import SalesOrderTemplate from '@/templates/SalesOrderTemplate'
 
 export default function Page() {
@@ -35,12 +34,17 @@ export default function Page() {
     enabled: Boolean(stockCycleId && salesOrderNumber),
   })
 
-  const handleSharePDF = useCallback(async () => {
-    convertPdfUrlToPdfFileAndShare(
-      routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber),
-      { title: `Sales Order ${salesOrderNumber}` }
-    )
-  }, [salesOrderNumber, stockCycleId])
+  const { share, isPending: isSharePending } = useFetchAndShare(
+    routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber),
+    { title: `Sales Order ${salesOrderNumber}` }
+  )
+
+  // const handleSharePDF = useCallback(async () => {
+  //   convertPdfUrlToPdfFileAndShare(
+  //     routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber),
+  //     { title: `Sales Order ${salesOrderNumber}` }
+  //   )
+  // }, [salesOrderNumber, stockCycleId])
 
   return (
     <>
@@ -61,7 +65,8 @@ export default function Page() {
               <Button
                 className='rounded-3xl mb-4'
                 variant='outlined'
-                onClick={handleSharePDF}>
+                onClick={share}
+                loading={isSharePending}>
                 Share PDF
               </Button>
             </Box>
