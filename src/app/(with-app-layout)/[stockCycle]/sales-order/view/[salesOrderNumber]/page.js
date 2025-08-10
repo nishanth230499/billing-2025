@@ -51,7 +51,7 @@ export default function Page() {
       return
     }
     console.log('The file is good')
-    const pdfBlob = await response.blob()
+    const pdfBuffer = await response.arrayBuffer()
 
     // const url = URL.createObjectURL(pdfBlob)
     // const a = document.createElement('a')
@@ -61,7 +61,7 @@ export default function Page() {
     // a.click()
     // a.remove()
     // URL.revokeObjectURL(url)
-    const file = new File([pdfBlob], `Sales_Order_${salesOrderNumber}.pdf`, {
+    const file = new File([pdfBuffer], `Sales_Order_${salesOrderNumber}.pdf`, {
       type: 'application/pdf',
     })
 
