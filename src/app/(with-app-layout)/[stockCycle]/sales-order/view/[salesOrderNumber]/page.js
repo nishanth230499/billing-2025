@@ -36,8 +36,7 @@ export default function Page() {
 
   const handleSharePDF = useCallback(async () => {
     const response = await fetch(
-      routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber),
-      { cache: 'no-store' }
+      routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)
     )
 
     if (!response.ok) {
