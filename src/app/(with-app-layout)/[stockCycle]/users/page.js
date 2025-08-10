@@ -63,6 +63,7 @@ export default function Page() {
           className='rounded-3xl'
           variant='outlined'
           LinkComponent={Link}
+          replace
           href={getCreateUserModalURL(true)}>
           Create User
         </Button>

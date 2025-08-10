@@ -5,33 +5,10 @@ import { formatAmount } from '@/lib/utils/amoutUtils'
 import {
   AUTO_GENERATE_CUSTOMER_ID,
   CUSTOMER_ID_REGEX,
-  IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
-  STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
+  STOCK_CYCLE_CUSTOMER_FIELDS,
 } from '../../appConfig'
 import { modelConstants } from './constants'
-
-export const additionalCustomerFields = {
-  billingName: {
-    type: String,
-    required: true,
-  },
-  billingAddress: {
-    type: String,
-    required: true,
-  },
-  gstin: {
-    type: String,
-    default: '',
-  },
-  phoneNumber: {
-    type: String,
-    default: '',
-  },
-  emailId: {
-    type: String,
-    default: '',
-  },
-}
+import { additionalCustomerFields } from './StockCycleCustomer'
 
 const customerSchema = mongoose.Schema(
   {
@@ -46,6 +23,7 @@ const customerSchema = mongoose.Schema(
     name: {
       type: String,
       required: true,
+      set: (name) => name?.toUpperCase(),
     },
     place: { type: String, required: true },
     firmId: {
@@ -56,29 +34,9 @@ const customerSchema = mongoose.Schema(
     openingBalance: { type: Number, required: true, set: formatAmount },
     ...Object.fromEntries(
       Object.entries(additionalCustomerFields).filter(
-        ([fieldName]) =>
-          !STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)
+        ([fieldName]) => !STOCK_CYCLE_CUSTOMER_FIELDS.includes(fieldName)
       )
     ),
-    ...(IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
-      ? {
-          stockCycleOverrides: [
-            {
-              _id: {
-                type: String,
-                required: true,
-                index: true,
-                ref: modelConstants.stock_cycle.modelName,
-              },
-              ...Object.fromEntries(
-                Object.entries(additionalCustomerFields).filter(([fieldName]) =>
-                  STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)
-                )
-              ),
-            },
-          ],
-        }
-      : {}),
   },
   {
     autoSearchIndex: true,
@@ -88,6 +46,13 @@ const customerSchema = mongoose.Schema(
         delete ret.id
         delete ret.__v
         ret._id = ret?._id?.toString()
+        ret.billingName = ret.stockCycleCustomer?.billingName ?? ret.billingName
+        ret.billingAddress =
+          ret.stockCycleCustomer?.billingAddress ?? ret.billingAddress
+        ret.gstin = ret.stockCycleCustomer?.gstin ?? ret.gstin
+        ret.phoneNumber = ret.stockCycleCustomer?.phoneNumber ?? ret.phoneNumber
+        ret.emailId = ret.stockCycleCustomer?.emailId ?? ret.emailId
+        delete ret.stockCycleCustomer
       },
     },
   }
@@ -97,6 +62,13 @@ customerSchema.virtual('firm', {
   ref: modelConstants?.firm?.modelName,
   localField: 'firmId',
   foreignField: '_id',
+  justOne: true,
+})
+
+customerSchema.virtual('stockCycleCustomer', {
+  ref: modelConstants?.stock_cycle_customer?.modelName,
+  localField: '_id',
+  foreignField: 'customerId',
   justOne: true,
 })
 

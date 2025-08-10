@@ -18,6 +18,7 @@ export default function UsersTableActions({ data: user }) {
         <IconButton
           color='primary'
           LinkComponent={Link}
+          replace
           href={getEditUserModalURL(user?._id)}>
           <EditIcon />
         </IconButton>
@@ -26,6 +27,7 @@ export default function UsersTableActions({ data: user }) {
         <IconButton
           color='primary'
           LinkComponent={Link}
+          replace
           href={getResetPasswordModalURL(user?._id)}>
           <LockResetIcon />
         </IconButton>

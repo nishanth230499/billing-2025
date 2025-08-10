@@ -14,12 +14,7 @@ export default function DataInput({
     () => (column?.format ? column?.format(data) : data?.[columnKey]) ?? '',
     [column, columnKey, data]
   )
-  // if (value === '31') {
-  //   console.log('Value', value)
-  //   console.log('Data', data)
-  //   console.log('data.columnKey', data?.[columnKey])
-  //   console.log(defaultValue)
-  // }
+
   useEffect(() => {
     setValue(defaultValue)
   }, [defaultValue])
@@ -32,7 +27,6 @@ export default function DataInput({
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onBlur={() => {
-        // console.log(value, defaultValue, value === defaultValue)
         if (value !== defaultValue) onChange(value, columnKey)
       }}
       error={error}

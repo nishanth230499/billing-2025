@@ -21,7 +21,7 @@ export default function AddExistingCustomerFormModal({ refetchCustomers }) {
 
   const { modalValue, handleCloseModal } = useModalControl('add')
 
-  const { CUSTOMER_ID_REGEX, STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS } = appConfig
+  const { CUSTOMER_ID_REGEX, STOCK_CYCLE_CUSTOMER_FIELDS } = appConfig
 
   const [selectedCustomerId, setSelectedCustomerId] = useState('')
 
@@ -95,7 +95,7 @@ export default function AddExistingCustomerFormModal({ refetchCustomers }) {
         ),
         validator: (val) => new RegExp(CUSTOMER_ID_REGEX).test(val),
       },
-      ...(STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.length
+      ...(STOCK_CYCLE_CUSTOMER_FIELDS.length
         ? {
             noteDivider: {
               type: 'divider',
@@ -108,7 +108,7 @@ export default function AddExistingCustomerFormModal({ refetchCustomers }) {
             },
             ...Object.fromEntries(
               Object.entries(additionalFields).filter(([fieldName]) =>
-                STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)
+                STOCK_CYCLE_CUSTOMER_FIELDS.includes(fieldName)
               )
             ),
           }
@@ -116,7 +116,7 @@ export default function AddExistingCustomerFormModal({ refetchCustomers }) {
     }),
     [
       CUSTOMER_ID_REGEX,
-      STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
+      STOCK_CYCLE_CUSTOMER_FIELDS,
       additionalFields,
       customerResponse,
       stockCycleId,

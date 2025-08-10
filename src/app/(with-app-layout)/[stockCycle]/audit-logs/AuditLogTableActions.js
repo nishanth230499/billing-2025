@@ -14,6 +14,7 @@ export default function AuditLogTableActions({ data }) {
       <IconButton
         color='primary'
         LinkComponent={Link}
+        replace
         href={getViewAuditLogModalURL(data?._id)}>
         <VisibilityIcon />
       </IconButton>

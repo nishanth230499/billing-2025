@@ -15,6 +15,7 @@ export default function DocumentsTableActions({ data }) {
       <IconButton
         color='primary'
         LinkComponent={Link}
+        replace
         href={getEditDocumentModalURL(data?._id)}>
         <EditIcon />
       </IconButton>

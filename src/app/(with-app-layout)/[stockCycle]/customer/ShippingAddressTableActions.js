@@ -15,6 +15,7 @@ export default function ShippingAddressTableActions({ data }) {
       <IconButton
         color='primary'
         LinkComponent={Link}
+        replace
         href={getEditShippingAddressModalURL(data?._id)}>
         <EditIcon />
       </IconButton>

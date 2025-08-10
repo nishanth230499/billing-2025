@@ -29,10 +29,8 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
   const { modalValue: editingCustomerId, handleCloseModal } =
     useModalControl('editCustomer')
 
-  const {
-    IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
-    STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
-  } = appConfig
+  const { IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE, STOCK_CYCLE_CUSTOMER_FIELDS } =
+    appConfig
 
   const {
     data: customerResponse,
@@ -124,12 +122,11 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
       },
       ...Object.fromEntries(
         Object.entries(additionalFields).filter(
-          ([fieldName]) =>
-            !STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)
+          ([fieldName]) => !STOCK_CYCLE_CUSTOMER_FIELDS.includes(fieldName)
         )
       ),
       ...(IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE &&
-      STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.length
+      STOCK_CYCLE_CUSTOMER_FIELDS.length
         ? {
             noteDivider: {
               type: 'divider',
@@ -144,13 +141,13 @@ export default function EditCustomerFormModal({ refetchCustomers }) {
         : {}),
       ...Object.fromEntries(
         Object.entries(additionalFields).filter(([fieldName]) =>
-          STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)
+          STOCK_CYCLE_CUSTOMER_FIELDS.includes(fieldName)
         )
       ),
     }),
     [
       IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
-      STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
+      STOCK_CYCLE_CUSTOMER_FIELDS,
       additionalFields,
       customerResponse?._id,
       customerResponse?.firm?.name,

@@ -1,7 +1,5 @@
 'use server'
 
-import mongoose from 'mongoose'
-
 import { DEFAULT_PAGE_SIZE } from '@/constants/generalConstants'
 import connectDB from '@/lib/connectDB'
 import { getPaginatedData } from '@/lib/pagination'
@@ -9,12 +7,15 @@ import { trackCreation, trackUpdates } from '@/lib/utils/auditLogUtils'
 import { withAuth } from '@/lib/withAuth'
 import withTransaction from '@/lib/withTransaction'
 import { modelConstants } from '@/models/constants'
-import Customer, { additionalCustomerFields } from '@/models/Customer'
+import Customer from '@/models/Customer'
+import StockCycleCustomer, {
+  additionalCustomerFields,
+} from '@/models/StockCycleCustomer'
 
 import {
   AUTO_GENERATE_CUSTOMER_ID,
   IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
-  STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
+  STOCK_CYCLE_CUSTOMER_FIELDS,
 } from '../../appConfig'
 
 async function getCustomers({
@@ -50,26 +51,89 @@ async function getCustomers({
             },
           ]
         : []),
-      ...(filter?.stockCycle
-        ? [
-            filter?.stockCycle?.not
-              ? {
-                  $match: {
-                    stockCycleOverrides: {
-                      $not: {
-                        $elemMatch: {
-                          _id: filter?.stockCycle?.id,
+      ...(IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE && filter?.stockCycle
+        ? filter?.stockCycle?.not
+          ? [
+              // Query all the customers who donot have data for given stockcycle, but populate it with some other stock cycle data
+              {
+                $lookup: {
+                  from: modelConstants?.stock_cycle_customer?.collectionName,
+                  let: { customerId: '$_id' },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $and: [
+                            { $eq: ['$customerId', '$$customerId'] },
+                            { $eq: ['$stockCycleId', filter?.stockCycle?.id] },
+                          ],
                         },
                       },
                     },
-                  },
-                }
-              : {
-                  $match: {
-                    'stockCycleOverrides._id': filter?.stockCycle?.id,
-                  },
+                    { $limit: 1 },
+                  ],
+                  as: 'stockCycleCustomer',
                 },
-          ]
+              },
+              {
+                $match: {
+                  stockCycleCustomer: { $size: 0 },
+                },
+              },
+              {
+                $lookup: {
+                  from: modelConstants?.stock_cycle_customer?.collectionName,
+                  let: { customerId: '$_id' },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: { $eq: ['$customerId', '$$customerId'] },
+                      },
+                    },
+                    { $limit: 1 },
+                  ],
+                  as: 'stockCycleCustomer',
+                },
+              },
+              {
+                $set: {
+                  stockCycleCustomer: { $first: '$stockCycleCustomer' },
+                },
+              },
+            ]
+          : [
+              // Query all the customers who does have the data for given stock cycle and populate the same
+              {
+                $lookup: {
+                  from: modelConstants?.stock_cycle_customer?.collectionName,
+                  let: { customerId: '$_id' },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $and: [
+                            { $eq: ['$customerId', '$$customerId'] },
+                            { $eq: ['$stockCycleId', filter?.stockCycle?.id] },
+                          ],
+                        },
+                      },
+                    },
+                    { $limit: 1 },
+                  ],
+                  as: 'stockCycleCustomer',
+                },
+              },
+              {
+                $match: {
+                  $expr: { $gt: [{ $size: '$stockCycleCustomer' }, 0] },
+                },
+              },
+              {
+                $set: {
+                  stockCycleCustomer: { $first: '$stockCycleCustomer' },
+                },
+              },
+            ]
         : []),
       ...(Object.keys(sortFields).length
         ? [
@@ -109,65 +173,31 @@ async function getCustomers({
 
 async function getCustomer(customerId, stockCycleId = '') {
   await connectDB()
-  const customer = await Customer.aggregate([
-    {
-      $match: {
-        _id: AUTO_GENERATE_CUSTOMER_ID
-          ? new mongoose.Types.ObjectId(customerId)
-          : customerId,
-      },
-    },
-    {
-      $lookup: {
-        from: modelConstants.firm.collectionName,
-        localField: 'firmId',
-        foreignField: '_id',
-        as: 'firm',
-      },
-    },
-    {
-      $set: {
-        firm: { $first: '$firm' },
-      },
-    },
-    ...(IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
-      ? [
-          ...(stockCycleId
-            ? [
-                {
-                  $set: {
-                    stockCycleOverrides: {
-                      $filter: {
-                        input: '$stockCycleOverrides',
-                        as: 'stockCycleOverrides',
-                        cond: {
-                          $eq: ['$$stockCycleOverrides._id', stockCycleId],
-                        },
-                      },
-                    },
-                  },
-                },
-              ]
-            : []),
-          {
-            $replaceRoot: {
-              newRoot: {
-                $mergeObjects: ['$$ROOT', { $last: '$stockCycleOverrides' }],
-              },
-            },
-          },
-          {
-            $project: {
-              stockCycleOverrides: 0,
-            },
-          },
-        ]
-      : []),
-  ])
 
-  if (customer[0]) {
-    customer[0]._id = customer[0]._id.toString()
-    return { success: true, data: customer[0] }
+  let customer = await Customer.findById(customerId, {
+    _id: 1,
+    name: 1,
+    place: 1,
+    firmId: 1,
+    openingBalance: 1,
+  }).populate('firm', 'color')
+
+  if (IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE) {
+    await customer.populate({
+      path: 'stockCycleCustomer',
+      select: {
+        billingName: 1,
+        billingAddress: 1,
+        gstin: 1,
+        phoneNumber: 1,
+        emailId: 1,
+      },
+      match: stockCycleId ? { stockCycleId: stockCycleId } : {},
+    })
+  }
+
+  if (customer) {
+    return { success: true, data: customer.toJSON() }
   }
   return { success: false, error: 'Customer not found!' }
 }
@@ -176,36 +206,57 @@ async function createCustomer(customerReq) {
   await connectDB()
 
   try {
-    const customer = new Customer({
+    const customerFields = {
       _id: AUTO_GENERATE_CUSTOMER_ID ? undefined : customerReq?._id,
       name: customerReq?.name,
       place: customerReq?.place,
       firmId: customerReq?.firmId,
       openingBalance: customerReq?.openingBalance,
-    })
+    }
 
-    const stockCycleFields = {}
+    const stockCycleFields = {
+      stockCycleId: customerReq?.stockCycleId,
+    }
 
     Object.keys(additionalCustomerFields).forEach((fieldName) => {
-      if (STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)) {
+      if (STOCK_CYCLE_CUSTOMER_FIELDS.includes(fieldName)) {
         stockCycleFields[fieldName] = customerReq?.[fieldName]
       } else {
-        customer[fieldName] = customerReq?.[fieldName]
+        customerFields[fieldName] = customerReq?.[fieldName]
       }
     })
 
-    if (IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE) {
-      stockCycleFields._id = customerReq?.stockCycleId
-      customer.stockCycleOverrides = [stockCycleFields]
-    }
+    const { customerJson, stockCycleCustomerJSON } = await withTransaction(
+      async ({ session }) => {
+        const customer = new Customer(customerFields)
+        await customer.save({ session })
 
-    await customer.save()
+        const customerJson = customer.toJSON()
+        if (IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE) {
+          stockCycleFields.customerId = customer._id
+          const stockCycleCustomer = new StockCycleCustomer(stockCycleFields)
+          await stockCycleCustomer.save({ session })
+
+          const stockCycleCustomerJSON = stockCycleCustomer.toJSON()
+          return { customerJson, stockCycleCustomerJSON }
+        }
+        return { customerJson }
+      }
+    )
 
     trackCreation({
       model: Customer,
-      documentId: customer._id,
-      newDocument: customer.toJSON(),
+      documentId: customerJson._id,
+      newDocument: customerJson,
     })
+
+    if (stockCycleCustomerJSON) {
+      trackCreation({
+        model: StockCycleCustomer,
+        documentId: stockCycleCustomerJSON._id,
+        newDocument: stockCycleCustomerJSON,
+      })
+    }
 
     return {
       success: true,
@@ -222,34 +273,31 @@ async function createCustomer(customerReq) {
 
 async function addCustomer(customerId, customerReq) {
   await connectDB()
+
+  if (!IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE) {
+    return {
+      success: false,
+      error: 'The configuration does not allow to access this.',
+    }
+  }
   try {
     const stockCycleFields = {}
     Object.keys(additionalCustomerFields).forEach((fieldName) => {
-      if (STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)) {
+      if (STOCK_CYCLE_CUSTOMER_FIELDS.includes(fieldName)) {
         stockCycleFields[fieldName] = customerReq?.[fieldName]
       }
     })
-    stockCycleFields._id = customerReq?.stockCycleId
+    stockCycleFields.stockCycleId = customerReq?.stockCycleId
+    stockCycleFields.customerId = customerId
 
-    const { oldCustomerJSON, newCustomerJSON } = await withTransaction(
-      async ({ session }) => {
-        const customer = await Customer.findById(customerId)
-          .session(session)
-          .exec()
-        const oldCustomerJSON = customer.toJSON()
-        customer.stockCycleOverrides.push(stockCycleFields)
-        await customer.save({ session })
-        const newCustomerJSON = customer.toJSON()
-        return { oldCustomerJSON, newCustomerJSON }
-      }
-    )
-
-    trackUpdates({
-      model: Customer,
-      documentId: oldCustomerJSON._id,
-      oldDocument: oldCustomerJSON,
-      newDocument: newCustomerJSON,
+    const stockCycleCustomer = new StockCycleCustomer(stockCycleFields)
+    await stockCycleCustomer.save()
+    trackCreation({
+      model: StockCycleCustomer,
+      documentId: stockCycleCustomer._id,
+      newDocument: stockCycleCustomer.toJSON(),
     })
+
     return {
       success: true,
       data: 'Customer added successfully!',
@@ -267,42 +315,60 @@ async function editCustomer(customerId, customerReq) {
   await connectDB()
 
   try {
-    const { oldCustomerJSON, newCustomerJSON } = await withTransaction(
-      async ({ session }) => {
-        const customer = await Customer.findById(customerId)
+    const customerFields = {
+      name: customerReq?.name,
+      place: customerReq?.place,
+      openingBalance: customerReq?.openingBalance,
+    }
+
+    const stockCycleFields = {}
+
+    Object.keys(additionalCustomerFields).forEach((fieldName) => {
+      if (STOCK_CYCLE_CUSTOMER_FIELDS.includes(fieldName)) {
+        stockCycleFields[fieldName] = customerReq?.[fieldName]
+      } else {
+        customerFields[fieldName] = customerReq?.[fieldName]
+      }
+    })
+
+    const {
+      oldCustomerJSON,
+      newCustomerJSON,
+      oldStockCycleCustomerJSON,
+      newStockCycleCustomerJSON,
+    } = await withTransaction(async ({ session }) => {
+      const customer = await Customer.findById(customerId)
+        .session(session)
+        .exec()
+
+      const oldCustomerJSON = customer.toJSON()
+      Object.assign(customer, customerFields)
+      await customer.save({ session })
+      const newCustomerJSON = customer.toJSON()
+
+      if (IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE) {
+        const stockCycleCustomer = await StockCycleCustomer.findOne({
+          stockCycleId: customerReq?.stockCycleId,
+          customerId: customerId,
+        })
           .session(session)
           .exec()
-        const oldCustomerJSON = customer.toJSON()
 
-        customer.name = customerReq?.name
-        customer.place = customerReq?.place
-        customer.openingBalance = customerReq?.openingBalance
+        const oldStockCycleCustomerJSON = stockCycleCustomer.toJSON()
+        Object.assign(stockCycleCustomer, stockCycleFields)
+        await stockCycleCustomer.save({ session })
+        const newStockCycleCustomerJSON = customer.toJSON()
 
-        if (IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE) {
-          const overrides = customer.stockCycleOverrides.id(
-            customerReq?.stockCycleId
-          )
-
-          Object.keys(additionalCustomerFields).forEach((fieldName) => {
-            if (STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)) {
-              overrides[fieldName] = customerReq?.[fieldName]
-            } else {
-              customer[fieldName] = customerReq?.[fieldName]
-            }
-          })
-        } else {
-          Object.keys(additionalCustomerFields).forEach((fieldName) => {
-            if (!STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)) {
-              customer[fieldName] = customerReq?.[fieldName]
-            }
-          })
+        return {
+          oldCustomerJSON,
+          newCustomerJSON,
+          oldStockCycleCustomerJSON,
+          newStockCycleCustomerJSON,
         }
-
-        await customer.save({ session })
-        const newCustomerJSON = customer.toJSON()
-        return { oldCustomerJSON, newCustomerJSON }
       }
-    )
+
+      return { oldCustomerJSON, newCustomerJSON }
+    })
 
     trackUpdates({
       model: Customer,
@@ -310,6 +376,13 @@ async function editCustomer(customerId, customerReq) {
       oldDocument: oldCustomerJSON,
       newDocument: newCustomerJSON,
     })
+    if (oldStockCycleCustomerJSON && newStockCycleCustomerJSON)
+      trackUpdates({
+        model: StockCycleCustomer,
+        documentId: oldStockCycleCustomerJSON._id,
+        oldDocument: oldStockCycleCustomerJSON,
+        newDocument: newStockCycleCustomerJSON,
+      })
 
     return {
       success: true,

@@ -30,7 +30,7 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
     AUTO_GENERATE_CUSTOMER_ID,
     CUSTOMER_ID_REGEX,
     IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
-    STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
+    STOCK_CYCLE_CUSTOMER_FIELDS,
   } = appConfig
 
   const { mutate: createCustomer, isPending: isCreateCustomerLoading } =
@@ -115,12 +115,11 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
       },
       ...Object.fromEntries(
         Object.entries(additionalFields).filter(
-          ([fieldName]) =>
-            !STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)
+          ([fieldName]) => !STOCK_CYCLE_CUSTOMER_FIELDS.includes(fieldName)
         )
       ),
       ...(IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE &&
-      STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.length
+      STOCK_CYCLE_CUSTOMER_FIELDS.length
         ? {
             noteDivider: {
               type: 'divider',
@@ -135,7 +134,7 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
         : {}),
       ...Object.fromEntries(
         Object.entries(additionalFields).filter(([fieldName]) =>
-          STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS.includes(fieldName)
+          STOCK_CYCLE_CUSTOMER_FIELDS.includes(fieldName)
         )
       ),
     }),
@@ -143,7 +142,7 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
       AUTO_GENERATE_CUSTOMER_ID,
       CUSTOMER_ID_REGEX,
       IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
-      STOCK_CYCLE_SPECIFIC_CUSTOMER_FIELDS,
+      STOCK_CYCLE_CUSTOMER_FIELDS,
       additionalFields,
     ]
   )

@@ -13,6 +13,7 @@ export default function ItemTableActions({ data }) {
       <IconButton
         color='primary'
         LinkComponent={Link}
+        replace
         href={getEditItemModalURL(data?._id)}>
         <EditIcon />
       </IconButton>

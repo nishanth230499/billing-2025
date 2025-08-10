@@ -6,6 +6,7 @@ type ModelConstantsKeyType =
   | 'audit_log'
   | 'firm'
   | 'customer'
+  | 'stock_cycle_customer'
   | 'company'
   | 'hsn'
   | 'item'
@@ -39,6 +40,10 @@ export const modelConstants: ModelConstantsType = {
   customer: {
     modelName: 'Customer',
     collectionName: 'customer',
+  },
+  stock_cycle_customer: {
+    modelName: 'StockCycleCustomer',
+    collectionName: 'stock_cycle_customer',
   },
   company: {
     modelName: 'Company',

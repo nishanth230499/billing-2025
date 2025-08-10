@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import {
   Fragment,
@@ -45,6 +45,7 @@ export default function SelectedItemsPanel({
   setSelectedItemsOrder,
 }) {
   const params = useParams()
+  const router = useRouter()
   const { searchParams, replaceURL } = useHandleSearchParams()
   const { appConfig } = useContext(AppContext)
 
@@ -202,9 +203,8 @@ export default function SelectedItemsPanel({
       ],
       {
         onSuccess: async (data) => {
-          enqueueSnackbar(data, { variant: 'success' })
-          // await refetchCustomers()
-          // handleCloseModal()
+          enqueueSnackbar(data?.message, { variant: 'success' })
+          router.push(routes.salesOrder.view(stockCycleId, data?.orderNumber))
         },
         onError: (error) =>
           enqueueSnackbar(error.message, { variant: 'error' }),
@@ -216,6 +216,7 @@ export default function SelectedItemsPanel({
     customerShippingAddressId,
     isSetPack,
     orderRef,
+    router,
     selectedItems,
     selectedItemsOrder,
     stockCycleId,

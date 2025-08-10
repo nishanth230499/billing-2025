@@ -86,6 +86,7 @@ export default function Page() {
             className='rounded-3xl'
             variant='outlined'
             LinkComponent={Link}
+            replace
             href={getCreateUserModalURL(true)}>
             Create New Customer
           </Button>
@@ -94,6 +95,7 @@ export default function Page() {
               className='rounded-3xl hidden sm:block'
               variant='outlined'
               LinkComponent={Link}
+              replace
               href={getAddUserModalURL(true)}>
               Add Existing Customer
             </Button>
@@ -106,6 +108,7 @@ export default function Page() {
             className='rounded-3xl'
             variant='outlined'
             LinkComponent={Link}
+            replace
             href={getAddUserModalURL(true)}>
             Add Existing Customer
           </Button>

@@ -72,6 +72,7 @@ export default function ViewShippingAddressModal() {
           className='rounded-3xl mb-4'
           variant='outlined'
           LinkComponent={Link}
+          replace
           href={getCreateShippingAddressModalURL(true)}>
           Create Shipping Address
         </Button>

@@ -13,6 +13,7 @@ export default function CompanyTableActions({ data }) {
       <IconButton
         color='primary'
         LinkComponent={Link}
+        replace
         href={getEditCompanyModalURL(data?._id)}>
         <EditIcon />
       </IconButton>

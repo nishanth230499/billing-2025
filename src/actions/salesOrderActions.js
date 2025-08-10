@@ -103,10 +103,16 @@ async function getSalesOrder(stockCycleId, number) {
     .populate({
       path: 'customer',
       select: 'name place firmId',
-      populate: {
-        path: 'firm',
-        select: 'name gstin address phoneNumber emailId',
-      },
+      populate: [
+        {
+          path: 'stockCycleCustomer',
+          select: 'billingName billingAddress phoneNumber emailId gstin',
+        },
+        {
+          path: 'firm',
+          select: 'name gstin address phoneNumber emailId',
+        },
+      ],
     })
     .populate('customerShippingAddress', 'name address')
     .populate('items.item', { name: 1, 'company.shortName': 1 })
@@ -151,7 +157,10 @@ async function createSalesOrder(stockCycleId, salesOrderReq) {
 
     return {
       success: true,
-      data: 'Sales Order created successfully!',
+      data: {
+        message: 'Sales Order created successfully!',
+        orderNumber: salesOrder?.number,
+      },
     }
   } catch (e) {
     console.error(e)

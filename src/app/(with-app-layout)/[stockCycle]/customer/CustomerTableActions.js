@@ -25,6 +25,7 @@ export default function CustomerTableActions({ data }) {
         <IconButton
           color='primary'
           LinkComponent={Link}
+          replace
           href={getEditCustomerModalURL(data?._id)}>
           <EditIcon />
         </IconButton>
@@ -33,6 +34,7 @@ export default function CustomerTableActions({ data }) {
         <IconButton
           color='primary'
           LinkComponent={Link}
+          replace
           href={getViewShippingAddressModalURL(data?._id)}>
           <LocalShippingIcon />
         </IconButton>
@@ -41,6 +43,7 @@ export default function CustomerTableActions({ data }) {
         <IconButton
           color='primary'
           LinkComponent={Link}
+          replace
           href={getViewSalesOrdersModalURL(data?._id)}>
           <PlaylistAddIcon />
         </IconButton>

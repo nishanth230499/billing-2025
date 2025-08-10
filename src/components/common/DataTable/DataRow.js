@@ -18,7 +18,6 @@ function DataRow({
   handleInputChange,
   handleMoveRow,
 }) {
-  // console.log('Data Row Rerendered', data?.group)
   const setInputRef = useCallback(
     (ele, columnKey) => {
       inputsRef[columnKey] = ele
@@ -132,12 +131,10 @@ function DataRow({
 export default memo(DataRow, (prevProps, nextProps) => {
   const dataEqual =
     JSON.stringify(prevProps.data) === JSON.stringify(nextProps.data)
-  // if (nextProps.data.group === 'Nursery') console.log(dataEqual)
 
   for (const key in prevProps) {
     if (key !== 'data') {
       if (prevProps[key] !== nextProps[key]) {
-        // if (nextProps.data.group === 'Nursery') console.log(key)
         return false
       }
     }
@@ -145,7 +142,6 @@ export default memo(DataRow, (prevProps, nextProps) => {
 
   for (const key in nextProps) {
     if (key !== 'data' && !(key in prevProps)) {
-      // if (nextProps?.data?.group === 'Nursery') console.log(key)
       return false
     }
   }

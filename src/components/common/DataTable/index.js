@@ -27,7 +27,6 @@ function DataTable({
   onEnterPress,
   className,
 }) {
-  // console.log('Table Rerendered')
   const inputsRef = useRef({})
 
   const canUpdateOrder = useMemo(() => Boolean(setDataOrder), [setDataOrder])

@@ -70,6 +70,7 @@ export default function Page() {
             className='rounded-3xl'
             variant='outlined'
             LinkComponent={Link}
+            replace
             href={getCreateCompanyModalURL(true)}>
             Create New Company
           </Button>
