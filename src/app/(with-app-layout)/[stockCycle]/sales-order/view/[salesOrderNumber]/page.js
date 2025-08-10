@@ -4,7 +4,7 @@ import { Box, Button, CircularProgress, Paper } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { getSalesOrderAction } from '@/actions/salesOrderActions'
 import ErrorAlert from '@/components/common/ErrorAlert'
@@ -34,46 +34,60 @@ export default function Page() {
     enabled: Boolean(stockCycleId && salesOrderNumber),
   })
 
-  const handleSharePDF = useCallback(async () => {
-    const response = await fetch(
-      routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)
-    )
+  const [url, setUrl] = useState('')
 
-    if (!response.ok) {
-      console.error('Failed to fetch PDF:', response.statusText)
-      return
-    }
-
-    const contentType = response.headers.get('content-type') || ''
-    if (!contentType.includes('pdf')) {
-      console.error('Response is not a PDF:', contentType)
-      return
-    }
-    console.log('The file is good')
-    const pdfBuffer = await response.arrayBuffer()
-
-    // const url = URL.createObjectURL(pdfBlob)
-    // const a = document.createElement('a')
-    // a.href = url
-    // a.download = `Sales Order ${salesOrderNumber}.pdf`
-    // document.body.appendChild(a)
-    // a.click()
-    // a.remove()
-    // URL.revokeObjectURL(url)
-    const file = new File([pdfBuffer], `Sales_Order_${salesOrderNumber}.pdf`, {
-      type: 'application/pdf',
-    })
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({
-        files: [file],
-        title: `Sales Order ${salesOrderNumber}.pdf`,
-        text: `Sales Order ${salesOrderNumber}.pdf`,
-      })
-    } else {
-      console.error('File sharing is not supported!')
-    }
+  useEffect(() => {
+    setUrl(routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber))
   }, [salesOrderNumber, stockCycleId])
+
+  const handleSharePDF = useCallback(
+    async (buffer) => {
+      const response = await fetch(url)
+
+      if (!response.ok) {
+        console.error('Failed to fetch PDF:', response.statusText)
+        return
+      }
+
+      const contentType = response.headers.get('content-type') || ''
+      if (!contentType.includes('pdf')) {
+        console.error('Response is not a PDF:', contentType)
+        return
+      }
+      console.log('The file is good')
+      const pdfBuffer = buffer
+        ? await response.arrayBuffer()
+        : await response.blob()
+
+      // const url = URL.createObjectURL(pdfBlob)
+      // const a = document.createElement('a')
+      // a.href = url
+      // a.download = `Sales Order ${salesOrderNumber}.pdf`
+      // document.body.appendChild(a)
+      // a.click()
+      // a.remove()
+      // URL.revokeObjectURL(url)
+      const file = new File(
+        [pdfBuffer],
+        `Sales_Order_${salesOrderNumber}.pdf`,
+        {
+          type: 'application/pdf',
+        }
+      )
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: `Sales Order ${salesOrderNumber}.pdf`,
+          text: `Sales Order ${salesOrderNumber}.pdf`,
+        })
+      } else {
+        console.error('File sharing is not supported!')
+      }
+    },
+    [salesOrderNumber, url]
+  )
+
   return (
     <>
       <Paper className='overflow-auto h-full flex flex-col p-4 print:hidden'>
@@ -93,9 +107,20 @@ export default function Page() {
               <Button
                 className='rounded-3xl mb-4'
                 variant='outlined'
-                onClick={handleSharePDF}>
-                Share PDF
+                onClick={() => handleSharePDF(false)}>
+                Share PDF with blob
               </Button>
+              <Button
+                className='rounded-3xl mb-4'
+                variant='outlined'
+                onClick={() => handleSharePDF(true)}>
+                Share PDF with buffer
+              </Button>
+              <input
+                type='text'
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
             </Box>
             <SalesOrderTemplate
               salesOrder={salesOrderResponse}

@@ -8,7 +8,10 @@ import {
   STOCK_CYCLE_CUSTOMER_FIELDS,
 } from '../../appConfig'
 import { modelConstants } from './constants'
-import { additionalCustomerFields } from './StockCycleCustomer'
+import Firm from './Firm'
+import StockCycleCustomer, {
+  additionalCustomerFields,
+} from './StockCycleCustomer'
 
 const customerSchema = mongoose.Schema(
   {
@@ -59,14 +62,14 @@ const customerSchema = mongoose.Schema(
 )
 
 customerSchema.virtual('firm', {
-  ref: modelConstants?.firm?.modelName,
+  ref: Firm,
   localField: 'firmId',
   foreignField: '_id',
   justOne: true,
 })
 
 customerSchema.virtual('stockCycleCustomer', {
-  ref: modelConstants?.stock_cycle_customer?.modelName,
+  ref: StockCycleCustomer,
   localField: '_id',
   foreignField: 'customerId',
   justOne: true,

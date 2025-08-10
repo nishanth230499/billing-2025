@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 
 import { AUTO_GENERATE_COMPANY_ID, COMPANY_ID_REGEX } from '../../appConfig'
 import { modelConstants } from './constants'
+import Firm from './Firm'
 import Item from './Item'
 
 const companySchema = mongoose.Schema(
@@ -67,7 +68,7 @@ const companySchema = mongoose.Schema(
 )
 
 companySchema.virtual('firm', {
-  ref: modelConstants?.firm?.modelName,
+  ref: Firm,
   localField: 'firmId',
   foreignField: '_id',
   justOne: true,

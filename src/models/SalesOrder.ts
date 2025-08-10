@@ -12,6 +12,9 @@ import {
   ITEM_CODE_REGEX,
 } from '../../appConfig'
 import { modelConstants } from './constants'
+import Customer from './Customer'
+import CustomerShippingAddress from './CustomerShippingAddress'
+import Item from './Item'
 
 const salesOrderItemSchema = new mongoose.Schema(
   {
@@ -135,21 +138,21 @@ const salesOrderSchema = new mongoose.Schema(
 )
 
 salesOrderSchema.virtual('customer', {
-  ref: modelConstants?.customer?.modelName,
+  ref: Customer,
   localField: 'customerId',
   foreignField: '_id',
   justOne: true,
 })
 
 salesOrderSchema.virtual('customerShippingAddress', {
-  ref: modelConstants?.customer_shipping_address?.modelName,
+  ref: CustomerShippingAddress,
   localField: 'customerShippingAddressId',
   foreignField: '_id',
   justOne: true,
 })
 
 salesOrderItemSchema.virtual('item', {
-  ref: modelConstants?.item?.modelName,
+  ref: Item,
   localField: 'itemId',
   foreignField: '_id',
   justOne: true,
