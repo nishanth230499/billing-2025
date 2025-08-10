@@ -1,9 +1,17 @@
+import chromium from '@sparticuz/chromium'
+import puppeteer from 'puppeteer'
+
 import templateStyles from '@/templates/templateStyles'
 
-const { default: puppeteer } = require('puppeteer')
-
 export async function convertHtmlToPdfBinary(htmlContent, { title = '' }) {
-  const browser = await puppeteer.launch()
+  const executablePath = await chromium.executablePath()
+
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath,
+    headless: chromium.headless,
+  })
   const page = await browser.newPage()
   await page.setContent(`<html>
   <head>
