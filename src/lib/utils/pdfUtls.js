@@ -1,12 +1,8 @@
+import templateStyles from '@/templates/templateStyles'
+
 const { default: puppeteer } = require('puppeteer')
-const fsPromises = require('fs/promises')
 
 export async function convertHtmlToPdfBinary(htmlContent, { title = '' }) {
-  const cssContent = await fsPromises.readFile(
-    './src/templates/template_styles.css',
-    'utf8'
-  )
-
   const browser = await puppeteer.launch()
   const page = await browser.newPage()
   await page.setContent(`<html>
@@ -15,7 +11,7 @@ export async function convertHtmlToPdfBinary(htmlContent, { title = '' }) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <title>${title}</title>
-    <style>${cssContent}</style>
+    <style>${templateStyles}</style>
   </head>
   <body>
     ${htmlContent}

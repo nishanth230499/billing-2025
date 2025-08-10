@@ -1,4 +1,4 @@
-@page {
+const templateStyles = `@page {
   margin: 1rem 1.5rem;
 }
 
@@ -15,10 +15,10 @@ body {
   display: none;
 }
 @media print {
-  .print\:hidden {
+  .print\\:hidden {
     display: none;
   }
-  .print\:block {
+  .print\\:block {
     display: block;
   }
 }
@@ -103,4 +103,6 @@ table {
 /* Text Decoration */
 .underline {
   text-decoration-line: underline;
-}
+}`
+
+export default templateStyles

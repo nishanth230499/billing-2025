@@ -100,7 +100,7 @@ export default function Page() {
                 className='rounded-3xl mb-4'
                 variant='outlined'
                 onClick={handleSharePDF}>
-                Share PDF with blob
+                Share PDF
               </Button>
               <input
                 type='text'
@@ -108,6 +108,7 @@ export default function Page() {
                 onChange={(e) => setUrl(e.target.value)}
               />
             </Box>
+            <Box></Box>
             <SalesOrderTemplate
               salesOrder={salesOrderResponse}
               stockCycleId={stockCycleId}
