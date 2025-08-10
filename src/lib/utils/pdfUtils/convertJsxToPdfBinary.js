@@ -4,9 +4,10 @@ import chromium from '@sparticuz/chromium'
 import puppeteer from 'puppeteer'
 
 import templateStyles from '@/templates/templateStyles'
+const { renderToString } = await import('react-dom/server')
 
-export default async function convertHtmlToPdfBinary(
-  htmlContent,
+export default async function convertJsxToPdfBinary(
+  jsxContent,
   { title = '' }
 ) {
   const executablePath = await chromium.executablePath()
@@ -27,7 +28,7 @@ export default async function convertHtmlToPdfBinary(
       <style>${templateStyles}</style>
     </head>
     <body>
-      ${htmlContent}
+      ${renderToString(jsxContent)}
     </body>
   </html>`)
   const pdfBuffer = await page.pdf({

@@ -3,10 +3,8 @@
 import { NextResponse } from 'next/server'
 
 import { getSalesOrderAction } from '@/actions/salesOrderActions'
-import convertHtmlToPdfBinary from '@/lib/utils/pdfUtils/convertHtmlToPdfBinary'
+import convertJsxToPdfBinary from '@/lib/utils/pdfUtils/convertJsxToPdfBinary'
 import SalesOrderTemplate from '@/templates/SalesOrderTemplate'
-
-const { renderToString } = await import('react-dom/server')
 
 export async function GET(_, { params }) {
   const { stockCycle: stockCycleId, salesOrderNumber } = await params
@@ -19,10 +17,8 @@ export async function GET(_, { params }) {
 
   if (!success) return new NextResponse(error)
 
-  const pdfBuffer = await convertHtmlToPdfBinary(
-    renderToString(
-      <SalesOrderTemplate salesOrder={salesOrder} stockCycleId={stockCycleId} />
-    ),
+  const pdfBuffer = await convertJsxToPdfBinary(
+    <SalesOrderTemplate salesOrder={salesOrder} stockCycleId={stockCycleId} />,
     { title: `Sales Order ${salesOrderNumber}` }
   )
 

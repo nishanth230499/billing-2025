@@ -4,14 +4,13 @@ import { Box, Button, CircularProgress, Paper } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { enqueueSnackbar } from 'notistack'
 import { useCallback } from 'react'
 
 import { getSalesOrderAction } from '@/actions/salesOrderActions'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import routes from '@/constants/routeConstants'
 import handleServerAction from '@/lib/handleServerAction'
-import convertPdfUrlToPdfFile from '@/lib/utils/pdfUtils/convertPdfUrlToPdfFile'
+import convertPdfUrlToPdfFileAndShare from '@/lib/utils/pdfUtils/convertPdfUrlToPdfFileAndShare'
 import SalesOrderTemplate from '@/templates/SalesOrderTemplate'
 
 export default function Page() {
@@ -37,24 +36,10 @@ export default function Page() {
   })
 
   const handleSharePDF = useCallback(async () => {
-    try {
-      const pdfFile = await convertPdfUrlToPdfFile(
-        routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber),
-        { title: `Sales Order ${salesOrderNumber}` }
-      )
-      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-        navigator.share({
-          files: [pdfFile],
-          // title: `Sales Order ${salesOrderNumber}.pdf`,
-          // text: `Sales Order ${salesOrderNumber}.pdf`,
-        })
-      } else {
-        enqueueSnackbar('File sharing is not supported!', { variant: 'error' })
-        console.error('File sharing is not supported!')
-      }
-    } catch (error) {
-      enqueueSnackbar(error.message, { variant: 'error' })
-    }
+    convertPdfUrlToPdfFileAndShare(
+      routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber),
+      { title: `Sales Order ${salesOrderNumber}` }
+    )
   }, [salesOrderNumber, stockCycleId])
 
   return (
@@ -64,7 +49,7 @@ export default function Page() {
           <CircularProgress size={24} color='action' />
         ) : (
           <ErrorAlert isError={isSalesOrderError} error={salesOrderError}>
-            <Box>
+            <Box className='flex gap-2'>
               <Button
                 className='rounded-3xl mb-4'
                 variant='outlined'
