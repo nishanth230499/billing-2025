@@ -11,7 +11,7 @@ import { getSalesOrderAction } from '@/actions/salesOrderActions'
 import ErrorAlert from '@/components/common/ErrorAlert'
 import routes from '@/constants/routeConstants'
 import handleServerAction from '@/lib/handleServerAction'
-import { convertPdfUrlToPdfFile } from '@/lib/utils/pdfUtls'
+import convertPdfUrlToPdfFile from '@/lib/utils/pdfUtils/convertPdfUrlToPdfFile'
 import SalesOrderTemplate from '@/templates/SalesOrderTemplate'
 
 export default function Page() {

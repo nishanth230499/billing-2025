@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server'
 
 import { getSalesOrderAction } from '@/actions/salesOrderActions'
-import { convertHtmlToPdfBinary } from '@/lib/utils/pdfUtls'
+import convertHtmlToPdfBinary from '@/lib/utils/pdfUtils/convertHtmlToPdfBinary'
 import SalesOrderTemplate from '@/templates/SalesOrderTemplate'
 
 const { renderToString } = await import('react-dom/server')
