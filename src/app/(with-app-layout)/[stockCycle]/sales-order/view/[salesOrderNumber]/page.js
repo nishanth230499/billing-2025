@@ -36,11 +36,32 @@ export default function Page() {
 
   const handleSharePDF = useCallback(async () => {
     const response = await fetch(
-      routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)
+      routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber),
+      { cache: 'no-store' }
     )
+
+    if (!response.ok) {
+      console.error('Failed to fetch PDF:', response.statusText)
+      return
+    }
+
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.includes('pdf')) {
+      console.error('Response is not a PDF:', contentType)
+      return
+    }
+    console.log('The file is good')
     const pdfBlob = await response.blob()
 
-    const file = new File([pdfBlob], `Sales Order ${salesOrderNumber}.pdf`, {
+    // const url = URL.createObjectURL(pdfBlob)
+    // const a = document.createElement('a')
+    // a.href = url
+    // a.download = `Sales Order ${salesOrderNumber}.pdf`
+    // document.body.appendChild(a)
+    // a.click()
+    // a.remove()
+    // URL.revokeObjectURL(url)
+    const file = new File([pdfBlob], `Sales_Order_${salesOrderNumber}.pdf`, {
       type: 'application/pdf',
     })
 
