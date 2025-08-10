@@ -35,25 +35,25 @@ export default function Page() {
   })
 
   const handleSharePDF = useCallback(async () => {
-    // const response = await fetch(
-    //   routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)
-    // )
-    // const pdfBlob = await response.blob()
+    const response = await fetch(
+      routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)
+    )
+    const pdfBlob = await response.blob()
 
-    // const file = new File([pdfBlob], `Sales Order ${salesOrderNumber}.pdf`, {
-    //   type: 'application/pdf',
-    // })
-
-    // if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    navigator.share({
-      // files: [file],
-      title: `Sales Order ${salesOrderNumber}.pdf`,
-      text: `Sales Order ${salesOrderNumber}.pdf`,
+    const file = new File([pdfBlob], `Sales Order ${salesOrderNumber}.pdf`, {
+      type: 'application/pdf',
     })
-    // } else {
-    //   console.error('File sharing is not supported!')
-    // }
-  }, [salesOrderNumber])
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        files: [file],
+        title: `Sales Order ${salesOrderNumber}.pdf`,
+        text: `Sales Order ${salesOrderNumber}.pdf`,
+      })
+    } else {
+      console.error('File sharing is not supported!')
+    }
+  }, [salesOrderNumber, stockCycleId])
   return (
     <>
       <Paper className='overflow-auto h-full flex flex-col p-4 print:hidden'>
