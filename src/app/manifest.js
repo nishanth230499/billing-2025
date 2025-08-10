@@ -2,7 +2,7 @@ export default function manifest() {
   return {
     name: 'Billing Application',
     short_name: 'BillingApp',
-    description: 'A billing and inventory management application',
+    description: 'A Billing and Inventory Management Application',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',

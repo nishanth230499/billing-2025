@@ -19,17 +19,17 @@ export async function GET(_, { params }) {
 
   if (!success) return new NextResponse(error)
 
-  const pdfBinary = await convertHtmlToPdfBinary(
+  const pdfBuffer = await convertHtmlToPdfBinary(
     renderToString(
       <SalesOrderTemplate salesOrder={salesOrder} stockCycleId={stockCycleId} />
     ),
-    { title: `Sales Order ${stockCycleId}_${salesOrderNumber}` }
+    { title: `Sales Order ${salesOrderNumber}` }
   )
 
-  return new NextResponse(pdfBinary, {
+  return new NextResponse(pdfBuffer, {
     headers: {
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `inline; filename='Sales Order ${stockCycleId}_${salesOrderNumber}.pdf'`,
+      'Content-Disposition': `inline; filename='Sales Order ${salesOrderNumber}.pdf'`,
     },
   })
 }

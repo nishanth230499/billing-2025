@@ -4,6 +4,7 @@ import { Box, Button, CircularProgress, Paper } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useCallback } from 'react'
 
 import { getSalesOrderAction } from '@/actions/salesOrderActions'
 import ErrorAlert from '@/components/common/ErrorAlert'
@@ -32,6 +33,27 @@ export default function Page() {
     queryKey: ['getSalesOrderAction', stockCycleId, salesOrderNumber],
     enabled: Boolean(stockCycleId && salesOrderNumber),
   })
+
+  const handleSharePDF = useCallback(async () => {
+    // const response = await fetch(
+    //   routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)
+    // )
+    // const pdfBlob = await response.blob()
+
+    // const file = new File([pdfBlob], `Sales Order ${salesOrderNumber}.pdf`, {
+    //   type: 'application/pdf',
+    // })
+
+    // if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({
+      // files: [file],
+      title: `Sales Order ${salesOrderNumber}.pdf`,
+      text: `Sales Order ${salesOrderNumber}.pdf`,
+    })
+    // } else {
+    //   console.error('File sharing is not supported!')
+    // }
+  }, [salesOrderNumber])
   return (
     <>
       <Paper className='overflow-auto h-full flex flex-col p-4 print:hidden'>
@@ -47,6 +69,12 @@ export default function Page() {
                 href={routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)}
                 target='_blank'>
                 View PDF
+              </Button>
+              <Button
+                className='rounded-3xl mb-4'
+                variant='outlined'
+                onClick={handleSharePDF}>
+                Share PDF
               </Button>
             </Box>
             <SalesOrderTemplate
