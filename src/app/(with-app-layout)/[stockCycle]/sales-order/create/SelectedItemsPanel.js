@@ -20,13 +20,19 @@ import {
 } from 'react'
 
 import { getCustomerAction } from '@/actions/customerActions'
-import { createSalesOrderAction } from '@/actions/salesOrderActions'
+import {
+  createSalesOrderAction,
+  editSalesOrderAction,
+  getSalesOrderAction,
+} from '@/actions/salesOrderActions'
 import { AppContext } from '@/app/ClientProviders'
 import DataTable from '@/components/common/DataTable'
 import ErrorAlert from '@/components/common/ErrorAlert'
+import Loader from '@/components/common/Loader'
 import CustomerSelector from '@/components/common/selectors/CustomerSelector'
 import CustomerShippingAddressSelector from '@/components/common/selectors/CustomerShippingAddressSelector'
 import DateSelector from '@/components/common/selectors/DateSelector'
+import TableSkeleton from '@/components/TableSkeleton'
 import routes from '@/constants/routeConstants'
 import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
@@ -43,6 +49,7 @@ export default function SelectedItemsPanel({
   setSelectedItems,
   selectedItemsOrder,
   setSelectedItemsOrder,
+  editingSalesOrderNumber,
 }) {
   const params = useParams()
   const router = useRouter()
@@ -142,9 +149,52 @@ export default function SelectedItemsPanel({
     enabled: Boolean(customerId) && Boolean(stockCycleId),
   })
 
+  const {
+    data: salesOrderResponse,
+    isLoading: isSalesOrderLoading,
+    isError: isSalesOrderError,
+    error: salesOrderError,
+  } = useQuery({
+    queryFn: async () =>
+      await handleServerAction(
+        getSalesOrderAction,
+        stockCycleId,
+        editingSalesOrderNumber
+      ),
+    queryKey: ['getSalesOrderAction', stockCycleId, editingSalesOrderNumber],
+    enabled: Boolean(stockCycleId) && Boolean(editingSalesOrderNumber),
+  })
+
+  useEffect(() => {
+    if (salesOrderResponse) {
+      replaceURL({ customerId: salesOrderResponse?.customerId || undefined })
+      setOrderRef(salesOrderResponse?.orderRef)
+      setIsSetPack(salesOrderResponse?.isSetPack)
+      setCustomerShippingAddressId(
+        salesOrderResponse?.customerShippingAddressId
+      )
+      setSupplyDate(salesOrderResponse?.supplyDate)
+      const selectedItems = Object.fromEntries(
+        salesOrderResponse?.items?.map((item) => [
+          // TODO: Does not work in mobile
+          crypto.randomUUID(),
+          { ...item, ...item?.item },
+        ])
+      )
+      setSelectedItems(selectedItems)
+      setSelectedItemsOrder(Object.keys(selectedItems))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [salesOrderResponse])
+
   const { mutate: createSalesOrder, isPending: isCreateSalesOrderLoading } =
     useMutation({
       mutationFn: (data) => handleServerAction(createSalesOrderAction, ...data),
+    })
+
+  const { mutate: editSalesOrder, isPending: isEditSalesOrderLoading } =
+    useMutation({
+      mutationFn: (data) => handleServerAction(editSalesOrderAction, ...data),
     })
 
   const handleSubmit = useCallback(() => {
@@ -180,40 +230,75 @@ export default function SelectedItemsPanel({
       })
       return
     }
-    createSalesOrder(
-      [
-        stockCycleId,
+    if (editingSalesOrderNumber) {
+      editSalesOrder(
+        [
+          stockCycleId,
+          editingSalesOrderNumber,
+          {
+            customerId,
+            customerShippingAddressId: customerShippingAddressId || null,
+            supplyDate,
+            orderRef,
+            isSetPack,
+            items: selectedItemsOrder?.map((itemKey) => {
+              const item = selectedItems?.[itemKey]
+              return {
+                itemId: item?._id,
+                group: item?.group,
+                quantity: item?.quantity,
+                unitQuantity: item?.unitQuantity,
+              }
+            }),
+          },
+        ],
         {
-          customerId,
-          customerShippingAddressId: customerShippingAddressId || undefined,
-          date: getCurrentDateString(),
-          supplyDate,
-          orderRef,
-          isSetPack,
-          items: selectedItemsOrder?.map((itemKey) => {
-            const item = selectedItems?.[itemKey]
-            return {
-              itemId: item?._id,
-              group: item?.group,
-              quantity: item?.quantity,
-              unitQuantity: item?.unitQuantity,
-            }
-          }),
-        },
-      ],
-      {
-        onSuccess: async (data) => {
-          enqueueSnackbar(data?.message, { variant: 'success' })
-          router.push(routes.salesOrder.view(stockCycleId, data?.orderNumber))
-        },
-        onError: (error) =>
-          enqueueSnackbar(error.message, { variant: 'error' }),
-      }
-    )
+          onSuccess: async (data) => {
+            enqueueSnackbar(data?.message, { variant: 'success' })
+            router.push(routes.salesOrder.view(stockCycleId, data?.orderNumber))
+          },
+          onError: (error) =>
+            enqueueSnackbar(error.message, { variant: 'error' }),
+        }
+      )
+    } else {
+      createSalesOrder(
+        [
+          stockCycleId,
+          {
+            customerId,
+            customerShippingAddressId: customerShippingAddressId || null,
+            date: getCurrentDateString(),
+            supplyDate,
+            orderRef,
+            isSetPack,
+            items: selectedItemsOrder?.map((itemKey) => {
+              const item = selectedItems?.[itemKey]
+              return {
+                itemId: item?._id,
+                group: item?.group,
+                quantity: item?.quantity,
+                unitQuantity: item?.unitQuantity,
+              }
+            }),
+          },
+        ],
+        {
+          onSuccess: async (data) => {
+            enqueueSnackbar(data?.message, { variant: 'success' })
+            router.push(routes.salesOrder.view(stockCycleId, data?.orderNumber))
+          },
+          onError: (error) =>
+            enqueueSnackbar(error.message, { variant: 'error' }),
+        }
+      )
+    }
   }, [
     createSalesOrder,
     customerId,
     customerShippingAddressId,
+    editSalesOrder,
+    editingSalesOrderNumber,
     isSetPack,
     orderRef,
     router,
@@ -226,103 +311,110 @@ export default function SelectedItemsPanel({
   return (
     <Fragment key='123'>
       <Typography variant='h6'>Create New Order</Typography>
-      <Grid
-        container
-        columnSpacing={2}
-        columns={{ xs: 1, sm: 3 }}
-        className='mb-2'
-        alignItems='center'>
-        <Grid size={1}>
-          <ErrorAlert isError={isCustomerError} error={customerError}>
-            <CustomerSelector
-              selectedCustomerId={customerId}
-              setSelectedCustomerId={(id) => {
-                setIsCustomerIdTouched(true)
-                replaceURL({ customerId: id || undefined })
-              }}
-              filter={
-                IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
-                  ? { stockCycle: { id: stockCycleId } }
-                  : {}
-              }
-              error={isCustomerIdTouched && !customerId}
-              required
-              isLoading={isCustomerLoading}
-              customerResponse={customerResponse}
-            />
-          </ErrorAlert>
-        </Grid>
-        <Grid size={1}>
-          <TextField
-            margin='normal'
-            fullWidth
-            label='Order Ref.'
-            value={orderRef}
-            onChange={(e) => setOrderRef(e.target.value)}
-          />
-        </Grid>
-        <Grid size={1}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isSetPack}
-                onChange={(e) => setIsSetPack(e.target.checked)}
+      <ErrorAlert isError={isSalesOrderError} error={salesOrderError}>
+        <Loader loading={isSalesOrderLoading} />
+        <Grid
+          container
+          columnSpacing={2}
+          columns={{ xs: 1, sm: 3 }}
+          className='mb-2'
+          alignItems='center'>
+          <Grid size={1}>
+            <ErrorAlert isError={isCustomerError} error={customerError}>
+              <CustomerSelector
+                selectedCustomerId={customerId}
+                setSelectedCustomerId={(id) => {
+                  setIsCustomerIdTouched(true)
+                  replaceURL({ customerId: id || undefined })
+                }}
+                filter={
+                  IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
+                    ? { stockCycle: { id: stockCycleId } }
+                    : {}
+                }
+                error={isCustomerIdTouched && !customerId}
+                required
+                isLoading={isCustomerLoading}
+                customerResponse={customerResponse}
               />
-            }
-            label='Set Pack'
-            labelPlacement='start'
-          />
+            </ErrorAlert>
+          </Grid>
+          <Grid size={1}>
+            <TextField
+              margin='normal'
+              fullWidth
+              label='Order Ref.'
+              value={orderRef}
+              onChange={(e) => setOrderRef(e.target.value)}
+            />
+          </Grid>
+          <Grid size={1}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isSetPack}
+                  onChange={(e) => setIsSetPack(e.target.checked)}
+                />
+              }
+              label='Set Pack'
+              labelPlacement='start'
+            />
+          </Grid>
+          <Grid size={1}>
+            <CustomerShippingAddressSelector
+              selectedCustomerShippingAddressId={customerShippingAddressId}
+              setSelectedCustomerShippingAddressId={
+                setCustomerShippingAddressId
+              }
+              customerId={customerId}
+            />
+          </Grid>
+          <Grid size={1}>
+            <DateSelector
+              required
+              label='Supply Date'
+              selectedDate={supplyDate}
+              setSelectedDate={(date) => {
+                setSupplyDate(date)
+                setIsSupplyDateTouched(true)
+              }}
+              error={isSupplyDateTouched && !dateStringValidator(supplyDate)}
+            />
+          </Grid>
+          <Grid size={1}>
+            <Button
+              className='rounded-3xl'
+              variant='outlined'
+              fullWidth
+              disabled={!customerId || editingSalesOrderNumber}>
+              Add Previous Stock Cycle Order
+            </Button>
+          </Grid>
         </Grid>
-        <Grid size={1}>
-          <CustomerShippingAddressSelector
-            selectedCustomerShippingAddressId={customerShippingAddressId}
-            setSelectedCustomerShippingAddressId={setCustomerShippingAddressId}
-            customerId={customerId}
-          />
-        </Grid>
-        <Grid size={1}>
-          <DateSelector
-            required
-            label='Supply Date'
-            selectedDate={supplyDate}
-            setSelectedDate={(date) => {
-              setSupplyDate(date)
-              setIsSupplyDateTouched(true)
-            }}
-            error={isSupplyDateTouched && !dateStringValidator(supplyDate)}
-          />
-        </Grid>
-        <Grid size={1}>
+        {isSalesOrderLoading && <TableSkeleton />}
+        <DataTable
+          hidden={isSalesOrderLoading}
+          columns={selectedItemTableColumns}
+          data={selectedItems}
+          dataOrder={selectedItemsOrder}
+          setData={setSelectedItems}
+          setDataOrder={setSelectedItemsOrder}
+          className='grow'
+        />
+        <Box className='flex items-center justify-between mt-4'>
+          <Button className='rounded-3xl' variant='outlined'>
+            Auto Apply Quantity
+          </Button>
           <Button
             className='rounded-3xl'
-            variant='outlined'
-            fullWidth
-            disabled={!customerId}>
-            Add Previous Stock Cycle Order
+            variant='contained'
+            disabled={isCreateSalesOrderLoading || isEditSalesOrderLoading}
+            loading={isCreateSalesOrderLoading || isEditSalesOrderLoading}
+            onClick={handleSubmit}>
+            Save
           </Button>
-        </Grid>
-      </Grid>
-      <DataTable
-        columns={selectedItemTableColumns}
-        data={selectedItems}
-        dataOrder={selectedItemsOrder}
-        setData={setSelectedItems}
-        setDataOrder={setSelectedItemsOrder}
-        className='grow'
-      />
-      <Box className='flex items-center justify-between mt-4'>
-        <Button className='rounded-3xl' variant='outlined'>
-          Auto Apply Quantity
-        </Button>
-        <Button
-          className='rounded-3xl'
-          variant='contained'
-          disabled={isCreateSalesOrderLoading}
-          loading={isCreateSalesOrderLoading}
-          onClick={handleSubmit}>
-          Save
-        </Button>
-      </Box>
+        </Box>
+      </ErrorAlert>
     </Fragment>
   )
 }

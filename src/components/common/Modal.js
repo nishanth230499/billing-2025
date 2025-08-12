@@ -2,8 +2,6 @@
 
 import CloseIcon from '@mui/icons-material/Close'
 import {
-  Backdrop,
-  CircularProgress,
   Dialog,
   DialogTitle,
   IconButton,
@@ -11,6 +9,8 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material'
+
+import Loader from './Loader'
 
 export default function Modal({
   title,
@@ -40,11 +40,7 @@ export default function Modal({
             },
           },
         }}>
-        <Backdrop
-          open={isLoading}
-          slotProps={{ root: { sx: { zIndex: 'loader' } } }}>
-          <CircularProgress color='inherit' />
-        </Backdrop>
+        <Loader loading={isLoading} />
         <DialogTitle>{title}</DialogTitle>
         {children}
       </SwipeableDrawer>
@@ -52,11 +48,7 @@ export default function Modal({
   }
   return (
     <Dialog fullWidth maxWidth={maxWidth} open={open} onClose={onClose}>
-      <Backdrop
-        open={isLoading}
-        slotProps={{ root: { sx: { zIndex: 'loader' } } }}>
-        <CircularProgress color='inherit' />
-      </Backdrop>
+      <Loader loading={isLoading} />
       <IconButton
         aria-label='close'
         onClick={onClose}

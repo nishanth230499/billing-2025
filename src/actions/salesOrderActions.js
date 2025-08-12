@@ -6,7 +6,7 @@ import { DEFAULT_PAGE_SIZE } from '@/constants/generalConstants'
 import connectDB from '@/lib/connectDB'
 import { getIncrementedNumber } from '@/lib/getIncrementedNumber'
 import { getPaginatedData } from '@/lib/pagination'
-import { trackCreation } from '@/lib/utils/auditLogUtils'
+import { trackCreation, trackUpdates } from '@/lib/utils/auditLogUtils'
 import { withAuth } from '@/lib/withAuth'
 import withTransaction from '@/lib/withTransaction'
 import { modelConstants } from '@/models/constants'
@@ -94,6 +94,7 @@ async function getSalesOrder(stockCycleId, number) {
       date: 1,
       orderRef: 1,
       supplyDate: 1,
+      isSetPack: 1,
       'items.itemId': 1,
       'items.group': 1,
       'items.quantity': 1,
@@ -171,60 +172,49 @@ async function createSalesOrder(stockCycleId, salesOrderReq) {
   }
 }
 
-// async function editCompany(companyId, companyReq) {
-//   await connectDB()
+async function editSalesOrder(stockCycleId, number, salesOrderReq) {
+  await connectDB()
 
-//   try {
-//     const companyUpdateFields = {
-//       name: companyReq?.name,
-//       shortName: companyReq?.shortName,
-//       address: companyReq?.address,
-//       gstin: companyReq?.gstin,
-//       phoneNumber: companyReq?.phoneNumber,
-//       emailId: companyReq?.emailId,
-//       shippingAddress: companyReq?.shippingAddress,
-//       shippingPhoneNumber: companyReq?.shippingPhoneNumber,
-//       tags: companyReq?.tags,
-//     }
+  try {
+    const salesOrderFields = {
+      customerId: salesOrderReq?.customerId,
+      customerShippingAddressId: salesOrderReq?.customerShippingAddressId,
+      supplyDate: salesOrderReq?.supplyDate,
+      orderRef: salesOrderReq?.orderRef,
+      isSetPack: salesOrderReq?.isSetPack,
+      items: salesOrderReq?.items,
+    }
 
-//     const { oldCompanyJSON, newCompanyJSON } = await withTransaction(
-//       async ({ session }) => {
-//         const company = await Company.findById(companyId)
-//           .session(session)
-//           .exec()
-//         const oldCompany = company.toObject()
-//         const oldCompanyJSON = company.toJSON()
+    const salesOrder = await SalesOrder.findOneAndUpdate(
+      { stockCycleId, number },
+      salesOrderFields,
+      { runValidators: true }
+    )
 
-//         Object.assign(company, companyUpdateFields)
-//         await company.normalizer(oldCompany, session)
-//         await company.save({ session })
+    trackUpdates({
+      model: SalesOrder,
+      documentId: salesOrder._id,
+      oldDocument: salesOrder.toJSON(),
+      newDocument: salesOrderFields,
+    })
 
-//         const newCompanyJSON = company.toJSON()
-
-//         return { oldCompanyJSON, newCompanyJSON }
-//       }
-//     )
-//     trackUpdates({
-//       model: Company,
-//       documentId: oldCompanyJSON._id,
-//       oldDocument: oldCompanyJSON,
-//       newDocument: newCompanyJSON,
-//     })
-
-//     return {
-//       success: true,
-//       data: 'Company saved successfully!',
-//     }
-//   } catch (e) {
-//     console.error(e)
-//     return {
-//       success: false,
-//       error: e.message,
-//     }
-//   }
-// }
+    return {
+      success: true,
+      data: {
+        message: 'Sales Order saved successfully!',
+        orderNumber: salesOrder?.number,
+      },
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      success: false,
+      error: e.message,
+    }
+  }
+}
 
 export const getSalesOrdersAction = withAuth(getSalesOrders)
 export const getSalesOrderAction = withAuth(getSalesOrder)
 export const createSalesOrderAction = withAuth(createSalesOrder)
-// export const editCompanyAction = withAuth(editCompany)
+export const editSalesOrderAction = withAuth(editSalesOrder)

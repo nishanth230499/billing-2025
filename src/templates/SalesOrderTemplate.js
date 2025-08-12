@@ -33,7 +33,7 @@ export default function SalesOrderTemplate({ salesOrder, stockCycleId }) {
       </thead>
       <thead>
         <tr>
-          <th colSpan={3} rowSpan={3} className='border py-1 px-2'>
+          <th colSpan={3} rowSpan={4} className='border py-1 px-2'>
             <div className='flex flex-col'>
               <div className='font-normal'>From,</div>
               <div className='text-2xl ml-4'>{salesOrder?.customer?.name}</div>
@@ -64,18 +64,18 @@ export default function SalesOrderTemplate({ salesOrder, stockCycleId }) {
           </th>
         </tr>
         <tr>
-          <th className='border py-1 px-2 font-normal'>Ref.</th>
+          <th className='border py-1 px-2 font-normal'>Order Ref.</th>
           <th colSpan={2} className='border py-1 px-2'>
             {salesOrder?.orderRef}
           </th>
         </tr>
-        {/* <tr>
+        <tr>
           <th className='border py-1 px-2 font-normal'>Set Pack</th>
           <th colSpan={2} className='border py-1 px-2'>
             {salesOrder?.isSetPack ? 'Yes' : 'No'}
           </th>
         </tr>
-        <tr>
+        {/* <tr>
           <th className='border py-1 px-2 font-normal'>Supply Date</th>
           <th colSpan={2} className='border py-1 px-2'>
             {salesOrder?.supplyDate}

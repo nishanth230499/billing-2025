@@ -10,6 +10,8 @@ const routes = {
       `/${stockCycleId}/sales-order/view/${salesOrderNumber}`,
     viewPDF: (stockCycleId: string, salesOrderNumber: string) =>
       `/${stockCycleId}/sales-order/view/${salesOrderNumber}/pdf`,
+    edit: (stockCycleId: string, salesOrderNumber: string) =>
+      `/${stockCycleId}/sales-order/edit/${salesOrderNumber}`,
   },
   company: {
     home: (stockCycleId: string) => `/${stockCycleId}/companies`,

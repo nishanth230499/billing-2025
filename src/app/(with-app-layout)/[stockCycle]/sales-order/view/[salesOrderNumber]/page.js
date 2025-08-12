@@ -34,17 +34,14 @@ export default function Page() {
     enabled: Boolean(stockCycleId && salesOrderNumber),
   })
 
-  const { share, isPending: isSharePending } = useFetchAndShare(
+  const {
+    share,
+    isPending: isSharePending,
+    canShare,
+  } = useFetchAndShare(
     routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber),
     { title: `Sales Order ${salesOrderNumber}` }
   )
-
-  // const handleSharePDF = useCallback(async () => {
-  //   convertPdfUrlToPdfFileAndShare(
-  //     routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber),
-  //     { title: `Sales Order ${salesOrderNumber}` }
-  //   )
-  // }, [salesOrderNumber, stockCycleId])
 
   return (
     <>
@@ -58,6 +55,13 @@ export default function Page() {
                 className='rounded-3xl mb-4'
                 variant='outlined'
                 LinkComponent={Link}
+                href={routes.salesOrder.edit(stockCycleId, salesOrderNumber)}>
+                Edit Sales Order
+              </Button>
+              <Button
+                className='rounded-3xl mb-4'
+                variant='outlined'
+                LinkComponent={Link}
                 href={routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)}
                 target='_blank'>
                 View PDF
@@ -65,6 +69,7 @@ export default function Page() {
               <Button
                 className='rounded-3xl mb-4'
                 variant='outlined'
+                disabled={!canShare}
                 onClick={share}
                 loading={isSharePending}>
                 Share PDF

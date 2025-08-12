@@ -66,6 +66,8 @@ const stockCycleCustomerSchema = mongoose.Schema(
   }
 )
 
+stockCycleCustomerSchema.index({ customerId: 1, stockCycleId: 1 })
+
 stockCycleCustomerSchema.searchIndex({
   name: 'id_name_place_searchIndex',
   definition: {
