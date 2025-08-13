@@ -50,16 +50,16 @@ export default function Page() {
           <CircularProgress size={24} color='action' />
         ) : (
           <ErrorAlert isError={isSalesOrderError} error={salesOrderError}>
-            <Box className='flex gap-2'>
+            <Box className='flex flex-col sm:flex-row gap-2 mb-4'>
               <Button
-                className='rounded-3xl mb-4'
+                className='rounded-3xl'
                 variant='outlined'
                 LinkComponent={Link}
                 href={routes.salesOrder.edit(stockCycleId, salesOrderNumber)}>
                 Edit Sales Order
               </Button>
               <Button
-                className='rounded-3xl mb-4'
+                className='rounded-3xl'
                 variant='outlined'
                 LinkComponent={Link}
                 href={routes.salesOrder.viewPDF(stockCycleId, salesOrderNumber)}
@@ -67,7 +67,7 @@ export default function Page() {
                 View PDF
               </Button>
               <Button
-                className='rounded-3xl mb-4'
+                className='rounded-3xl'
                 variant='outlined'
                 disabled={!canShare}
                 onClick={share}
@@ -75,7 +75,6 @@ export default function Page() {
                 Share PDF
               </Button>
             </Box>
-            <Box></Box>
             <SalesOrderTemplate
               salesOrder={salesOrderResponse}
               stockCycleId={stockCycleId}

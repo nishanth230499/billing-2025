@@ -37,7 +37,7 @@ export const appDrawerItems = [
       },
       {
         key: 'packing-note',
-        href: (stockCycle) => `/${stockCycle}/dummy`,
+        href: (stockCycle) => routes.packingNote(stockCycle),
         icon: ContentPasteIcon,
         name: 'Packing Note',
       },

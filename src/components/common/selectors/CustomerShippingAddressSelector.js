@@ -19,6 +19,7 @@ export default function CustomerShippingAddressSelector({
   customerId,
   required,
   error,
+  emptyLabel = 'Ship to Same Address',
 }) {
   const [inputValue, setInputValue] = useState('')
   const [searchText] = useDebounce(inputValue, 1000)
@@ -32,12 +33,12 @@ export default function CustomerShippingAddressSelector({
     queryFn: async () =>
       await handleServerAction(getCustomerShippingAddressesAction, {
         customerId,
-        searchText: searchText === 'Ship to Same Address' ? '' : searchText,
+        searchText: searchText === emptyLabel ? '' : searchText,
       }),
     queryKey: [
       'getCustomerShippingAddressesAction',
       customerId,
-      searchText === 'Ship to Same Address' ? '' : searchText,
+      searchText === emptyLabel ? '' : searchText,
     ],
     enabled: Boolean(customerId),
   })
@@ -77,9 +78,7 @@ export default function CustomerShippingAddressSelector({
           inputValue={inputValue}
           setInputValue={setInputValue}
           selectedKey={selectedCustomerShippingAddressId}
-          selectedLabel={
-            customerShippingAddressResponse?.name ?? 'Ship to Same Address'
-          }
+          selectedLabel={customerShippingAddressResponse?.name ?? emptyLabel}
           setSelectedKey={setSelectedCustomerShippingAddressId}
           options={
             customerShippingAddressesResponse?.paginatedResults?.map(

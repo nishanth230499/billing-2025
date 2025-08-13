@@ -180,7 +180,12 @@ async function getCustomer(customerId, stockCycleId = '') {
     place: 1,
     firmId: 1,
     openingBalance: 1,
-  }).populate('firm', 'color')
+    billingName: 1,
+    billingAddress: 1,
+    gstin: 1,
+    phoneNumber: 1,
+    emailId: 1,
+  }).populate('firm', 'name address phoneNumber emailId color gstin')
 
   if (IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE) {
     await customer.populate({

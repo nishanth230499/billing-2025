@@ -361,6 +361,7 @@ export default function SelectedItemsPanel({
             />
           </Grid>
           <Grid size={1}>
+            {/* TODO: Bug, doesnot populate when edit sales order is opened from view sales order */}
             <CustomerShippingAddressSelector
               selectedCustomerShippingAddressId={customerShippingAddressId}
               setSelectedCustomerShippingAddressId={

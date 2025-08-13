@@ -13,6 +13,7 @@ const routes = {
     edit: (stockCycleId: string, salesOrderNumber: string) =>
       `/${stockCycleId}/sales-order/edit/${salesOrderNumber}`,
   },
+  packingNote: (stockCycleId: string) => `/${stockCycleId}/packing-note`,
   company: {
     home: (stockCycleId: string) => `/${stockCycleId}/companies`,
   },
