@@ -13,6 +13,7 @@ import TableSkeleton from '@/components/TableSkeleton'
 import routes from '@/constants/routeConstants'
 import usePaginationControl from '@/hooks/usePaginationControl'
 import handleServerAction from '@/lib/handleServerAction'
+import { formatDateString } from '@/lib/utils/dateUtils'
 
 export default function Page() {
   const params = useParams()
@@ -47,7 +48,10 @@ export default function Page() {
         href: (salesOrder) =>
           routes.salesOrder.view(stockCycleId, salesOrder?.number),
       },
-      date: { label: 'Order Date' },
+      date: {
+        label: 'Order Date',
+        component: ({ data: order }) => formatDateString(order?.date),
+      },
       customer: {
         label: 'Customer',
         component: ({ data: order }) => order?.customer?.name ?? '',
@@ -67,7 +71,7 @@ export default function Page() {
       },
       supplyDate: {
         label: 'Supply Date',
-        component: ({ data: order }) => order?.supplyDate,
+        component: ({ data: order }) => formatDateString(order?.supplyDate),
       },
     }),
     [stockCycleId]

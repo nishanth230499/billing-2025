@@ -28,11 +28,9 @@ async function getPackingNote({ stockCycleId, customerId }) {
     { $unwind: '$items' },
     {
       $set: {
-        'items.for': ['shipping', 'invoice'],
-        'items.orderedQuantity': '$items.quantity',
+        orderedQuantity: '$items.quantity',
       },
     },
-    { $unwind: '$items.for' },
     // TODO: Populate packedListQuantity and invoicedQuantity
     {
       $group: {
@@ -42,66 +40,66 @@ async function getPackingNote({ stockCycleId, customerId }) {
           isSetPack: '$isSetPack',
           orderRef: '$orderRef',
           itemId: '$items.itemId',
-          for: '$items.for',
         },
-        orderedQuantity: { $sum: { $ifNull: ['$items.orderedQuantity', 0] } },
-        packedListQuantity: {
-          $sum: { $ifNull: ['$items.packedListQuantity', 0] },
+        orderedQuantity: {
+          $sum: { $ifNull: ['$orderedQuantity', 0] },
         },
-        invoicedQuantity: { $sum: { $ifNull: ['$items.invoicedQuantity', 0] } },
+        packedListQuantityForShipping: {
+          $sum: { $ifNull: ['$packedListQuantity.shipping', 0] },
+        },
+        packedListQuantityForInvoice: {
+          $sum: { $ifNull: ['$packedListQuantity.invoice', 0] },
+        },
+        invoicedQuantityForShipping: {
+          $sum: { $ifNull: ['$invoicedQuantity.shipping', 0] },
+        },
+        invoicedQuantityForInvoice: {
+          $sum: { $ifNull: ['$invoicedQuantity.invoice', 0] },
+        },
       },
     },
     {
       $set: {
         quantity: {
-          $subtract: [
-            '$orderedQuantity',
-            { $sum: ['$packedListQuantity', '$invoicedQuantity'] },
-          ],
-        },
-      },
-    },
-    {
-      $group: {
-        _id: {
-          customerId: '$_id.customerId',
-          customerShippingAddressId: '$_id.customerShippingAddressId',
-          isSetPack: '$_id.isSetPack',
-          orderRef: '$_id.orderRef',
-          itemId: '$_id.itemId',
-        },
-        quantity: {
-          $push: {
-            k: '$_id.for',
-            v: '$quantity',
+          $let: {
+            vars: {
+              shipping: {
+                $subtract: [
+                  '$orderedQuantity',
+                  {
+                    $sum: [
+                      '$packedListQuantityForShipping',
+                      '$invoicedQuantityForShipping',
+                    ],
+                  },
+                ],
+              },
+              invoice: {
+                $subtract: [
+                  '$orderedQuantity',
+                  {
+                    $sum: [
+                      '$packedListQuantityForInvoice',
+                      '$invoicedQuantityForInvoice',
+                    ],
+                  },
+                ],
+              },
+            },
+            in: {
+              shipping: {
+                $subtract: [
+                  '$$shipping',
+                  { $min: ['$$shipping', '$$invoice'] },
+                ],
+              },
+              invoice: {
+                $subtract: ['$$invoice', { $min: ['$$shipping', '$$invoice'] }],
+              },
+              all: { $max: [{ $min: ['$$shipping', '$$invoice'] }, 0] },
+            },
           },
         },
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        quantity: { $arrayToObject: '$quantity' },
-      },
-    },
-    {
-      $set: {
-        'quantity.all': { $min: ['$quantity.shipping', '$quantity.invoice'] },
-      },
-    },
-    {
-      $set: {
-        'quantity.shipping': {
-          $subtract: ['$quantity.shipping', '$quantity.all'],
-        },
-        'quantity.invoice': {
-          $subtract: ['$quantity.invoice', '$quantity.all'],
-        },
-      },
-    },
-    {
-      $set: {
-        'quantity.all': { $max: ['$quantity.all', 0] },
       },
     },
     {
@@ -118,6 +116,7 @@ async function getPackingNote({ stockCycleId, customerId }) {
         from: modelConstants.item.collectionName,
         localField: '_id.itemId',
         foreignField: '_id',
+        pipeline: [{ $project: { name: 1, price: 1, 'company.shortName': 1 } }],
         as: 'item',
       },
     },
@@ -168,12 +167,9 @@ async function getPackingNote({ stockCycleId, customerId }) {
         'customerShippingAddress.phoneNumber': 1,
         isSetPack: '$_id.isSetPack',
         orderRef: '$_id.orderRef',
-        // items: 1,
         'items.itemId': 1,
         'items.quantity': 1,
-        'items.item.name': 1,
-        'items.item.price': 1,
-        'items.item.company.shortName': 1,
+        'items.item': 1,
       },
     },
   ])

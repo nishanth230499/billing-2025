@@ -21,7 +21,7 @@ export default function AutoComplete({
   selectedKey: string
   selectedLabel: string
   // eslint-disable-next-line no-unused-vars
-  setSelectedKey: (key: string) => void
+  setSelectedKey: (key?: string) => void
   options: { key: string; label: string; highlightColor?: string }[]
   autoFilterOptions?: boolean
   error?: boolean
@@ -44,7 +44,7 @@ export default function AutoComplete({
       }}
       value={{ key: selectedKey, label: selectedLabel }}
       onChange={(_, option) => {
-        setSelectedKey(option?.key ?? '')
+        setSelectedKey(option?.key)
         setInputValue(option?.label ?? '')
       }}
       options={options}

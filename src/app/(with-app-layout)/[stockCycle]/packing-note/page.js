@@ -58,11 +58,20 @@ export default function Page() {
 
   useEffect(() => {
     if (customerId) {
-      setCustomerShippingAddressId('')
+      setCustomerShippingAddressId(undefined)
     } else {
-      setCustomerShippingAddressId('')
+      setCustomerShippingAddressId(undefined)
     }
   }, [customerId])
+
+  const filteredPackingNote = useMemo(() => {
+    return packingNoteResponse?.filter(
+      (packingNote) =>
+        typeof customerShippingAddressId === 'undefined' ||
+        (packingNote?.customerShippingAddressId ?? '') ===
+          customerShippingAddressId
+    )
+  }, [customerShippingAddressId, packingNoteResponse])
 
   return (
     <>
@@ -101,13 +110,12 @@ export default function Page() {
                     setCustomerShippingAddressId
                   }
                   customerId={customerId}
-                  emptyLabel='All'
                 />
               </Grid>
             </Grid>
             <PackingNoteTemplate
               customer={customerResponse}
-              packingNote={packingNoteResponse}
+              packingNote={filteredPackingNote}
               stockCycleId={stockCycleId}
             />
           </ErrorAlert>
@@ -117,7 +125,7 @@ export default function Page() {
         {!isPackingNoteLoading && !isPackingNoteError && (
           <PackingNoteTemplate
             customer={customerResponse}
-            packingNote={packingNoteResponse}
+            packingNote={filteredPackingNote}
             stockCycleId={stockCycleId}
           />
         )}

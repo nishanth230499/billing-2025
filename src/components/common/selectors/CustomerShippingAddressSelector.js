@@ -19,7 +19,7 @@ export default function CustomerShippingAddressSelector({
   customerId,
   required,
   error,
-  emptyLabel = 'Ship to Same Address',
+  originalAddressLabel = 'Original Address',
 }) {
   const [inputValue, setInputValue] = useState('')
   const [searchText] = useDebounce(inputValue, 1000)
@@ -33,12 +33,12 @@ export default function CustomerShippingAddressSelector({
     queryFn: async () =>
       await handleServerAction(getCustomerShippingAddressesAction, {
         customerId,
-        searchText: searchText === emptyLabel ? '' : searchText,
+        searchText: searchText === originalAddressLabel ? '' : searchText,
       }),
     queryKey: [
       'getCustomerShippingAddressesAction',
       customerId,
-      searchText === emptyLabel ? '' : searchText,
+      searchText === originalAddressLabel ? '' : searchText,
     ],
     enabled: Boolean(customerId),
   })
@@ -78,16 +78,23 @@ export default function CustomerShippingAddressSelector({
           inputValue={inputValue}
           setInputValue={setInputValue}
           selectedKey={selectedCustomerShippingAddressId}
-          selectedLabel={customerShippingAddressResponse?.name ?? emptyLabel}
+          selectedLabel={
+            selectedCustomerShippingAddressId
+              ? customerShippingAddressResponse?.name
+              : typeof selectedCustomerShippingAddressId === 'undefined'
+              ? ''
+              : originalAddressLabel
+          }
           setSelectedKey={setSelectedCustomerShippingAddressId}
-          options={
-            customerShippingAddressesResponse?.paginatedResults?.map(
+          options={[
+            { key: '', label: originalAddressLabel },
+            ...(customerShippingAddressesResponse?.paginatedResults?.map(
               (address) => ({
                 key: address?._id,
                 label: address?.name,
               })
-            ) || []
-          }
+            ) || []),
+          ]}
           placeholder='Search for Shipping Addresses'
           noOptionsText='No Shipping Addresses Found'
         />

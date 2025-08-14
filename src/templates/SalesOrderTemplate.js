@@ -1,4 +1,5 @@
 import routes from '@/constants/routeConstants'
+import { formatDateString } from '@/lib/utils/dateUtils'
 import { getFullItemName } from '@/lib/utils/itemUtils'
 import TemplateLink from '@/templates/TemplateLink'
 
@@ -60,7 +61,7 @@ export default function SalesOrderTemplate({ salesOrder, stockCycleId }) {
         <tr>
           <th className='border py-1 px-2 font-normal'>Order Date.</th>
           <th colSpan={2} className='border py-1 px-2'>
-            {salesOrder?.date}
+            {formatDateString(salesOrder?.date)}
           </th>
         </tr>
         <tr>

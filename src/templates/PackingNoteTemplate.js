@@ -1,10 +1,17 @@
 import { Chip } from '@mui/material'
 import { Fragment } from 'react'
 
+import routes from '@/constants/routeConstants'
 import { formatAmount } from '@/lib/utils/amoutUtils'
 import { getFullItemName } from '@/lib/utils/itemUtils'
 
-export default function PackingNoteTemplate({ customer, packingNote }) {
+import TemplateLink from './TemplateLink'
+
+export default function PackingNoteTemplate({
+  customer,
+  packingNote,
+  stockCycleId,
+}) {
   return (
     <table className='w-full text-left'>
       <thead>
@@ -36,7 +43,7 @@ export default function PackingNoteTemplate({ customer, packingNote }) {
         <tr>
           <th colSpan={3} rowSpan={5} className='border py-1 px-2'>
             <div className='flex flex-col'>
-              <div className='font-normal'>From,</div>
+              <div className='font-normal'>Customer:</div>
               <div className='text-2xl ml-4'>{customer?.name}</div>
               <div className='ml-4 font-normal'>{customer?.billingName}</div>
               <div className='ml-4 font-normal'>{customer?.billingAddress}</div>
@@ -112,7 +119,12 @@ export default function PackingNoteTemplate({ customer, packingNote }) {
                     quantity ? (
                       <tr key={quantityFor}>
                         <td className='border py-1 px-2'>{j + 1}</td>
-                        <td className='border py-1 px-2'>{itemId}</td>
+                        <td className='border py-1 px-2'>
+                          <TemplateLink
+                            href={routes.item.legend(stockCycleId, itemId)}>
+                            {itemId}
+                          </TemplateLink>
+                        </td>
                         <td className='border py-1 px-2'>
                           {getFullItemName(item)}
                           {quantityFor === 'shipping' && (

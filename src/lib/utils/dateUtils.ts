@@ -24,3 +24,7 @@ export function getCurrentDateString() {
 
   return `${year}-${month}-${day}`
 }
+
+export function formatDateString(dateString: string) {
+  return new Date(dateString + 'T00:00:00').toLocaleDateString()
+}
