@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   FormControlLabel,
@@ -18,6 +19,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+import { v4 as uuid } from 'uuid'
 
 import { getCustomerAction } from '@/actions/customerActions'
 import {
@@ -42,6 +44,7 @@ import {
   getCurrentDateString,
 } from '@/lib/utils/dateUtils'
 
+import DocumentParseModal from './DocumentParseModal'
 import SelectedItemTableActions from './SelectedItemTableActions'
 
 export default function SelectedItemsPanel({
@@ -50,6 +53,8 @@ export default function SelectedItemsPanel({
   selectedItemsOrder,
   setSelectedItemsOrder,
   editingSalesOrderNumber,
+  addBeforeKey,
+  setAddBeforeKey,
 }) {
   const params = useParams()
   const router = useRouter()
@@ -67,6 +72,9 @@ export default function SelectedItemsPanel({
   const [isSetPack, setIsSetPack] = useState(false)
   const [customerShippingAddressId, setCustomerShippingAddressId] = useState('')
   const [supplyDate, setSupplyDate] = useState('')
+
+  const [isDocumentParseModalOpen, setIsDocumentParseModalOpen] =
+    useState(false)
 
   const [isCustomerIdTouched, setIsCustomerIdTouched] = useState(false)
   const [isSupplyDateTouched, setIsSupplyDateTouched] = useState(false)
@@ -88,8 +96,11 @@ export default function SelectedItemsPanel({
       setSelectedItemsOrder((itemKeys) =>
         itemKeys.filter((itemKey) => itemKey !== itemKeyToBeDeleted)
       )
+      if (addBeforeKey === itemKeyToBeDeleted) {
+        setAddBeforeKey(null)
+      }
     },
-    [setSelectedItems, setSelectedItemsOrder]
+    [addBeforeKey, setAddBeforeKey, setSelectedItems, setSelectedItemsOrder]
   )
 
   const selectedItemTableColumns = useMemo(
@@ -129,12 +140,14 @@ export default function SelectedItemsPanel({
           <SelectedItemTableActions
             {...props}
             handleDeleteItem={handleDeleteItem}
+            addBeforeKey={addBeforeKey}
+            setAddBeforeKey={setAddBeforeKey}
           />
         ),
         slotProps: { tableBodyCell: { sx: { paddingY: 0 } } },
       },
     }),
-    [handleDeleteItem, isSetPack, stockCycleId]
+    [addBeforeKey, handleDeleteItem, isSetPack, setAddBeforeKey, stockCycleId]
   )
 
   const {
@@ -176,8 +189,7 @@ export default function SelectedItemsPanel({
       setSupplyDate(salesOrderResponse?.supplyDate)
       const selectedItems = Object.fromEntries(
         salesOrderResponse?.items?.map((item) => [
-          // TODO: Does not work in mobile
-          crypto.randomUUID(),
+          uuid(),
           { ...item, ...item?.item },
         ])
       )
@@ -391,7 +403,37 @@ export default function SelectedItemsPanel({
               Add Previous Stock Cycle Order
             </Button>
           </Grid>
+          <Grid size={1}>
+            <Button
+              className='rounded-3xl'
+              variant='outlined'
+              fullWidth
+              onClick={() => setIsDocumentParseModalOpen(true)}>
+              Auto Parse Documents
+            </Button>
+          </Grid>
         </Grid>
+        {addBeforeKey && (
+          <Alert
+            className='mb-2'
+            severity='info'
+            action={
+              <Button size='small' onClick={() => setAddBeforeKey(null)}>
+                Clear
+              </Button>
+            }>
+            Adding items before{' '}
+            <span className='font-bold'>
+              {selectedItems?.[addBeforeKey]?.name}
+            </span>
+          </Alert>
+        )}
+        <DocumentParseModal
+          open={isDocumentParseModalOpen}
+          onClose={() => setIsDocumentParseModalOpen(false)}
+          setSelectedItems={setSelectedItems}
+          setSelectedItemsOrder={setSelectedItemsOrder}
+        />
         {isSalesOrderLoading && <TableSkeleton />}
         <DataTable
           hidden={isSalesOrderLoading}

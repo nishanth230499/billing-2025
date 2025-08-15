@@ -4,12 +4,15 @@ import mongoose from 'mongoose'
 
 import { DEFAULT_PAGE_SIZE } from '@/constants/generalConstants'
 import connectDB from '@/lib/connectDB'
+import DocumentParser from '@/lib/DocumentParser'
 import { getIncrementedNumber } from '@/lib/getIncrementedNumber'
 import { getPaginatedData } from '@/lib/pagination'
 import { trackCreation, trackUpdates } from '@/lib/utils/auditLogUtils'
 import { withAuth } from '@/lib/withAuth'
 import withTransaction from '@/lib/withTransaction'
 import { modelConstants } from '@/models/constants'
+import Item from '@/models/Item'
+import ParsedSalesOrderSchema from '@/models/ParsedSalesOrderSchema'
 import SalesOrder from '@/models/SalesOrder'
 
 import { AUTO_GENERATE_CUSTOMER_ID } from '../../appConfig'
@@ -214,7 +217,79 @@ async function editSalesOrder(stockCycleId, number, salesOrderReq) {
   }
 }
 
+async function parseSalesOrder(documentsFormData) {
+  await connectDB()
+
+  try {
+    const documents = documentsFormData.getAll('document')
+    const documentParser = new DocumentParser()
+    await documentParser.addDocuments(documents)
+    const parsedSalesOrder = await documentParser.parse(ParsedSalesOrderSchema)
+
+    const items = await Promise.all(
+      parsedSalesOrder?.order_items?.map(
+        async (orderItem) =>
+          await Promise.all(
+            orderItem?.variants?.map(async ({ variant_name, qty }) => {
+              return (
+                await Item.aggregate([
+                  {
+                    $search: {
+                      index: 'id_name_tags_company_searchIndex',
+                      text: {
+                        query: `${orderItem?.category} ${orderItem?.name} ${variant_name}`,
+                        path: [
+                          'name',
+                          'tags',
+                          'company.name',
+                          'company.shortName',
+                          'company.tags',
+                        ],
+                        fuzzy: { maxEdits: 2 },
+                      },
+                    },
+                  },
+                  { $limit: 1 },
+                  {
+                    $addFields: {
+                      quantity: qty,
+                      unitQuantity: 1,
+                    },
+                  },
+                  {
+                    $project: {
+                      _id: { $toString: '$_id' },
+                      name: 1,
+                      group: 1,
+                      'company.shortName': 1,
+                      quantity: 1,
+                      unitQuantity: 1,
+                    },
+                  },
+                ])
+              )[0]
+            })
+          )
+      )
+    )
+    return {
+      success: true,
+      data: {
+        message: 'Parsed Successfully!',
+        parsedSalesOrder: { ...parsedSalesOrder, items: items.flat() },
+      },
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      success: false,
+      error: e.message,
+    }
+  }
+}
+
 export const getSalesOrdersAction = withAuth(getSalesOrders)
 export const getSalesOrderAction = withAuth(getSalesOrder)
 export const createSalesOrderAction = withAuth(createSalesOrder)
 export const editSalesOrderAction = withAuth(editSalesOrder)
+export const parseSalesOrderAction = withAuth(parseSalesOrder)

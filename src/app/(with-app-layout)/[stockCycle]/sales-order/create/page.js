@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useCallback, useState } from 'react'
+import { v4 as uuid } from 'uuid'
 
 import SplitPanel from '@/components/common/SplitPanel/SplitPanel'
 
@@ -10,16 +11,29 @@ import SelectedItemsPanel from './SelectedItemsPanel'
 export default function Page() {
   const [selectedItems, setSelectedItems] = useState({})
   const [selectedItemsOrder, setSelectedItemsOrder] = useState([])
+  const [addBeforeKey, setAddBeforeKey] = useState()
 
-  const handleAddItem = useCallback((item) => {
-    // TODO: Doesnot work in mobile. Use npm uuid
-    const selectedItemKey = crypto.randomUUID()
-    setSelectedItems((items) => ({
-      ...items,
-      [selectedItemKey]: { ...item },
-    }))
-    setSelectedItemsOrder((itemKeys) => [...itemKeys, selectedItemKey])
-  }, [])
+  const handleAddItem = useCallback(
+    (item) => {
+      const selectedItemKey = uuid()
+      setSelectedItems((items) => ({
+        ...items,
+        [selectedItemKey]: { ...item },
+      }))
+
+      setSelectedItemsOrder((itemKeys) => {
+        const indexToInsertBefore = itemKeys.indexOf(addBeforeKey)
+        if (indexToInsertBefore !== -1) {
+          const newArray = [...itemKeys]
+          newArray.splice(indexToInsertBefore, 0, selectedItemKey)
+          return newArray
+        } else {
+          return [...itemKeys, selectedItemKey]
+        }
+      })
+    },
+    [addBeforeKey]
+  )
 
   return (
     <>
@@ -30,6 +44,8 @@ export default function Page() {
           setSelectedItems={setSelectedItems}
           selectedItemsOrder={selectedItemsOrder}
           setSelectedItemsOrder={setSelectedItemsOrder}
+          addBeforeKey={addBeforeKey}
+          setAddBeforeKey={setAddBeforeKey}
         />
         <SearchedItemPanel
           key='searchedItemPanel'

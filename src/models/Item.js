@@ -130,45 +130,70 @@ itemSchema.searchIndex({
           minGrams: 2,
           tokenization: 'edgeGram',
         },
-        name: {
-          type: 'autocomplete',
-          foldDiacritics: false,
-          maxGrams: 10,
-          minGrams: 2,
-          tokenization: 'edgeGram',
-        },
-        tags: {
-          type: 'autocomplete',
-          foldDiacritics: false,
-          maxGrams: 10,
-          minGrams: 2,
-          tokenization: 'edgeGram',
-        },
+        name: [
+          {
+            type: 'autocomplete',
+            foldDiacritics: false,
+            maxGrams: 10,
+            minGrams: 2,
+            tokenization: 'edgeGram',
+          },
+          {
+            type: 'string',
+          },
+        ],
+        tags: [
+          {
+            type: 'autocomplete',
+            foldDiacritics: false,
+            maxGrams: 10,
+            minGrams: 2,
+            tokenization: 'edgeGram',
+          },
+          {
+            type: 'string',
+          },
+        ],
         company: {
           type: 'document',
           dynamic: false,
           fields: {
-            name: {
-              type: 'autocomplete',
-              foldDiacritics: false,
-              maxGrams: 10,
-              minGrams: 2,
-              tokenization: 'edgeGram',
-            },
-            shortName: {
-              type: 'autocomplete',
-              foldDiacritics: false,
-              maxGrams: 10,
-              minGrams: 2,
-              tokenization: 'edgeGram',
-            },
-            tags: {
-              type: 'autocomplete',
-              foldDiacritics: false,
-              maxGrams: 10,
-              minGrams: 2,
-              tokenization: 'edgeGram',
-            },
+            name: [
+              {
+                type: 'autocomplete',
+                foldDiacritics: false,
+                maxGrams: 10,
+                minGrams: 2,
+                tokenization: 'edgeGram',
+              },
+              {
+                type: 'string',
+              },
+            ],
+            shortName: [
+              {
+                type: 'autocomplete',
+                foldDiacritics: false,
+                maxGrams: 10,
+                minGrams: 2,
+                tokenization: 'edgeGram',
+              },
+              {
+                type: 'string',
+              },
+            ],
+            tags: [
+              {
+                type: 'autocomplete',
+                foldDiacritics: false,
+                maxGrams: 10,
+                minGrams: 2,
+                tokenization: 'edgeGram',
+              },
+              {
+                type: 'string',
+              },
+            ],
           },
         },
       },

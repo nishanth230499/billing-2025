@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import React, { useCallback, useState } from 'react'
+import { v4 as uuid } from 'uuid'
 
 import SplitPanel from '@/components/common/SplitPanel/SplitPanel'
 
@@ -17,8 +18,7 @@ export default function Page() {
   const [selectedItemsOrder, setSelectedItemsOrder] = useState([])
 
   const handleAddItem = useCallback((item) => {
-    // TODO: Doesnot work in mobile. Use npm uuid
-    const selectedItemKey = crypto.randomUUID()
+    const selectedItemKey = uuid()
     setSelectedItems((items) => ({
       ...items,
       [selectedItemKey]: { ...item },
