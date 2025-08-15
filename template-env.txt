@@ -11,3 +11,5 @@ COMPANY_ID_ITEM_ID_DELIM=- #If present, adds company ID. works only if AUTO_GENE
 ITEM_CODE_REGEX="^\d{5}$" # works only if AUTO_GENERATE_ITEM_ID is false
 AUTO_INCREMENT_ITEM_CODE=true # works only if AUTO_GENERATE_ITEM_ID is false and ITEM_CODE_REGEX can be parseInt
 ITEM_CODE_DIGITS_COUNT=5 # for generating the item id, works only if AUTO_INCREMENT_ITEM_CODE is true
+
+OPENAI_API_KEY=<OPENAI_API_KEY>
