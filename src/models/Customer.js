@@ -88,20 +88,30 @@ customerSchema.searchIndex({
           minGrams: 2,
           tokenization: 'edgeGram',
         },
-        name: {
-          type: 'autocomplete',
-          foldDiacritics: false,
-          maxGrams: 10,
-          minGrams: 2,
-          tokenization: 'edgeGram',
-        },
-        place: {
-          type: 'autocomplete',
-          foldDiacritics: false,
-          maxGrams: 10,
-          minGrams: 2,
-          tokenization: 'edgeGram',
-        },
+        name: [
+          {
+            type: 'autocomplete',
+            foldDiacritics: false,
+            maxGrams: 10,
+            minGrams: 2,
+            tokenization: 'edgeGram',
+          },
+          {
+            type: 'string',
+          },
+        ],
+        place: [
+          {
+            type: 'autocomplete',
+            foldDiacritics: false,
+            maxGrams: 10,
+            minGrams: 2,
+            tokenization: 'edgeGram',
+          },
+          {
+            type: 'string',
+          },
+        ],
       },
     },
   },

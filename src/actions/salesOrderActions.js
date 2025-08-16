@@ -11,11 +11,15 @@ import { trackCreation, trackUpdates } from '@/lib/utils/auditLogUtils'
 import { withAuth } from '@/lib/withAuth'
 import withTransaction from '@/lib/withTransaction'
 import { modelConstants } from '@/models/constants'
+import Customer from '@/models/Customer'
 import Item from '@/models/Item'
 import ParsedSalesOrderSchema from '@/models/ParsedSalesOrderSchema'
 import SalesOrder from '@/models/SalesOrder'
 
-import { AUTO_GENERATE_CUSTOMER_ID } from '../../appConfig'
+import {
+  AUTO_GENERATE_CUSTOMER_ID,
+  IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE,
+} from '../../appConfig'
 
 async function getSalesOrders({
   pageNumber = 0,
@@ -217,7 +221,7 @@ async function editSalesOrder(stockCycleId, number, salesOrderReq) {
   }
 }
 
-async function parseSalesOrder(documentsFormData) {
+async function parseSalesOrder(stockCycleId, documentsFormData) {
   await connectDB()
 
   try {
@@ -226,57 +230,115 @@ async function parseSalesOrder(documentsFormData) {
     await documentParser.addDocuments(documents)
     const parsedSalesOrder = await documentParser.parse(ParsedSalesOrderSchema)
 
-    const items = await Promise.all(
-      parsedSalesOrder?.order_items?.map(
-        async (orderItem) =>
-          await Promise.all(
-            orderItem?.variants?.map(async ({ variant_name, qty }) => {
-              return (
-                await Item.aggregate([
-                  {
-                    $search: {
-                      index: 'id_name_tags_company_searchIndex',
-                      text: {
-                        query: `${orderItem?.category} ${orderItem?.name} ${variant_name}`,
-                        path: [
-                          'name',
-                          'tags',
-                          'company.name',
-                          'company.shortName',
-                          'company.tags',
-                        ],
-                        fuzzy: { maxEdits: 2 },
+    const [items, customerId] = await Promise.all([
+      Promise.all(
+        parsedSalesOrder?.items?.map(
+          async (orderItem) =>
+            await Promise.all(
+              orderItem?.variants?.map(async ({ variant_name, qty }) => {
+                return (
+                  await Item.aggregate([
+                    {
+                      $search: {
+                        index: 'id_name_tags_company_searchIndex',
+                        text: {
+                          query: `${orderItem?.category} ${orderItem?.name} ${variant_name}`,
+                          path: [
+                            'name',
+                            'tags',
+                            'company.name',
+                            'company.shortName',
+                            'company.tags',
+                          ],
+                          fuzzy: { maxEdits: 2 },
+                        },
                       },
                     },
-                  },
-                  { $limit: 1 },
-                  {
-                    $addFields: {
-                      quantity: qty,
-                      unitQuantity: 1,
+                    { $limit: 1 },
+                    {
+                      $addFields: {
+                        quantity: qty,
+                        unitQuantity: 1,
+                      },
                     },
-                  },
-                  {
-                    $project: {
-                      _id: { $toString: '$_id' },
-                      name: 1,
-                      group: 1,
-                      'company.shortName': 1,
-                      quantity: 1,
-                      unitQuantity: 1,
+                    {
+                      $project: {
+                        _id: { $toString: '$_id' },
+                        name: 1,
+                        group: 1,
+                        'company.shortName': 1,
+                        quantity: 1,
+                        unitQuantity: 1,
+                      },
                     },
+                  ])
+                )[0]
+              })
+            )
+        )
+      ),
+      (async () => {
+        const customer = await Customer.aggregate([
+          {
+            $search: {
+              index: 'id_name_place_searchIndex',
+              text: {
+                query: `${parsedSalesOrder?.customerName} ${parsedSalesOrder?.customerPlace}`,
+                path: ['name', 'place'],
+                fuzzy: { maxEdits: 2 },
+              },
+            },
+          },
+          ...(IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
+            ? [
+                {
+                  $lookup: {
+                    from: modelConstants?.stock_cycle_customer?.collectionName,
+                    let: { customerId: '$_id' },
+                    pipeline: [
+                      {
+                        $match: {
+                          $expr: {
+                            $and: [
+                              { $eq: ['$customerId', '$$customerId'] },
+                              { $eq: ['$stockCycleId', stockCycleId] },
+                            ],
+                          },
+                        },
+                      },
+                      { $limit: 1 },
+                    ],
+                    as: 'stockCycleCustomer',
                   },
-                ])
-              )[0]
-            })
-          )
-      )
-    )
+                },
+                {
+                  $match: {
+                    $expr: { $gt: [{ $size: '$stockCycleCustomer' }, 0] },
+                  },
+                },
+              ]
+            : []),
+          { $limit: 1 },
+          {
+            $project: {
+              _id: { $toString: '$_id' },
+            },
+          },
+        ])
+
+        // TODO: Also parse customer shipping address ID
+        return customer[0]?._id?.toString()
+      })(),
+    ])
     return {
       success: true,
       data: {
         message: 'Parsed Successfully!',
-        parsedSalesOrder: { ...parsedSalesOrder, items: items.flat() },
+        parsedSalesOrder: {
+          customerId,
+          orderRef: parsedSalesOrder?.orderRef,
+          items: items.flat(),
+        },
       },
     }
   } catch (e) {

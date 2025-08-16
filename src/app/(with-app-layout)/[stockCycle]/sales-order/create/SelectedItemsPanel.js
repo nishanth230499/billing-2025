@@ -433,6 +433,7 @@ export default function SelectedItemsPanel({
           onClose={() => setIsDocumentParseModalOpen(false)}
           setSelectedItems={setSelectedItems}
           setSelectedItemsOrder={setSelectedItemsOrder}
+          setOrderRef={setOrderRef}
         />
         {isSalesOrderLoading && <TableSkeleton />}
         <DataTable

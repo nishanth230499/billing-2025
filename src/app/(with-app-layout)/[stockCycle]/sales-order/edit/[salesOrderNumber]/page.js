@@ -16,15 +16,28 @@ export default function Page() {
 
   const [selectedItems, setSelectedItems] = useState({})
   const [selectedItemsOrder, setSelectedItemsOrder] = useState([])
+  const [addBeforeKey, setAddBeforeKey] = useState()
 
-  const handleAddItem = useCallback((item) => {
-    const selectedItemKey = uuid()
-    setSelectedItems((items) => ({
-      ...items,
-      [selectedItemKey]: { ...item },
-    }))
-    setSelectedItemsOrder((itemKeys) => [...itemKeys, selectedItemKey])
-  }, [])
+  const handleAddItem = useCallback(
+    (item) => {
+      const selectedItemKey = uuid()
+      setSelectedItems((items) => ({
+        ...items,
+        [selectedItemKey]: { ...item },
+      }))
+      setSelectedItemsOrder((itemKeys) => {
+        const indexToInsertBefore = itemKeys.indexOf(addBeforeKey)
+        if (indexToInsertBefore !== -1) {
+          const newArray = [...itemKeys]
+          newArray.splice(indexToInsertBefore, 0, selectedItemKey)
+          return newArray
+        } else {
+          return [...itemKeys, selectedItemKey]
+        }
+      })
+    },
+    [addBeforeKey]
+  )
 
   return (
     <>
@@ -36,6 +49,8 @@ export default function Page() {
           selectedItemsOrder={selectedItemsOrder}
           setSelectedItemsOrder={setSelectedItemsOrder}
           editingSalesOrderNumber={editingSalesOrderNumber}
+          addBeforeKey={addBeforeKey}
+          setAddBeforeKey={setAddBeforeKey}
         />
         <SearchedItemPanel
           key='searchedItemPanel'

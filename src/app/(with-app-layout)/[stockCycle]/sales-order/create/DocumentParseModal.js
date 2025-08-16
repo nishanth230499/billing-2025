@@ -9,6 +9,7 @@ import {
 } from '@mui/material'
 import { Box, Grid } from '@mui/system'
 import { useMutation } from '@tanstack/react-query'
+import { useParams } from 'next/navigation'
 import { enqueueSnackbar } from 'notistack'
 import React, {
   Fragment,
@@ -21,6 +22,7 @@ import { v4 as uuid } from 'uuid'
 
 import { parseSalesOrderAction } from '@/actions/salesOrderActions'
 import Modal from '@/components/common/Modal'
+import useHandleSearchParams from '@/hooks/useHandleSearchParams'
 import handleServerAction from '@/lib/handleServerAction'
 
 export default function DocumentParseModal({
@@ -28,7 +30,13 @@ export default function DocumentParseModal({
   onClose,
   setSelectedItems,
   setSelectedItemsOrder,
+  setOrderRef,
 }) {
+  const params = useParams()
+
+  const { replaceURL } = useHandleSearchParams()
+  const stockCycleId = params.stockCycle
+
   const [documents, setDocuments] = useState({})
   const inputsRef = useRef({})
 
@@ -38,7 +46,7 @@ export default function DocumentParseModal({
 
   const { mutate: parseSalesOrder, isPending: isParseSalesOrderLoading } =
     useMutation({
-      mutationFn: (data) => handleServerAction(parseSalesOrderAction, data),
+      mutationFn: (data) => handleServerAction(parseSalesOrderAction, ...data),
     })
 
   const handleSubmit = useCallback(() => {
@@ -54,12 +62,14 @@ export default function DocumentParseModal({
     Object.values(documents).forEach(({ type, text, file }) => {
       formData.append('document', type === 'text' ? text : file)
     })
-    parseSalesOrder(formData, {
+    parseSalesOrder([stockCycleId, formData], {
       onSuccess: ({ message, parsedSalesOrder }) => {
         const items = {}
         parsedSalesOrder?.items.forEach((item) => {
           items[uuid()] = item
         })
+        replaceURL({ customerId: parsedSalesOrder?.customerId || undefined })
+        setOrderRef(parsedSalesOrder?.orderRef)
         setSelectedItems(items)
         setSelectedItemsOrder(Object.keys(items))
         enqueueSnackbar(message, { variant: 'success' })
@@ -71,8 +81,11 @@ export default function DocumentParseModal({
     documents,
     onClose,
     parseSalesOrder,
+    replaceURL,
+    setOrderRef,
     setSelectedItems,
     setSelectedItemsOrder,
+    stockCycleId,
   ])
 
   return (

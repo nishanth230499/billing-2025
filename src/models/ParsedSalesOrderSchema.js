@@ -2,27 +2,32 @@ const ParsedSalesOrderSchema = {
   type: 'object',
   properties: {
     // text: { type: 'string', description: 'The text on the file.' },
-    sender_email: {
+    customerEmail: {
       type: 'string',
       description:
         'The email id of the sender in the text on the file. If it is not found use empty string.',
     },
-    sender_firm_name: {
+    customerName: {
       type: 'string',
       description:
         'The firm name of the sender in the text on the file. If it is not found use empty string.',
     },
-    order_no: {
+    customerPlace: {
+      type: 'string',
+      description:
+        'The city where the firm of the sender is located. If it is not found use empty string.',
+    },
+    orderRef: {
       type: 'string',
       description:
         'The order number of the order in the text on the file. If it is not found use empty string.',
     },
-    ship_to_address: {
+    customerShippingAddress: {
       type: 'string',
       description:
-        'The shipping address. If the customer has mentioned to ship to a address, consider that as the shipping address. Do not consider any other address as the shipping address. If it is not found use empty string.',
+        'The shipping address. If the customer has mentioned to ship to a different address, consider that as the shipping address. Do not consider any other address as the shipping address. If it is not found use empty string. Incluce phone number of the shipping address if mentioned.',
     },
-    order_items: {
+    items: {
       type: 'array',
       items: {
         type: 'object',
