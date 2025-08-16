@@ -1,6 +1,13 @@
 'use client'
 
-import { Box, CircularProgress, Grid, Paper } from '@mui/material'
+import {
+  Box,
+  CircularProgress,
+  Grid,
+  MenuItem,
+  Paper,
+  TextField,
+} from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import { useContext, useEffect, useMemo, useState } from 'react'
@@ -28,6 +35,8 @@ export default function Page() {
   )
 
   const [customerShippingAddressId, setCustomerShippingAddressId] = useState('')
+  const [selectedOrderRefs, setSelectedOrderRefs] = useState([])
+  const [selectedCompanyIds, setSelectedCompanyIds] = useState([])
 
   const {
     data: customerResponse,
@@ -64,14 +73,83 @@ export default function Page() {
     }
   }, [customerId])
 
+  useEffect(() => {
+    if (packingNoteResponse) {
+      setSelectedOrderRefs([])
+    } else {
+      setSelectedOrderRefs([])
+    }
+  }, [packingNoteResponse])
+
+  const orderRefs = useMemo(
+    () => [
+      ...new Set(
+        packingNoteResponse?.map((packingNote) => packingNote?.orderRef)
+      ),
+    ],
+    [packingNoteResponse]
+  )
+
+  const companies = useMemo(() => {
+    const companies = {}
+    packingNoteResponse?.forEach((packingNote) => {
+      packingNote?.items.forEach(({ item }) => {
+        if (!(item?.companyId in companies)) {
+          companies[item?.companyId] = item?.company?.name
+        }
+      })
+    })
+    return companies
+  }, [packingNoteResponse])
+
   const filteredPackingNote = useMemo(() => {
-    return packingNoteResponse?.filter(
-      (packingNote) =>
-        typeof customerShippingAddressId === 'undefined' ||
-        (packingNote?.customerShippingAddressId ?? '') ===
-          customerShippingAddressId
-    )
-  }, [customerShippingAddressId, packingNoteResponse])
+    let newPackingNotes =
+      selectedCompanyIds.length === 0
+        ? packingNoteResponse
+        : packingNoteResponse
+            ?.map((packingNote) => ({
+              ...packingNote,
+              items: packingNote?.items.filter(({ item }) =>
+                selectedCompanyIds.includes(item.companyId)
+              ),
+            }))
+            ?.filter((packingNote) => packingNote.items.length)
+
+    newPackingNotes =
+      typeof customerShippingAddressId === 'undefined'
+        ? newPackingNotes
+        : newPackingNotes?.filter(
+            (packingNote) =>
+              (packingNote?.customerShippingAddressId ?? '') ===
+              customerShippingAddressId
+          )
+
+    newPackingNotes =
+      selectedOrderRefs.length === 0
+        ? newPackingNotes
+        : newPackingNotes?.filter((packingNote) =>
+            selectedOrderRefs.includes(packingNote?.orderRef)
+          )
+
+    return newPackingNotes
+  }, [
+    customerShippingAddressId,
+    packingNoteResponse,
+    selectedCompanyIds,
+    selectedOrderRefs,
+  ])
+
+  const partial = useMemo(
+    () =>
+      selectedCompanyIds.length ||
+      typeof customerShippingAddressId !== 'undefined' ||
+      selectedOrderRefs.length,
+    [
+      customerShippingAddressId,
+      selectedCompanyIds.length,
+      selectedOrderRefs.length,
+    ]
+  )
 
   return (
     <>
@@ -112,11 +190,48 @@ export default function Page() {
                   customerId={customerId}
                 />
               </Grid>
+              <Grid size={1}>
+                <TextField
+                  margin='normal'
+                  fullWidth
+                  select
+                  multiple
+                  label='Order Refs'
+                  value={selectedOrderRefs}
+                  onChange={(e) => setSelectedOrderRefs(e.target.value)}
+                  slotProps={{ select: { multiple: true } }}>
+                  {orderRefs?.map((orderRef) => (
+                    <MenuItem key={orderRef} value={orderRef}>
+                      {orderRef || '-'}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid size={1}>
+                <TextField
+                  margin='normal'
+                  fullWidth
+                  select
+                  multiple
+                  label='Companies'
+                  value={selectedCompanyIds}
+                  onChange={(e) => setSelectedCompanyIds(e.target.value)}
+                  slotProps={{ select: { multiple: true } }}>
+                  {Object.entries(companies)?.map(
+                    ([companyId, companyName]) => (
+                      <MenuItem key={companyId} value={companyId}>
+                        {companyName}
+                      </MenuItem>
+                    )
+                  )}
+                </TextField>
+              </Grid>
             </Grid>
             <PackingNoteTemplate
               customer={customerResponse}
               packingNote={filteredPackingNote}
               stockCycleId={stockCycleId}
+              partial={partial}
             />
           </ErrorAlert>
         )}
@@ -127,6 +242,7 @@ export default function Page() {
             customer={customerResponse}
             packingNote={filteredPackingNote}
             stockCycleId={stockCycleId}
+            partial={partial}
           />
         )}
       </Box>

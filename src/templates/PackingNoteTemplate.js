@@ -11,30 +11,34 @@ export default function PackingNoteTemplate({
   customer,
   packingNote,
   stockCycleId,
+  partial,
 }) {
   return (
     <table className='w-full text-left'>
       <thead>
         <tr>
-          <th colSpan={6}>GSTIN: {customer?.firm?.gstin}</th>
+          <th colSpan={3}>GSTIN: {customer?.firm?.gstin}</th>
+          <th colSpan={2} className='text-right underline'>
+            {partial ? 'Partial Packing Note' : ''}
+          </th>
         </tr>
         <tr>
-          <th colSpan={6} className='text-center text-4xl'>
+          <th colSpan={5} className='text-center text-4xl'>
             {customer?.firm?.name}
           </th>
         </tr>
         <tr>
-          <th colSpan={6} className='text-center'>
+          <th colSpan={5} className='text-center'>
             {customer?.firm?.address}
           </th>
         </tr>
         <tr>
-          <th colSpan={6} className='text-center'>
+          <th colSpan={5} className='text-center'>
             Ph.: {customer?.firm?.phoneNumber}. Email: {customer?.firm?.emailId}
           </th>
         </tr>
         <tr>
-          <th colSpan={6} className='text-center underline'>
+          <th colSpan={5} className='text-center underline'>
             PACKING NOTE
           </th>
         </tr>
@@ -56,24 +60,30 @@ export default function PackingNoteTemplate({
               </div>
             </div>
           </th>
-          <th className='border py-1 px-2 font-normal'>Printed Time</th>
-          <th className='border py-1 px-2'>{new Date().toLocaleString()}</th>
+          <th colSpan={2} className='border py-1 px-2 font-normal'>
+            Printed Date:{' '}
+            <span className='font-bold'>{new Date().toLocaleDateString()}</span>
+          </th>
         </tr>
         <tr>
-          <th className='border py-1 px-2 font-normal'>Packing Date</th>
-          <th className='border py-1 px-2' />
+          <th colSpan={2} className='border py-1 px-2 font-normal'>
+            Packing Date
+          </th>
         </tr>
         <tr>
-          <th className='border py-1 px-2 font-normal'>No. of Bundles</th>
-          <th className='border py-1 px-2' />
+          <th colSpan={2} className='border py-1 px-2 font-normal'>
+            No. of Bundles
+          </th>
         </tr>
         <tr>
-          <th className='border py-1 px-2 font-normal'>Packed By</th>
-          <th className='border py-1 px-2' />
+          <th colSpan={2} className='border py-1 px-2 font-normal'>
+            Packed By
+          </th>
         </tr>
         <tr>
-          <th className='border py-1 px-2 font-normal'>Checked By</th>
-          <th className='border py-1 px-2' />
+          <th colSpan={2} className='border py-1 px-2 font-normal'>
+            Checked By
+          </th>
         </tr>
         <tr>
           <th className='border py-1 px-2'>Sl. No.</th>

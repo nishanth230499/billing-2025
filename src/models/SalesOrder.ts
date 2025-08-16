@@ -158,7 +158,8 @@ salesOrderItemSchema.virtual('item', {
   justOne: true,
 })
 
-salesOrderSchema.index({ stockCycleId: 1, number: -1 })
+salesOrderSchema.index({ stockCycleId: 1, number: 1 })
+salesOrderSchema.index({ stockCycleId: 1, customerId: 1, number: 1 })
 
 const model = modelConstants.sales_order
 

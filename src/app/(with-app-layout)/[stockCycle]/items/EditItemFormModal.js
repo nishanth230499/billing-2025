@@ -110,7 +110,9 @@ export default function EditItemFormModal({ refetchItems }) {
           {
             name: formFieldValues?.name?.trim(),
             group: formFieldValues?.group?.trim(),
-            price: formFieldValues?.price,
+            price: formFieldValues?.price
+              ? parseFloat(formFieldValues?.price)
+              : formFieldValues?.price,
             tags: formFieldValues?.tags?.map((tag) => tag.trim()) ?? [],
             hsnId: formFieldValues?.hsnId,
           },

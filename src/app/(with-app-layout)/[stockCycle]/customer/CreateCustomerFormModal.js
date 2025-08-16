@@ -171,7 +171,9 @@ export default function CreateCustomerFormModal({ refetchCustomers }) {
           name: formFieldValues?.name?.trim(),
           place: formFieldValues?.place?.trim(),
           firmId: formFieldValues?.firmId,
-          openingBalance: formFieldValues?.openingBalance,
+          openingBalance: formFieldValues?.openingBalance
+            ? parseFloat(formFieldValues?.openingBalance)
+            : formFieldValues?.openingBalance,
           stockCycleId: IS_CUSTOMER_SPECIFIC_TO_STOCK_CYCLE
             ? stockCycleId
             : undefined,

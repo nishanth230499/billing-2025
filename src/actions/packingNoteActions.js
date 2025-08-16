@@ -25,10 +25,12 @@ async function getPackingNote({ stockCycleId, customerId }) {
           : {}),
       },
     },
+    { $sort: { number: 1 } },
     { $unwind: '$items' },
     {
       $set: {
         orderedQuantity: '$items.quantity',
+        orderNumber: '$number',
       },
     },
     // TODO: Populate packedListQuantity and invoicedQuantity
@@ -55,6 +57,9 @@ async function getPackingNote({ stockCycleId, customerId }) {
         },
         invoicedQuantityForInvoice: {
           $sum: { $ifNull: ['$invoicedQuantity.invoice', 0] },
+        },
+        orderNumber: {
+          $first: { $ifNull: ['$orderNumber', '$$REMOVE'] },
         },
       },
     },
@@ -116,7 +121,17 @@ async function getPackingNote({ stockCycleId, customerId }) {
         from: modelConstants.item.collectionName,
         localField: '_id.itemId',
         foreignField: '_id',
-        pipeline: [{ $project: { name: 1, price: 1, 'company.shortName': 1 } }],
+        pipeline: [
+          {
+            $project: {
+              name: 1,
+              price: 1,
+              companyId: { $toString: '$companyId' },
+              'company.name': 1,
+              'company.shortName': 1,
+            },
+          },
+        ],
         as: 'item',
       },
     },
@@ -140,6 +155,14 @@ async function getPackingNote({ stockCycleId, customerId }) {
             quantity: '$quantity',
           },
         },
+        orderNumber: {
+          $first: { $ifNull: ['$orderNumber', '$$REMOVE'] },
+        },
+      },
+    },
+    {
+      $sort: {
+        orderNumber: 1,
       },
     },
     {

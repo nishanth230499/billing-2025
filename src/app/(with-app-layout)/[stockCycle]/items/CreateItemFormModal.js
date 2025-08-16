@@ -142,7 +142,9 @@ export default function CreateItemFormModal({ refetchItems }) {
             : formFieldValues?.code,
           name: formFieldValues?.name?.trim(),
           group: formFieldValues?.group?.trim(),
-          price: formFieldValues?.price,
+          price: formFieldValues?.price
+            ? parseFloat(formFieldValues?.price)
+            : formFieldValues?.price,
           tags: formFieldValues?.tags?.map((tag) => tag.trim()) ?? [],
           companyId: formFieldValues?.companyId,
           hsnId: formFieldValues?.hsnId,
